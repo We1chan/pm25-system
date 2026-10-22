@@ -208,6 +208,8 @@ PYSPARK_PYTHON=/home/hadoop/venvs/pm25/bin/python \
 
 本轮完整测试 **40 项通过**；运行日志与耗时汇总在 `reports/documentation_verification.json.test_runs`。README 的数字抽查也保存在该报告中。
 
+答辩讲述、真实数据走读、页面说明及教师问答见 [docs/答辩讲解.md](docs/答辩讲解.md)。
+
 服务运行时执行城市缓存核验；站点核验会只读加载既有 HDFS / CUDA 模型：
 
 ```bash

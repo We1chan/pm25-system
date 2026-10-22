@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-23T00:19:06.274767+08:00",
+  "generated_at": "2026-10-23T00:24:43.192103+08:00",
   "city_split_evidence": {
     "source": "models/registry.json",
     "sha256": "c9b0f05e1c572324cb4cd8d575cb354842b0f695c29fbbc622271381a2f671b3",
@@ -138,6 +138,282 @@
       "passed": true
     }
   ],
+  "defense_numeric_checks": [
+    {
+      "label": "历史站点数",
+      "source": "reports/station_summary.json",
+      "field": [
+        "stations"
+      ],
+      "value": 81,
+      "display": "81",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "全国原始字节数",
+      "source": "reports/station_summary.json",
+      "field": [
+        "raw_archive_bytes"
+      ],
+      "value": 11205092271,
+      "display": "11,205,092,271",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "全国文件数",
+      "source": "reports/station_summary.json",
+      "field": [
+        "source_file_count"
+      ],
+      "value": 34580,
+      "display": "34,580",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "站点网格",
+      "source": "reports/station_summary.json",
+      "field": [
+        "grid_hours"
+      ],
+      "value": 2840184,
+      "display": "2,840,184",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "站点有效观测",
+      "source": "reports/station_summary.json",
+      "field": [
+        "valid_pm25"
+      ],
+      "value": 2503919,
+      "display": "2,503,919",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "站点特征数",
+      "source": "reports/station_summary.json",
+      "field": [
+        "feature_count"
+      ],
+      "value": 150,
+      "display": "150",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "过去天气小时数",
+      "source": "reports/station_summary.json",
+      "field": [
+        "weather_history_hours"
+      ],
+      "value": 72,
+      "display": "72",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "城市网格",
+      "source": "reports/data_summary.json",
+      "field": [
+        "panel_rows"
+      ],
+      "value": 578592,
+      "display": "578,592",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "CUDA训练起点",
+      "source": "reports/station_cuda_results.json",
+      "field": [
+        "gpu",
+        "train_origins"
+      ],
+      "value": 1252207,
+      "display": "1,252,207",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "未来天气六小时误差",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "by_horizon",
+        5,
+        "rmse"
+      ],
+      "value": 14.730029106140137,
+      "display": "14.7300",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "未来天气队列基线误差",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "by_horizon",
+        5,
+        "baseline_rmse"
+      ],
+      "value": 18.47213363647461,
+      "display": "18.4721",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "未来天气区间覆盖率",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "by_horizon",
+        5,
+        "coverage"
+      ],
+      "value": 0.8145868685203015,
+      "display": "81.46%",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "高浓度模型误差",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "regimes",
+        "pm_ge75",
+        5,
+        "rmse"
+      ],
+      "value": 35.55722427368164,
+      "display": "35.56",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "高浓度基线误差",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "regimes",
+        "pm_ge75",
+        5,
+        "baseline_rmse"
+      ],
+      "value": 33.19308090209961,
+      "display": "33.19",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "高浓度区间覆盖率",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "regimes",
+        "pm_ge75",
+        5,
+        "coverage"
+      ],
+      "value": 0.553851228764638,
+      "display": "55.39%",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "旧站点TCN误差",
+      "source": "reports/station_model_metrics.csv",
+      "filters": {
+        "model": "tcn72",
+        "variant": "sequence72",
+        "horizon": "6",
+        "split": "test",
+        "scope": "beijing"
+      },
+      "column": "rmse",
+      "value": 14.285356521606445,
+      "display": "14.2854",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "旧站点基线误差",
+      "source": "reports/station_model_metrics.csv",
+      "filters": {
+        "model": "persistence",
+        "variant": "baseline",
+        "horizon": "6",
+        "split": "test",
+        "scope": "beijing"
+      },
+      "column": "rmse",
+      "value": 18.52463421791116,
+      "display": "18.5246",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "历史天气RF误差",
+      "source": "reports/station_model_metrics.csv",
+      "filters": {
+        "model": "rf",
+        "variant": "history72",
+        "horizon": "6",
+        "split": "test",
+        "scope": "beijing"
+      },
+      "column": "rmse",
+      "value": 16.484969873981534,
+      "display": "16.4850",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "当前天气RF误差",
+      "source": "reports/station_model_metrics.csv",
+      "filters": {
+        "model": "rf",
+        "variant": "instant_weather",
+        "horizon": "6",
+        "split": "test",
+        "scope": "beijing"
+      },
+      "column": "rmse",
+      "value": 16.426862261853366,
+      "display": "16.4269",
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    },
+    {
+      "label": "实例原始值、查询库值及缓存预测",
+      "source": "reports/station_system_verification.json",
+      "station_id": "1001A",
+      "origin": "2025-12-30 12:00:00",
+      "pm25": 3.0,
+      "cached_tcn_h6": 6.95751953125,
+      "document": "docs/答辩讲解.md",
+      "passed": true
+    }
+  ],
+  "defense_question_count": 30,
   "test_runs": [
     {
       "log": "logs/baseline/tests.log",
@@ -179,6 +455,12 @@
       "log": "logs/phase3-tests.log",
       "count": 40,
       "seconds": 37.357,
+      "status": "passed"
+    },
+    {
+      "log": "logs/phase4-tests.log",
+      "count": 40,
+      "seconds": 36.949,
       "status": "passed"
     }
   ],

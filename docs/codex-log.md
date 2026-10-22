@@ -84,3 +84,23 @@
 | 14.2854 | `station_model_metrics.csv`：test / beijing / sequence72 / tcn72 / horizon=6，列 rmse |
 | 14.7300 | `forecast_model_results.json.runs.future_weather.test.by_horizon[5].rmse` |
 | 81.46% | 同上 `[5].coverage`，原值乘百分比显示 |
+
+## 阶段 4：答辩讲解（完成）
+
+- 新增 `docs/答辩讲解.md`：一句话及三分钟讲述、真实数据走读、HDFS/Spark分工、
+  五种方法的白话说明、评估解释、现有页面说明和恰好 30 个教师问答。
+- 实例采用已有报告中站点 1001A 在 2025-12-30 12:00 的 PM₂.₅=3 μg/m³，
+  对照原始值、查询库与约 6.9575 μg/m³ 的旧TCN六小时缓存预测。
+  明确该记录只用于测试，训练使用更早年份，避免把完整流程讲成测试数据参与训练。
+- 自动核对 20 项答辩材料数字/实例以及问答编号；结果加入
+  `reports/documentation_verification.json`。README保留的 10 项数字核对仍全部通过。
+- 全量 40 项测试通过：`logs/phase4-tests.log`。最终检查记录在 `logs/final-audit.json`：
+  36 个重构文件的 AST 不变（主服务另挂载阶段2新增路由），全部在 100 列内，
+  Bash 仍为 LF，文档本地链接有效；前端、依赖、配置、数据清单与权重均未改变。
+- 最终 HTTP 检查：health、system、live/meta、live/forecast 均为200，当前预测 usable=true。
+  检查时成功轮次为 `20261023T001946_717c1396`，实测起点为2026-10-23 00:00。
+  已恢复定时实时服务；未新增自动化任务，也未宣称完成长期在线核验。
+
+## 本轮收尾
+
+阶段0—4均通过验收并分别提交。界面重写、实验报告、PPT、截图及提交包继续按计划留待后续。
