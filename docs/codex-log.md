@@ -25,3 +25,7 @@
 - 格式化和 AST 比较工具只放在指定的 D 盘临时目录。因本组文件大量密集语句，使用该目录
   内独立临时环境的格式化工具；未改变项目依赖或任何全局配置。
 - 重构期间停止实时服务，完成四组及核验后再统一恢复，避免后台读取修改中的共享模块。
+- v3 预测组：4 个模块完成，34 项全量测试通过。B 类的
+  `prepare_forecast_training.py`、`train_forecast_model.py`、`fetch_forecast_archive.py`
+  去掉 docstring 后 AST 全部一致，未执行下载、训练或重新准备数据。
+  日志：`logs/phase1-forecast-tests.log`、`logs/phase1-forecast-ast.json`。
