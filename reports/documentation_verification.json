@@ -1,0 +1,186 @@
+{
+  "generated_at": "2026-10-23T00:19:06.274767+08:00",
+  "city_split_evidence": {
+    "source": "models/registry.json",
+    "sha256": "c9b0f05e1c572324cb4cd8d575cb354842b0f695c29fbbc622271381a2f671b3",
+    "train_period": "2015-2023",
+    "validation_period": "2024",
+    "test_period": "2025"
+  },
+  "readme_numeric_checks": [
+    {
+      "label": "城市原始字节数",
+      "source": "reports/data_summary.json",
+      "field": [
+        "raw_bytes"
+      ],
+      "value": 1699384831,
+      "display": "1,699,384,831",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "城市小时网格",
+      "source": "reports/data_summary.json",
+      "field": [
+        "panel_rows"
+      ],
+      "value": 578592,
+      "display": "578,592",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "城市有效观测",
+      "source": "reports/data_summary.json",
+      "field": [
+        "pm25_valid_hours_all_cities"
+      ],
+      "value": 564028,
+      "display": "564,028",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "全国原始小时文件",
+      "source": "reports/station_summary.json",
+      "field": [
+        "source_file_count"
+      ],
+      "value": 34580,
+      "display": "34,580",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "站点小时网格",
+      "source": "reports/station_summary.json",
+      "field": [
+        "grid_hours"
+      ],
+      "value": 2840184,
+      "display": "2,840,184",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "站点有效观测",
+      "source": "reports/station_summary.json",
+      "field": [
+        "valid_pm25"
+      ],
+      "value": 2503919,
+      "display": "2,503,919",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "城市RF六小时RMSE",
+      "source": "reports/model_metrics.csv",
+      "filters": {
+        "model": "rf",
+        "variant": "regional",
+        "horizon": "6",
+        "split": "test"
+      },
+      "column": "rmse",
+      "value": 11.8791,
+      "display": "11.8791",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "站点TCN六小时RMSE",
+      "source": "reports/station_model_metrics.csv",
+      "filters": {
+        "model": "tcn72",
+        "variant": "sequence72",
+        "horizon": "6",
+        "split": "test",
+        "scope": "beijing"
+      },
+      "column": "rmse",
+      "value": 14.285356521606445,
+      "display": "14.2854",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "未来天气模型六小时RMSE",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "by_horizon",
+        5,
+        "rmse"
+      ],
+      "value": 14.730029106140137,
+      "display": "14.7300",
+      "document": "README.md",
+      "passed": true
+    },
+    {
+      "label": "未来天气模型六小时覆盖率",
+      "source": "reports/forecast_model_results.json",
+      "field": [
+        "runs",
+        "future_weather",
+        "test",
+        "by_horizon",
+        5,
+        "coverage"
+      ],
+      "value": 0.8145868685203015,
+      "display": "81.46%",
+      "document": "README.md",
+      "passed": true
+    }
+  ],
+  "test_runs": [
+    {
+      "log": "logs/baseline/tests.log",
+      "count": 34,
+      "seconds": 47.791,
+      "status": "passed"
+    },
+    {
+      "log": "logs/phase1-live-tests.log",
+      "count": 34,
+      "seconds": 38.831,
+      "status": "passed"
+    },
+    {
+      "log": "logs/phase1-forecast-tests.log",
+      "count": 34,
+      "seconds": 36.519,
+      "status": "passed"
+    },
+    {
+      "log": "logs/phase1-station-tests.log",
+      "count": 34,
+      "seconds": 35.95,
+      "status": "passed"
+    },
+    {
+      "log": "logs/phase1-rest-tests.log",
+      "count": 34,
+      "seconds": 35.703,
+      "status": "passed"
+    },
+    {
+      "log": "logs/phase2-tests.log",
+      "count": 40,
+      "seconds": 37.23,
+      "status": "passed"
+    },
+    {
+      "log": "logs/phase3-tests.log",
+      "count": 40,
+      "seconds": 37.357,
+      "status": "passed"
+    }
+  ],
+  "note": "数字从既有JSON/CSV读取并核对文档显示；城市划分从原已训练模型登记表复制到本报告；未下载或训练。"
+}

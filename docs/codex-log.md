@@ -62,3 +62,25 @@
   字段路径、单位、中文业务错误与真实响应节选；单站/城市均值的实时响应都已实际调用。
   证据采集时间为 2026-10-23 00:11（北京时间），临时采集工具与原始响应在指定 D 盘目录。
   刷新 POST 示例复用阶段 1 的真实日志，没有为生成文档重复触发刷新。
+
+## 阶段 3：README 重写（完成）
+
+- 按简介、架构/教材对照、数据规模、Spark、三代模型、运行、验证、产物、局限重组。
+  数值从 JSON/CSV 生成，保留同队列比较、历史/实时分开、气象消融未提升、高浓度失效等说明。
+- 全量 40 项测试通过：`logs/phase3-tests.log`。
+- 机器核对报告 `reports/documentation_verification.json` 记录数字抽查、各阶段全量测试和城市划分。
+  城市划分从既有 `models/registry.json` 提取并带原始文件哈希保存到报告，未修改模型登记。
+- 抽查的 10 个数字及原始出处如下，全部与 README 显示一致：
+
+| 数字 | 报告出处 |
+| --- | --- |
+| 1,699,384,831 字节 | `data_summary.json.raw_bytes` |
+| 578,592 行 | `data_summary.json.panel_rows` |
+| 564,028 条 | `data_summary.json.pm25_valid_hours_all_cities` |
+| 34,580 份 | `station_summary.json.source_file_count` |
+| 2,840,184 行 | `station_summary.json.grid_hours` |
+| 2,503,919 条 | `station_summary.json.valid_pm25` |
+| 11.8791 | `model_metrics.csv`：test / regional / rf / horizon=6，列 rmse |
+| 14.2854 | `station_model_metrics.csv`：test / beijing / sequence72 / tcn72 / horizon=6，列 rmse |
+| 14.7300 | `forecast_model_results.json.runs.future_weather.test.by_horizon[5].rmse` |
+| 81.46% | 同上 `[5].coverage`，原值乘百分比显示 |
