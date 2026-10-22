@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-10-23T00:04:56.062858+08:00",
+  "hdfs_root": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025",
+  "command": "hdfs dfs -count",
+  "complete": true,
+  "entries": [
+    {
+      "name": "raw",
+      "path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/raw",
+      "directories": 25,
+      "files": 4077,
+      "bytes": 1699384831,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "name": "processed",
+      "path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/processed",
+      "directories": 25,
+      "files": 24,
+      "bytes": 21242635,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "name": "models",
+      "path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models",
+      "directories": 224,
+      "files": 252,
+      "bytes": 8659031,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "name": "stations_v2",
+      "path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2",
+      "directories": 269,
+      "files": 3086,
+      "bytes": 7370635975,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "name": "live_v1",
+      "path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/live_v1",
+      "directories": 86,
+      "files": 380,
+      "bytes": 171077081,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "name": "forecast_v3",
+      "path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/forecast_v3",
+      "directories": 5,
+      "files": 66,
+      "bytes": 54182170,
+      "status": "ok",
+      "error": null
+    }
+  ],
+  "note": "字节数是 HDFS 文件内容的逻辑字节数，不含副本倍数；各目录为本次盘点快照。"
+}

@@ -442,6 +442,9 @@ app.include_router(station_router)
 from server.live import router as live_router
 
 app.include_router(live_router)
+from server.system import router as system_router
+
+app.include_router(system_router)
 if DIST.exists():
     app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
 
