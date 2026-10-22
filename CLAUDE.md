@@ -98,4 +98,5 @@ These are the core of the project's methodology, and most tests check them. Keep
 ## Conventions
 
 - Most files under `data/`, `models/*.pt`, `data/app/` and `data/live/` are large or expensive to regenerate (many GB of raw data, GPU training runs). Do not delete or overwrite them casually.
-- Code style differs by file. Older modules (`server/app.py`, `model_features.py`, `spark_prepare.py`) are conventionally formatted. Newer ones (`server/live.py`, `server/stations.py`, `live_*`, `forecast_*`, `*_station_*`) are dense, with semicolons joining statements. Match the style of the file you are editing.
+- Python uses one statement per line, no semicolon-packed statements, and lines of at most 100 characters. Modules explain their pipeline role, inputs and outputs in Chinese; key functions have Chinese docstrings. Comments explain reasons and invariants.
+- Keep all shell scripts LF-only. Before changing live/shared inference code, stop the managed service and restore it after tests pass. See `AGENTS.md` and `docs/codex-plan.md` for the active scope and verification rules.

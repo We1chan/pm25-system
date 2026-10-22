@@ -35,3 +35,9 @@
   `prepare_station_tensors`、`fetch_station_archive`、`download_stations`。
   其余 3 个模块也通过相同比较。日志：`logs/phase1-station-tests.log`、
   `logs/phase1-station-ast.json`。
+- 其余组：主服务、连通性探测、冒烟提取和全部测试文件整理完成，34 项全量测试通过。
+  更新了 `CLAUDE.md` 的统一风格约定。日志：`logs/phase1-rest-tests.log`、
+  `logs/phase1-rest-ast.json`。四组共 36 个文件，去掉 docstring 后 AST 均与原文件一致。
+- 已恢复服务，并重新运行三类交付核验。与 `logs/baseline/` 的三个 JSON 报告逐字段比较，
+  仅 `verified_at` / `verified_at_utc` 改变，所有数值、源数据核对和模型版本完全一致。
+  比较证据保存在 `logs/phase1-verification/`。在线刷新已接受，正在等待采集轮次结束。
