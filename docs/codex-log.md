@@ -29,3 +29,9 @@
   `prepare_forecast_training.py`、`train_forecast_model.py`、`fetch_forecast_archive.py`
   去掉 docstring 后 AST 全部一致，未执行下载、训练或重新准备数据。
   日志：`logs/phase1-forecast-tests.log`、`logs/phase1-forecast-ast.json`。
+- 站点组：12 个模块完成，34 项全量测试通过。9 个 B 类文件逐一去掉 docstring 比较 AST，
+  全部一致：`spark_station_prepare`、`build_station_database`、`train_station_tcn`、
+  `spark_station_train`、`pack_station_transport`、`finalize_station_models`、
+  `prepare_station_tensors`、`fetch_station_archive`、`download_stations`。
+  其余 3 个模块也通过相同比较。日志：`logs/phase1-station-tests.log`、
+  `logs/phase1-station-ast.json`。
