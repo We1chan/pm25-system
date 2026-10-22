@@ -1,0 +1,3496 @@
+{
+  "engine": "Spark ML + PyTorch CUDA",
+  "splits": {
+    "train_end": 2023,
+    "validation": 2024,
+    "test": 2025
+  },
+  "runs": {
+    "persistence:h1": {
+      "model": "persistence",
+      "variant": "baseline",
+      "horizon": 1,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 624737,
+          "mae": 5.129748998378518,
+          "rmse": 9.104403515922975,
+          "r2": 0.9233506767944617
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198623,
+          "mae": 3.5412364127014495,
+          "rmse": 6.671582000846789,
+          "r2": 0.9493788255059121
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 594663,
+          "mae": 4.806983114806201,
+          "rmse": 8.571312080088466,
+          "r2": 0.9301887421408133
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 190173,
+          "mae": 3.249872484527246,
+          "rmse": 6.128779300249622,
+          "r2": 0.9526793569878661
+        }
+      ]
+    },
+    "persistence:h2": {
+      "model": "persistence",
+      "variant": "baseline",
+      "horizon": 2,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 623128,
+          "mae": 7.918337805394718,
+          "rmse": 13.916074858383126,
+          "r2": 0.8209089491694006
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198311,
+          "mae": 6.0588419200145225,
+          "rmse": 10.914790896594022,
+          "r2": 0.8643766499097544
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 592753,
+          "mae": 7.391782074489711,
+          "rmse": 12.892999111328857,
+          "r2": 0.8419530419913877
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189705,
+          "mae": 5.52434042328879,
+          "rmse": 9.938340518739214,
+          "r2": 0.8752134694132794
+        }
+      ]
+    },
+    "persistence:h3": {
+      "model": "persistence",
+      "variant": "baseline",
+      "horizon": 3,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 622528,
+          "mae": 10.159644224838079,
+          "rmse": 17.515213310846594,
+          "r2": 0.7165960477678537
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198143,
+          "mae": 8.068591875564618,
+          "rmse": 14.057673342322255,
+          "r2": 0.7756281978433557
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 591735,
+          "mae": 9.430062443492442,
+          "rmse": 16.113104585607292,
+          "r2": 0.7524545958332813
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189352,
+          "mae": 7.331393383750898,
+          "rmse": 12.758918432904352,
+          "r2": 0.7938410881811626
+        }
+      ]
+    },
+    "persistence:h4": {
+      "model": "persistence",
+      "variant": "baseline",
+      "horizon": 4,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 622016,
+          "mae": 12.068655790204753,
+          "rmse": 20.40263864142996,
+          "r2": 0.6153267700435214
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197992,
+          "mae": 9.75242434037739,
+          "rmse": 16.54035998473379,
+          "r2": 0.6892041630258677
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 591255,
+          "mae": 11.154144996659648,
+          "rmse": 18.729582394779086,
+          "r2": 0.6653856142458456
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189282,
+          "mae": 8.84359315729969,
+          "rmse": 15.014508714617879,
+          "r2": 0.7144175004415964
+        }
+      ]
+    },
+    "persistence:h5": {
+      "model": "persistence",
+      "variant": "baseline",
+      "horizon": 5,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 621667,
+          "mae": 13.697214103370454,
+          "rmse": 22.758424890889547,
+          "r2": 0.5208254826836005
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197884,
+          "mae": 11.196438317398071,
+          "rmse": 18.591556263592313,
+          "r2": 0.6066935747409226
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 590930,
+          "mae": 12.649021034640313,
+          "rmse": 20.910553832233724,
+          "r2": 0.5836970759195108
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189188,
+          "mae": 10.169709495316829,
+          "rmse": 16.942653188050357,
+          "r2": 0.636475483023208
+        }
+      ]
+    },
+    "persistence:h6": {
+      "model": "persistence",
+      "variant": "baseline",
+      "horizon": 6,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 621462,
+          "mae": 15.108328425551361,
+          "rmse": 24.728933085775033,
+          "r2": 0.43411901263196984
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197818,
+          "mae": 12.435779352738376,
+          "rmse": 20.318351789107723,
+          "r2": 0.5299887940076995
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 590250,
+          "mae": 13.926842863193562,
+          "rmse": 22.75200767958571,
+          "r2": 0.5064371321665937
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 188952,
+          "mae": 11.29922943393031,
+          "rmse": 18.52463421791116,
+          "r2": 0.5658495202969699
+        }
+      ]
+    },
+    "history72:rf:h1": {
+      "model": "rf",
+      "variant": "history72",
+      "horizon": 1,
+      "train_rows": 1235727,
+      "feature_count": 150,
+      "features": [
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "o3",
+        "co",
+        "pm25_lag_1h",
+        "pm25_lag_3h",
+        "pm25_lag_6h",
+        "pm25_lag_12h",
+        "pm25_lag_24h",
+        "pm25_lag_48h",
+        "pm25_lag_72h",
+        "pm25_mean_3h",
+        "pm25_std_3h",
+        "pm25_count_3h",
+        "pm25_mean_6h",
+        "pm25_std_6h",
+        "pm25_count_6h",
+        "pm25_mean_24h",
+        "pm25_std_24h",
+        "pm25_count_24h",
+        "pm25_mean_48h",
+        "pm25_std_48h",
+        "pm25_count_48h",
+        "pm25_mean_72h",
+        "pm25_std_72h",
+        "pm25_count_72h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "weekday_sin",
+        "weekday_cos",
+        "latitude",
+        "longitude",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "surface_pressure",
+        "wind_speed_10m",
+        "precipitation",
+        "wind_direction_sin",
+        "wind_direction_cos",
+        "city_pm25",
+        "city_pm25_count",
+        "regional_beijing_pm25",
+        "regional_beijing_pm25_lag_6h",
+        "regional_beijing_pm25_lag_24h",
+        "regional_tianjin_pm25",
+        "regional_tianjin_pm25_lag_6h",
+        "regional_tianjin_pm25_lag_24h",
+        "regional_langfang_pm25",
+        "regional_langfang_pm25_lag_6h",
+        "regional_langfang_pm25_lag_24h",
+        "regional_baoding_pm25",
+        "regional_baoding_pm25_lag_6h",
+        "regional_baoding_pm25_lag_24h",
+        "regional_tangshan_pm25",
+        "regional_tangshan_pm25_lag_6h",
+        "regional_tangshan_pm25_lag_24h",
+        "regional_zhangjiakou_pm25",
+        "regional_zhangjiakou_pm25_lag_6h",
+        "regional_zhangjiakou_pm25_lag_24h",
+        "weather_temperature_2m_lag_6h",
+        "weather_temperature_2m_lag_12h",
+        "weather_temperature_2m_lag_24h",
+        "weather_temperature_2m_lag_48h",
+        "weather_temperature_2m_lag_72h",
+        "weather_temperature_2m_mean_24h",
+        "weather_temperature_2m_std_24h",
+        "weather_temperature_2m_mean_48h",
+        "weather_temperature_2m_std_48h",
+        "weather_temperature_2m_mean_72h",
+        "weather_temperature_2m_std_72h",
+        "weather_temperature_2m_change_24h",
+        "weather_relative_humidity_2m_lag_6h",
+        "weather_relative_humidity_2m_lag_12h",
+        "weather_relative_humidity_2m_lag_24h",
+        "weather_relative_humidity_2m_lag_48h",
+        "weather_relative_humidity_2m_lag_72h",
+        "weather_relative_humidity_2m_mean_24h",
+        "weather_relative_humidity_2m_std_24h",
+        "weather_relative_humidity_2m_mean_48h",
+        "weather_relative_humidity_2m_std_48h",
+        "weather_relative_humidity_2m_mean_72h",
+        "weather_relative_humidity_2m_std_72h",
+        "weather_relative_humidity_2m_change_24h",
+        "weather_surface_pressure_lag_6h",
+        "weather_surface_pressure_lag_12h",
+        "weather_surface_pressure_lag_24h",
+        "weather_surface_pressure_lag_48h",
+        "weather_surface_pressure_lag_72h",
+        "weather_surface_pressure_mean_24h",
+        "weather_surface_pressure_std_24h",
+        "weather_surface_pressure_mean_48h",
+        "weather_surface_pressure_std_48h",
+        "weather_surface_pressure_mean_72h",
+        "weather_surface_pressure_std_72h",
+        "weather_surface_pressure_change_24h",
+        "weather_wind_speed_10m_lag_6h",
+        "weather_wind_speed_10m_lag_12h",
+        "weather_wind_speed_10m_lag_24h",
+        "weather_wind_speed_10m_lag_48h",
+        "weather_wind_speed_10m_lag_72h",
+        "weather_wind_speed_10m_mean_24h",
+        "weather_wind_speed_10m_std_24h",
+        "weather_wind_speed_10m_mean_48h",
+        "weather_wind_speed_10m_std_48h",
+        "weather_wind_speed_10m_mean_72h",
+        "weather_wind_speed_10m_std_72h",
+        "weather_wind_speed_10m_change_24h",
+        "weather_precipitation_lag_6h",
+        "weather_precipitation_lag_12h",
+        "weather_precipitation_lag_24h",
+        "weather_precipitation_lag_48h",
+        "weather_precipitation_lag_72h",
+        "weather_precipitation_mean_24h",
+        "weather_precipitation_std_24h",
+        "weather_precipitation_mean_48h",
+        "weather_precipitation_std_48h",
+        "weather_precipitation_mean_72h",
+        "weather_precipitation_std_72h",
+        "weather_precipitation_change_24h",
+        "weather_wind_direction_sin_lag_6h",
+        "weather_wind_direction_sin_lag_12h",
+        "weather_wind_direction_sin_lag_24h",
+        "weather_wind_direction_sin_lag_48h",
+        "weather_wind_direction_sin_lag_72h",
+        "weather_wind_direction_sin_mean_24h",
+        "weather_wind_direction_sin_std_24h",
+        "weather_wind_direction_sin_mean_48h",
+        "weather_wind_direction_sin_std_48h",
+        "weather_wind_direction_sin_mean_72h",
+        "weather_wind_direction_sin_std_72h",
+        "weather_wind_direction_sin_change_24h",
+        "weather_wind_direction_cos_lag_6h",
+        "weather_wind_direction_cos_lag_12h",
+        "weather_wind_direction_cos_lag_24h",
+        "weather_wind_direction_cos_lag_48h",
+        "weather_wind_direction_cos_lag_72h",
+        "weather_wind_direction_cos_mean_24h",
+        "weather_wind_direction_cos_std_24h",
+        "weather_wind_direction_cos_mean_48h",
+        "weather_wind_direction_cos_std_48h",
+        "weather_wind_direction_cos_mean_72h",
+        "weather_wind_direction_cos_std_72h",
+        "weather_wind_direction_cos_change_24h",
+        "weather_precipitation_sum_24h",
+        "weather_precipitation_sum_48h",
+        "weather_precipitation_sum_72h"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 624737,
+          "mae": 4.933650709749043,
+          "rmse": 8.642948346771977,
+          "r2": 0.9309236845902292
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198623,
+          "mae": 3.424214037421292,
+          "rmse": 6.336869832697415,
+          "r2": 0.9543307233282774
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 594663,
+          "mae": 4.620933201315091,
+          "rmse": 8.147831355970967,
+          "r2": 0.936916626497535
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 190173,
+          "mae": 3.160677412735129,
+          "rmse": 5.821896081840503,
+          "r2": 0.957299636632372
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/models/history72/rf/h1",
+      "fit_and_eval_seconds": 82.66815976699945,
+      "feature_importance": [
+        {
+          "feature": "pm25_mean_3h",
+          "importance": 0.0594321410075354
+        },
+        {
+          "feature": "pm25_lag_1h",
+          "importance": 0.04797211903387329
+        },
+        {
+          "feature": "pm25_mean_6h",
+          "importance": 0.04537486788836087
+        },
+        {
+          "feature": "pm25_lag_3h",
+          "importance": 0.0352978264212617
+        },
+        {
+          "feature": "wind_speed_10m",
+          "importance": 0.03256467163519774
+        },
+        {
+          "feature": "pm25_std_3h",
+          "importance": 0.03204531112747549
+        },
+        {
+          "feature": "pm25",
+          "importance": 0.028616580160014386
+        },
+        {
+          "feature": "wind_direction_cos",
+          "importance": 0.026828907030437076
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.025053099856030103
+        },
+        {
+          "feature": "weather_wind_speed_10m_change_24h",
+          "importance": 0.02440300456516742
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25",
+          "importance": 0.022467172683846324
+        },
+        {
+          "feature": "weather_relative_humidity_2m_change_24h",
+          "importance": 0.020969767845563186
+        },
+        {
+          "feature": "regional_beijing_pm25",
+          "importance": 0.020835840927082454
+        },
+        {
+          "feature": "regional_langfang_pm25",
+          "importance": 0.01730263655493058
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.01716578439857037
+        },
+        {
+          "feature": "city_pm25",
+          "importance": 0.017085133695936918
+        },
+        {
+          "feature": "pm25_std_24h",
+          "importance": 0.01611418596539626
+        },
+        {
+          "feature": "pm25_std_6h",
+          "importance": 0.014866314328053595
+        },
+        {
+          "feature": "pm10",
+          "importance": 0.013479101365118318
+        },
+        {
+          "feature": "regional_tianjin_pm25",
+          "importance": 0.012580806454341434
+        },
+        {
+          "feature": "pm25_std_72h",
+          "importance": 0.011086077735742468
+        },
+        {
+          "feature": "weather_surface_pressure_lag_24h",
+          "importance": 0.010795190933706202
+        },
+        {
+          "feature": "weather_wind_direction_cos_lag_6h",
+          "importance": 0.00998797808035375
+        },
+        {
+          "feature": "weather_temperature_2m_std_72h",
+          "importance": 0.009898759707540342
+        },
+        {
+          "feature": "pm25_mean_24h",
+          "importance": 0.009701878759368062
+        }
+      ]
+    },
+    "history72:rf:h2": {
+      "model": "rf",
+      "variant": "history72",
+      "horizon": 2,
+      "train_rows": 1230683,
+      "feature_count": 150,
+      "features": [
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "o3",
+        "co",
+        "pm25_lag_1h",
+        "pm25_lag_3h",
+        "pm25_lag_6h",
+        "pm25_lag_12h",
+        "pm25_lag_24h",
+        "pm25_lag_48h",
+        "pm25_lag_72h",
+        "pm25_mean_3h",
+        "pm25_std_3h",
+        "pm25_count_3h",
+        "pm25_mean_6h",
+        "pm25_std_6h",
+        "pm25_count_6h",
+        "pm25_mean_24h",
+        "pm25_std_24h",
+        "pm25_count_24h",
+        "pm25_mean_48h",
+        "pm25_std_48h",
+        "pm25_count_48h",
+        "pm25_mean_72h",
+        "pm25_std_72h",
+        "pm25_count_72h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "weekday_sin",
+        "weekday_cos",
+        "latitude",
+        "longitude",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "surface_pressure",
+        "wind_speed_10m",
+        "precipitation",
+        "wind_direction_sin",
+        "wind_direction_cos",
+        "city_pm25",
+        "city_pm25_count",
+        "regional_beijing_pm25",
+        "regional_beijing_pm25_lag_6h",
+        "regional_beijing_pm25_lag_24h",
+        "regional_tianjin_pm25",
+        "regional_tianjin_pm25_lag_6h",
+        "regional_tianjin_pm25_lag_24h",
+        "regional_langfang_pm25",
+        "regional_langfang_pm25_lag_6h",
+        "regional_langfang_pm25_lag_24h",
+        "regional_baoding_pm25",
+        "regional_baoding_pm25_lag_6h",
+        "regional_baoding_pm25_lag_24h",
+        "regional_tangshan_pm25",
+        "regional_tangshan_pm25_lag_6h",
+        "regional_tangshan_pm25_lag_24h",
+        "regional_zhangjiakou_pm25",
+        "regional_zhangjiakou_pm25_lag_6h",
+        "regional_zhangjiakou_pm25_lag_24h",
+        "weather_temperature_2m_lag_6h",
+        "weather_temperature_2m_lag_12h",
+        "weather_temperature_2m_lag_24h",
+        "weather_temperature_2m_lag_48h",
+        "weather_temperature_2m_lag_72h",
+        "weather_temperature_2m_mean_24h",
+        "weather_temperature_2m_std_24h",
+        "weather_temperature_2m_mean_48h",
+        "weather_temperature_2m_std_48h",
+        "weather_temperature_2m_mean_72h",
+        "weather_temperature_2m_std_72h",
+        "weather_temperature_2m_change_24h",
+        "weather_relative_humidity_2m_lag_6h",
+        "weather_relative_humidity_2m_lag_12h",
+        "weather_relative_humidity_2m_lag_24h",
+        "weather_relative_humidity_2m_lag_48h",
+        "weather_relative_humidity_2m_lag_72h",
+        "weather_relative_humidity_2m_mean_24h",
+        "weather_relative_humidity_2m_std_24h",
+        "weather_relative_humidity_2m_mean_48h",
+        "weather_relative_humidity_2m_std_48h",
+        "weather_relative_humidity_2m_mean_72h",
+        "weather_relative_humidity_2m_std_72h",
+        "weather_relative_humidity_2m_change_24h",
+        "weather_surface_pressure_lag_6h",
+        "weather_surface_pressure_lag_12h",
+        "weather_surface_pressure_lag_24h",
+        "weather_surface_pressure_lag_48h",
+        "weather_surface_pressure_lag_72h",
+        "weather_surface_pressure_mean_24h",
+        "weather_surface_pressure_std_24h",
+        "weather_surface_pressure_mean_48h",
+        "weather_surface_pressure_std_48h",
+        "weather_surface_pressure_mean_72h",
+        "weather_surface_pressure_std_72h",
+        "weather_surface_pressure_change_24h",
+        "weather_wind_speed_10m_lag_6h",
+        "weather_wind_speed_10m_lag_12h",
+        "weather_wind_speed_10m_lag_24h",
+        "weather_wind_speed_10m_lag_48h",
+        "weather_wind_speed_10m_lag_72h",
+        "weather_wind_speed_10m_mean_24h",
+        "weather_wind_speed_10m_std_24h",
+        "weather_wind_speed_10m_mean_48h",
+        "weather_wind_speed_10m_std_48h",
+        "weather_wind_speed_10m_mean_72h",
+        "weather_wind_speed_10m_std_72h",
+        "weather_wind_speed_10m_change_24h",
+        "weather_precipitation_lag_6h",
+        "weather_precipitation_lag_12h",
+        "weather_precipitation_lag_24h",
+        "weather_precipitation_lag_48h",
+        "weather_precipitation_lag_72h",
+        "weather_precipitation_mean_24h",
+        "weather_precipitation_std_24h",
+        "weather_precipitation_mean_48h",
+        "weather_precipitation_std_48h",
+        "weather_precipitation_mean_72h",
+        "weather_precipitation_std_72h",
+        "weather_precipitation_change_24h",
+        "weather_wind_direction_sin_lag_6h",
+        "weather_wind_direction_sin_lag_12h",
+        "weather_wind_direction_sin_lag_24h",
+        "weather_wind_direction_sin_lag_48h",
+        "weather_wind_direction_sin_lag_72h",
+        "weather_wind_direction_sin_mean_24h",
+        "weather_wind_direction_sin_std_24h",
+        "weather_wind_direction_sin_mean_48h",
+        "weather_wind_direction_sin_std_48h",
+        "weather_wind_direction_sin_mean_72h",
+        "weather_wind_direction_sin_std_72h",
+        "weather_wind_direction_sin_change_24h",
+        "weather_wind_direction_cos_lag_6h",
+        "weather_wind_direction_cos_lag_12h",
+        "weather_wind_direction_cos_lag_24h",
+        "weather_wind_direction_cos_lag_48h",
+        "weather_wind_direction_cos_lag_72h",
+        "weather_wind_direction_cos_mean_24h",
+        "weather_wind_direction_cos_std_24h",
+        "weather_wind_direction_cos_mean_48h",
+        "weather_wind_direction_cos_std_48h",
+        "weather_wind_direction_cos_mean_72h",
+        "weather_wind_direction_cos_std_72h",
+        "weather_wind_direction_cos_change_24h",
+        "weather_precipitation_sum_24h",
+        "weather_precipitation_sum_48h",
+        "weather_precipitation_sum_72h"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 623128,
+          "mae": 7.431238879237795,
+          "rmse": 12.877409199291769,
+          "r2": 0.8466452032450069
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198311,
+          "mae": 5.73313140001266,
+          "rmse": 10.166402840212413,
+          "r2": 0.8823374498429455
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 592753,
+          "mae": 6.923265363924289,
+          "rmse": 11.902785275904547,
+          "r2": 0.8652975688996551
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189705,
+          "mae": 5.25560128783703,
+          "rmse": 9.23907360767929,
+          "r2": 0.8921557936640134
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/models/history72/rf/h2",
+      "fit_and_eval_seconds": 76.63655360300072,
+      "feature_importance": [
+        {
+          "feature": "pm25_mean_3h",
+          "importance": 0.08158356147236259
+        },
+        {
+          "feature": "pm25",
+          "importance": 0.04557618976748435
+        },
+        {
+          "feature": "pm25_mean_6h",
+          "importance": 0.044785626803841114
+        },
+        {
+          "feature": "pm25_lag_1h",
+          "importance": 0.04201708100841013
+        },
+        {
+          "feature": "wind_direction_cos",
+          "importance": 0.029148501922341103
+        },
+        {
+          "feature": "weather_wind_speed_10m_change_24h",
+          "importance": 0.029097282500359346
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25",
+          "importance": 0.028656517843750874
+        },
+        {
+          "feature": "wind_speed_10m",
+          "importance": 0.0280707134551874
+        },
+        {
+          "feature": "regional_beijing_pm25",
+          "importance": 0.027771319847963685
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.025880344611113517
+        },
+        {
+          "feature": "pm25_lag_3h",
+          "importance": 0.025089204673986034
+        },
+        {
+          "feature": "pm25_std_3h",
+          "importance": 0.02342513690269034
+        },
+        {
+          "feature": "city_pm25",
+          "importance": 0.021936589157744203
+        },
+        {
+          "feature": "weather_surface_pressure_lag_24h",
+          "importance": 0.020105740288998093
+        },
+        {
+          "feature": "pm25_std_6h",
+          "importance": 0.018692768120602277
+        },
+        {
+          "feature": "weather_relative_humidity_2m_change_24h",
+          "importance": 0.01745577770277953
+        },
+        {
+          "feature": "pm25_std_24h",
+          "importance": 0.014676030978025103
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.013526567523886542
+        },
+        {
+          "feature": "pm25_mean_24h",
+          "importance": 0.011421942848028728
+        },
+        {
+          "feature": "pm25_lag_6h",
+          "importance": 0.01105085859597007
+        },
+        {
+          "feature": "regional_langfang_pm25",
+          "importance": 0.010800864031991056
+        },
+        {
+          "feature": "pm10",
+          "importance": 0.009833698467664834
+        },
+        {
+          "feature": "weather_surface_pressure_lag_12h",
+          "importance": 0.009441150065806576
+        },
+        {
+          "feature": "weather_surface_pressure_mean_24h",
+          "importance": 0.009284949765522882
+        },
+        {
+          "feature": "regional_tangshan_pm25",
+          "importance": 0.009108136645849134
+        }
+      ]
+    },
+    "history72:rf:h3": {
+      "model": "rf",
+      "variant": "history72",
+      "horizon": 3,
+      "train_rows": 1228401,
+      "feature_count": 150,
+      "features": [
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "o3",
+        "co",
+        "pm25_lag_1h",
+        "pm25_lag_3h",
+        "pm25_lag_6h",
+        "pm25_lag_12h",
+        "pm25_lag_24h",
+        "pm25_lag_48h",
+        "pm25_lag_72h",
+        "pm25_mean_3h",
+        "pm25_std_3h",
+        "pm25_count_3h",
+        "pm25_mean_6h",
+        "pm25_std_6h",
+        "pm25_count_6h",
+        "pm25_mean_24h",
+        "pm25_std_24h",
+        "pm25_count_24h",
+        "pm25_mean_48h",
+        "pm25_std_48h",
+        "pm25_count_48h",
+        "pm25_mean_72h",
+        "pm25_std_72h",
+        "pm25_count_72h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "weekday_sin",
+        "weekday_cos",
+        "latitude",
+        "longitude",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "surface_pressure",
+        "wind_speed_10m",
+        "precipitation",
+        "wind_direction_sin",
+        "wind_direction_cos",
+        "city_pm25",
+        "city_pm25_count",
+        "regional_beijing_pm25",
+        "regional_beijing_pm25_lag_6h",
+        "regional_beijing_pm25_lag_24h",
+        "regional_tianjin_pm25",
+        "regional_tianjin_pm25_lag_6h",
+        "regional_tianjin_pm25_lag_24h",
+        "regional_langfang_pm25",
+        "regional_langfang_pm25_lag_6h",
+        "regional_langfang_pm25_lag_24h",
+        "regional_baoding_pm25",
+        "regional_baoding_pm25_lag_6h",
+        "regional_baoding_pm25_lag_24h",
+        "regional_tangshan_pm25",
+        "regional_tangshan_pm25_lag_6h",
+        "regional_tangshan_pm25_lag_24h",
+        "regional_zhangjiakou_pm25",
+        "regional_zhangjiakou_pm25_lag_6h",
+        "regional_zhangjiakou_pm25_lag_24h",
+        "weather_temperature_2m_lag_6h",
+        "weather_temperature_2m_lag_12h",
+        "weather_temperature_2m_lag_24h",
+        "weather_temperature_2m_lag_48h",
+        "weather_temperature_2m_lag_72h",
+        "weather_temperature_2m_mean_24h",
+        "weather_temperature_2m_std_24h",
+        "weather_temperature_2m_mean_48h",
+        "weather_temperature_2m_std_48h",
+        "weather_temperature_2m_mean_72h",
+        "weather_temperature_2m_std_72h",
+        "weather_temperature_2m_change_24h",
+        "weather_relative_humidity_2m_lag_6h",
+        "weather_relative_humidity_2m_lag_12h",
+        "weather_relative_humidity_2m_lag_24h",
+        "weather_relative_humidity_2m_lag_48h",
+        "weather_relative_humidity_2m_lag_72h",
+        "weather_relative_humidity_2m_mean_24h",
+        "weather_relative_humidity_2m_std_24h",
+        "weather_relative_humidity_2m_mean_48h",
+        "weather_relative_humidity_2m_std_48h",
+        "weather_relative_humidity_2m_mean_72h",
+        "weather_relative_humidity_2m_std_72h",
+        "weather_relative_humidity_2m_change_24h",
+        "weather_surface_pressure_lag_6h",
+        "weather_surface_pressure_lag_12h",
+        "weather_surface_pressure_lag_24h",
+        "weather_surface_pressure_lag_48h",
+        "weather_surface_pressure_lag_72h",
+        "weather_surface_pressure_mean_24h",
+        "weather_surface_pressure_std_24h",
+        "weather_surface_pressure_mean_48h",
+        "weather_surface_pressure_std_48h",
+        "weather_surface_pressure_mean_72h",
+        "weather_surface_pressure_std_72h",
+        "weather_surface_pressure_change_24h",
+        "weather_wind_speed_10m_lag_6h",
+        "weather_wind_speed_10m_lag_12h",
+        "weather_wind_speed_10m_lag_24h",
+        "weather_wind_speed_10m_lag_48h",
+        "weather_wind_speed_10m_lag_72h",
+        "weather_wind_speed_10m_mean_24h",
+        "weather_wind_speed_10m_std_24h",
+        "weather_wind_speed_10m_mean_48h",
+        "weather_wind_speed_10m_std_48h",
+        "weather_wind_speed_10m_mean_72h",
+        "weather_wind_speed_10m_std_72h",
+        "weather_wind_speed_10m_change_24h",
+        "weather_precipitation_lag_6h",
+        "weather_precipitation_lag_12h",
+        "weather_precipitation_lag_24h",
+        "weather_precipitation_lag_48h",
+        "weather_precipitation_lag_72h",
+        "weather_precipitation_mean_24h",
+        "weather_precipitation_std_24h",
+        "weather_precipitation_mean_48h",
+        "weather_precipitation_std_48h",
+        "weather_precipitation_mean_72h",
+        "weather_precipitation_std_72h",
+        "weather_precipitation_change_24h",
+        "weather_wind_direction_sin_lag_6h",
+        "weather_wind_direction_sin_lag_12h",
+        "weather_wind_direction_sin_lag_24h",
+        "weather_wind_direction_sin_lag_48h",
+        "weather_wind_direction_sin_lag_72h",
+        "weather_wind_direction_sin_mean_24h",
+        "weather_wind_direction_sin_std_24h",
+        "weather_wind_direction_sin_mean_48h",
+        "weather_wind_direction_sin_std_48h",
+        "weather_wind_direction_sin_mean_72h",
+        "weather_wind_direction_sin_std_72h",
+        "weather_wind_direction_sin_change_24h",
+        "weather_wind_direction_cos_lag_6h",
+        "weather_wind_direction_cos_lag_12h",
+        "weather_wind_direction_cos_lag_24h",
+        "weather_wind_direction_cos_lag_48h",
+        "weather_wind_direction_cos_lag_72h",
+        "weather_wind_direction_cos_mean_24h",
+        "weather_wind_direction_cos_std_24h",
+        "weather_wind_direction_cos_mean_48h",
+        "weather_wind_direction_cos_std_48h",
+        "weather_wind_direction_cos_mean_72h",
+        "weather_wind_direction_cos_std_72h",
+        "weather_wind_direction_cos_change_24h",
+        "weather_precipitation_sum_24h",
+        "weather_precipitation_sum_48h",
+        "weather_precipitation_sum_72h"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 622528,
+          "mae": 9.386391916345765,
+          "rmse": 15.883321816241732,
+          "r2": 0.7669453827416877
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198143,
+          "mae": 7.551242635531421,
+          "rmse": 12.940959576464726,
+          "r2": 0.8098596265307172
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 591735,
+          "mae": 8.686946678123894,
+          "rmse": 14.563325570093113,
+          "r2": 0.7977830606787621
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189352,
+          "mae": 6.910242579022893,
+          "rmse": 11.731171895732901,
+          "r2": 0.8257161327201237
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/models/history72/rf/h3",
+      "fit_and_eval_seconds": 66.85308033000001,
+      "feature_importance": [
+        {
+          "feature": "pm25_mean_3h",
+          "importance": 0.08469460184425634
+        },
+        {
+          "feature": "pm25",
+          "importance": 0.05194240885692451
+        },
+        {
+          "feature": "pm25_mean_6h",
+          "importance": 0.049884287779657546
+        },
+        {
+          "feature": "wind_direction_cos",
+          "importance": 0.041100942868758546
+        },
+        {
+          "feature": "pm25_lag_1h",
+          "importance": 0.04070792452882486
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25",
+          "importance": 0.0326022576367419
+        },
+        {
+          "feature": "wind_speed_10m",
+          "importance": 0.03039044312787768
+        },
+        {
+          "feature": "city_pm25",
+          "importance": 0.025011036390531014
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.02486592341211622
+        },
+        {
+          "feature": "regional_beijing_pm25",
+          "importance": 0.024597247678034114
+        },
+        {
+          "feature": "weather_wind_speed_10m_change_24h",
+          "importance": 0.024107408439669194
+        },
+        {
+          "feature": "pm25_std_6h",
+          "importance": 0.023823673983067905
+        },
+        {
+          "feature": "pm25_lag_3h",
+          "importance": 0.02276436015881122
+        },
+        {
+          "feature": "pm25_std_3h",
+          "importance": 0.01900169124050984
+        },
+        {
+          "feature": "pm10",
+          "importance": 0.01822668596536748
+        },
+        {
+          "feature": "pm25_std_24h",
+          "importance": 0.016745779242859717
+        },
+        {
+          "feature": "weather_relative_humidity_2m_change_24h",
+          "importance": 0.015829798544645425
+        },
+        {
+          "feature": "weather_surface_pressure_lag_24h",
+          "importance": 0.013368017383835017
+        },
+        {
+          "feature": "weather_wind_direction_cos_change_24h",
+          "importance": 0.011326492886337827
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.011152654848246705
+        },
+        {
+          "feature": "pm25_lag_6h",
+          "importance": 0.01039781150055002
+        },
+        {
+          "feature": "weather_surface_pressure_lag_12h",
+          "importance": 0.01012083689361283
+        },
+        {
+          "feature": "regional_tangshan_pm25",
+          "importance": 0.009732285180621324
+        },
+        {
+          "feature": "regional_langfang_pm25",
+          "importance": 0.008992108622667033
+        },
+        {
+          "feature": "weather_surface_pressure_change_24h",
+          "importance": 0.008073981287488105
+        }
+      ]
+    },
+    "history72:rf:h4": {
+      "model": "rf",
+      "variant": "history72",
+      "horizon": 4,
+      "train_rows": 1227176,
+      "feature_count": 150,
+      "features": [
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "o3",
+        "co",
+        "pm25_lag_1h",
+        "pm25_lag_3h",
+        "pm25_lag_6h",
+        "pm25_lag_12h",
+        "pm25_lag_24h",
+        "pm25_lag_48h",
+        "pm25_lag_72h",
+        "pm25_mean_3h",
+        "pm25_std_3h",
+        "pm25_count_3h",
+        "pm25_mean_6h",
+        "pm25_std_6h",
+        "pm25_count_6h",
+        "pm25_mean_24h",
+        "pm25_std_24h",
+        "pm25_count_24h",
+        "pm25_mean_48h",
+        "pm25_std_48h",
+        "pm25_count_48h",
+        "pm25_mean_72h",
+        "pm25_std_72h",
+        "pm25_count_72h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "weekday_sin",
+        "weekday_cos",
+        "latitude",
+        "longitude",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "surface_pressure",
+        "wind_speed_10m",
+        "precipitation",
+        "wind_direction_sin",
+        "wind_direction_cos",
+        "city_pm25",
+        "city_pm25_count",
+        "regional_beijing_pm25",
+        "regional_beijing_pm25_lag_6h",
+        "regional_beijing_pm25_lag_24h",
+        "regional_tianjin_pm25",
+        "regional_tianjin_pm25_lag_6h",
+        "regional_tianjin_pm25_lag_24h",
+        "regional_langfang_pm25",
+        "regional_langfang_pm25_lag_6h",
+        "regional_langfang_pm25_lag_24h",
+        "regional_baoding_pm25",
+        "regional_baoding_pm25_lag_6h",
+        "regional_baoding_pm25_lag_24h",
+        "regional_tangshan_pm25",
+        "regional_tangshan_pm25_lag_6h",
+        "regional_tangshan_pm25_lag_24h",
+        "regional_zhangjiakou_pm25",
+        "regional_zhangjiakou_pm25_lag_6h",
+        "regional_zhangjiakou_pm25_lag_24h",
+        "weather_temperature_2m_lag_6h",
+        "weather_temperature_2m_lag_12h",
+        "weather_temperature_2m_lag_24h",
+        "weather_temperature_2m_lag_48h",
+        "weather_temperature_2m_lag_72h",
+        "weather_temperature_2m_mean_24h",
+        "weather_temperature_2m_std_24h",
+        "weather_temperature_2m_mean_48h",
+        "weather_temperature_2m_std_48h",
+        "weather_temperature_2m_mean_72h",
+        "weather_temperature_2m_std_72h",
+        "weather_temperature_2m_change_24h",
+        "weather_relative_humidity_2m_lag_6h",
+        "weather_relative_humidity_2m_lag_12h",
+        "weather_relative_humidity_2m_lag_24h",
+        "weather_relative_humidity_2m_lag_48h",
+        "weather_relative_humidity_2m_lag_72h",
+        "weather_relative_humidity_2m_mean_24h",
+        "weather_relative_humidity_2m_std_24h",
+        "weather_relative_humidity_2m_mean_48h",
+        "weather_relative_humidity_2m_std_48h",
+        "weather_relative_humidity_2m_mean_72h",
+        "weather_relative_humidity_2m_std_72h",
+        "weather_relative_humidity_2m_change_24h",
+        "weather_surface_pressure_lag_6h",
+        "weather_surface_pressure_lag_12h",
+        "weather_surface_pressure_lag_24h",
+        "weather_surface_pressure_lag_48h",
+        "weather_surface_pressure_lag_72h",
+        "weather_surface_pressure_mean_24h",
+        "weather_surface_pressure_std_24h",
+        "weather_surface_pressure_mean_48h",
+        "weather_surface_pressure_std_48h",
+        "weather_surface_pressure_mean_72h",
+        "weather_surface_pressure_std_72h",
+        "weather_surface_pressure_change_24h",
+        "weather_wind_speed_10m_lag_6h",
+        "weather_wind_speed_10m_lag_12h",
+        "weather_wind_speed_10m_lag_24h",
+        "weather_wind_speed_10m_lag_48h",
+        "weather_wind_speed_10m_lag_72h",
+        "weather_wind_speed_10m_mean_24h",
+        "weather_wind_speed_10m_std_24h",
+        "weather_wind_speed_10m_mean_48h",
+        "weather_wind_speed_10m_std_48h",
+        "weather_wind_speed_10m_mean_72h",
+        "weather_wind_speed_10m_std_72h",
+        "weather_wind_speed_10m_change_24h",
+        "weather_precipitation_lag_6h",
+        "weather_precipitation_lag_12h",
+        "weather_precipitation_lag_24h",
+        "weather_precipitation_lag_48h",
+        "weather_precipitation_lag_72h",
+        "weather_precipitation_mean_24h",
+        "weather_precipitation_std_24h",
+        "weather_precipitation_mean_48h",
+        "weather_precipitation_std_48h",
+        "weather_precipitation_mean_72h",
+        "weather_precipitation_std_72h",
+        "weather_precipitation_change_24h",
+        "weather_wind_direction_sin_lag_6h",
+        "weather_wind_direction_sin_lag_12h",
+        "weather_wind_direction_sin_lag_24h",
+        "weather_wind_direction_sin_lag_48h",
+        "weather_wind_direction_sin_lag_72h",
+        "weather_wind_direction_sin_mean_24h",
+        "weather_wind_direction_sin_std_24h",
+        "weather_wind_direction_sin_mean_48h",
+        "weather_wind_direction_sin_std_48h",
+        "weather_wind_direction_sin_mean_72h",
+        "weather_wind_direction_sin_std_72h",
+        "weather_wind_direction_sin_change_24h",
+        "weather_wind_direction_cos_lag_6h",
+        "weather_wind_direction_cos_lag_12h",
+        "weather_wind_direction_cos_lag_24h",
+        "weather_wind_direction_cos_lag_48h",
+        "weather_wind_direction_cos_lag_72h",
+        "weather_wind_direction_cos_mean_24h",
+        "weather_wind_direction_cos_std_24h",
+        "weather_wind_direction_cos_mean_48h",
+        "weather_wind_direction_cos_std_48h",
+        "weather_wind_direction_cos_mean_72h",
+        "weather_wind_direction_cos_std_72h",
+        "weather_wind_direction_cos_change_24h",
+        "weather_precipitation_sum_24h",
+        "weather_precipitation_sum_48h",
+        "weather_precipitation_sum_72h"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 622016,
+          "mae": 11.003520674336942,
+          "rmse": 18.193837621810125,
+          "r2": 0.6941081419870858
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197992,
+          "mae": 9.07998456981521,
+          "rmse": 15.08892255566056,
+          "r2": 0.74135639950901
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 591255,
+          "mae": 10.140345320337573,
+          "rmse": 16.692383274873556,
+          "r2": 0.7342182749677092
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189282,
+          "mae": 8.281864949941287,
+          "rmse": 13.682668948463105,
+          "r2": 0.7628347931791918
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/models/history72/rf/h4",
+      "fit_and_eval_seconds": 62.94051247399875,
+      "feature_importance": [
+        {
+          "feature": "pm25_mean_3h",
+          "importance": 0.09663218391937758
+        },
+        {
+          "feature": "pm25",
+          "importance": 0.05869811128901757
+        },
+        {
+          "feature": "wind_direction_cos",
+          "importance": 0.04579764798640136
+        },
+        {
+          "feature": "pm25_lag_1h",
+          "importance": 0.04528850841345665
+        },
+        {
+          "feature": "pm25_mean_6h",
+          "importance": 0.043370769702265694
+        },
+        {
+          "feature": "city_pm25",
+          "importance": 0.03567645480830146
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25",
+          "importance": 0.03130322843685787
+        },
+        {
+          "feature": "wind_speed_10m",
+          "importance": 0.02829924761769236
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.023130923162456206
+        },
+        {
+          "feature": "regional_beijing_pm25",
+          "importance": 0.022724905502251747
+        },
+        {
+          "feature": "pm25_lag_3h",
+          "importance": 0.021660261020395193
+        },
+        {
+          "feature": "pm10",
+          "importance": 0.02140744867188408
+        },
+        {
+          "feature": "weather_wind_speed_10m_change_24h",
+          "importance": 0.020951887038153892
+        },
+        {
+          "feature": "pm25_std_6h",
+          "importance": 0.018854192890044284
+        },
+        {
+          "feature": "pm25_std_24h",
+          "importance": 0.0181966803891316
+        },
+        {
+          "feature": "weather_surface_pressure_lag_24h",
+          "importance": 0.01568785055606074
+        },
+        {
+          "feature": "pm25_std_3h",
+          "importance": 0.01441885543022851
+        },
+        {
+          "feature": "weather_wind_direction_cos_change_24h",
+          "importance": 0.014015809591967007
+        },
+        {
+          "feature": "pm25_lag_6h",
+          "importance": 0.013262071710522108
+        },
+        {
+          "feature": "weather_relative_humidity_2m_change_24h",
+          "importance": 0.011498872945262932
+        },
+        {
+          "feature": "regional_tangshan_pm25",
+          "importance": 0.010562892694848749
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25_lag_6h",
+          "importance": 0.009956228035901692
+        },
+        {
+          "feature": "weather_surface_pressure_mean_48h",
+          "importance": 0.009792198582272465
+        },
+        {
+          "feature": "pm25_mean_24h",
+          "importance": 0.009754819856281651
+        },
+        {
+          "feature": "weather_surface_pressure_lag_12h",
+          "importance": 0.009725465411623427
+        }
+      ]
+    },
+    "history72:rf:h5": {
+      "model": "rf",
+      "variant": "history72",
+      "horizon": 5,
+      "train_rows": 1226264,
+      "feature_count": 150,
+      "features": [
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "o3",
+        "co",
+        "pm25_lag_1h",
+        "pm25_lag_3h",
+        "pm25_lag_6h",
+        "pm25_lag_12h",
+        "pm25_lag_24h",
+        "pm25_lag_48h",
+        "pm25_lag_72h",
+        "pm25_mean_3h",
+        "pm25_std_3h",
+        "pm25_count_3h",
+        "pm25_mean_6h",
+        "pm25_std_6h",
+        "pm25_count_6h",
+        "pm25_mean_24h",
+        "pm25_std_24h",
+        "pm25_count_24h",
+        "pm25_mean_48h",
+        "pm25_std_48h",
+        "pm25_count_48h",
+        "pm25_mean_72h",
+        "pm25_std_72h",
+        "pm25_count_72h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "weekday_sin",
+        "weekday_cos",
+        "latitude",
+        "longitude",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "surface_pressure",
+        "wind_speed_10m",
+        "precipitation",
+        "wind_direction_sin",
+        "wind_direction_cos",
+        "city_pm25",
+        "city_pm25_count",
+        "regional_beijing_pm25",
+        "regional_beijing_pm25_lag_6h",
+        "regional_beijing_pm25_lag_24h",
+        "regional_tianjin_pm25",
+        "regional_tianjin_pm25_lag_6h",
+        "regional_tianjin_pm25_lag_24h",
+        "regional_langfang_pm25",
+        "regional_langfang_pm25_lag_6h",
+        "regional_langfang_pm25_lag_24h",
+        "regional_baoding_pm25",
+        "regional_baoding_pm25_lag_6h",
+        "regional_baoding_pm25_lag_24h",
+        "regional_tangshan_pm25",
+        "regional_tangshan_pm25_lag_6h",
+        "regional_tangshan_pm25_lag_24h",
+        "regional_zhangjiakou_pm25",
+        "regional_zhangjiakou_pm25_lag_6h",
+        "regional_zhangjiakou_pm25_lag_24h",
+        "weather_temperature_2m_lag_6h",
+        "weather_temperature_2m_lag_12h",
+        "weather_temperature_2m_lag_24h",
+        "weather_temperature_2m_lag_48h",
+        "weather_temperature_2m_lag_72h",
+        "weather_temperature_2m_mean_24h",
+        "weather_temperature_2m_std_24h",
+        "weather_temperature_2m_mean_48h",
+        "weather_temperature_2m_std_48h",
+        "weather_temperature_2m_mean_72h",
+        "weather_temperature_2m_std_72h",
+        "weather_temperature_2m_change_24h",
+        "weather_relative_humidity_2m_lag_6h",
+        "weather_relative_humidity_2m_lag_12h",
+        "weather_relative_humidity_2m_lag_24h",
+        "weather_relative_humidity_2m_lag_48h",
+        "weather_relative_humidity_2m_lag_72h",
+        "weather_relative_humidity_2m_mean_24h",
+        "weather_relative_humidity_2m_std_24h",
+        "weather_relative_humidity_2m_mean_48h",
+        "weather_relative_humidity_2m_std_48h",
+        "weather_relative_humidity_2m_mean_72h",
+        "weather_relative_humidity_2m_std_72h",
+        "weather_relative_humidity_2m_change_24h",
+        "weather_surface_pressure_lag_6h",
+        "weather_surface_pressure_lag_12h",
+        "weather_surface_pressure_lag_24h",
+        "weather_surface_pressure_lag_48h",
+        "weather_surface_pressure_lag_72h",
+        "weather_surface_pressure_mean_24h",
+        "weather_surface_pressure_std_24h",
+        "weather_surface_pressure_mean_48h",
+        "weather_surface_pressure_std_48h",
+        "weather_surface_pressure_mean_72h",
+        "weather_surface_pressure_std_72h",
+        "weather_surface_pressure_change_24h",
+        "weather_wind_speed_10m_lag_6h",
+        "weather_wind_speed_10m_lag_12h",
+        "weather_wind_speed_10m_lag_24h",
+        "weather_wind_speed_10m_lag_48h",
+        "weather_wind_speed_10m_lag_72h",
+        "weather_wind_speed_10m_mean_24h",
+        "weather_wind_speed_10m_std_24h",
+        "weather_wind_speed_10m_mean_48h",
+        "weather_wind_speed_10m_std_48h",
+        "weather_wind_speed_10m_mean_72h",
+        "weather_wind_speed_10m_std_72h",
+        "weather_wind_speed_10m_change_24h",
+        "weather_precipitation_lag_6h",
+        "weather_precipitation_lag_12h",
+        "weather_precipitation_lag_24h",
+        "weather_precipitation_lag_48h",
+        "weather_precipitation_lag_72h",
+        "weather_precipitation_mean_24h",
+        "weather_precipitation_std_24h",
+        "weather_precipitation_mean_48h",
+        "weather_precipitation_std_48h",
+        "weather_precipitation_mean_72h",
+        "weather_precipitation_std_72h",
+        "weather_precipitation_change_24h",
+        "weather_wind_direction_sin_lag_6h",
+        "weather_wind_direction_sin_lag_12h",
+        "weather_wind_direction_sin_lag_24h",
+        "weather_wind_direction_sin_lag_48h",
+        "weather_wind_direction_sin_lag_72h",
+        "weather_wind_direction_sin_mean_24h",
+        "weather_wind_direction_sin_std_24h",
+        "weather_wind_direction_sin_mean_48h",
+        "weather_wind_direction_sin_std_48h",
+        "weather_wind_direction_sin_mean_72h",
+        "weather_wind_direction_sin_std_72h",
+        "weather_wind_direction_sin_change_24h",
+        "weather_wind_direction_cos_lag_6h",
+        "weather_wind_direction_cos_lag_12h",
+        "weather_wind_direction_cos_lag_24h",
+        "weather_wind_direction_cos_lag_48h",
+        "weather_wind_direction_cos_lag_72h",
+        "weather_wind_direction_cos_mean_24h",
+        "weather_wind_direction_cos_std_24h",
+        "weather_wind_direction_cos_mean_48h",
+        "weather_wind_direction_cos_std_48h",
+        "weather_wind_direction_cos_mean_72h",
+        "weather_wind_direction_cos_std_72h",
+        "weather_wind_direction_cos_change_24h",
+        "weather_precipitation_sum_24h",
+        "weather_precipitation_sum_48h",
+        "weather_precipitation_sum_72h"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 621667,
+          "mae": 12.288806807006852,
+          "rmse": 19.923674718020848,
+          "r2": 0.6327615067820718
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197884,
+          "mae": 10.322105275539126,
+          "rmse": 16.752787854020433,
+          "r2": 0.6806449937105428
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 590930,
+          "mae": 11.35202989066865,
+          "rmse": 18.38962361865405,
+          "r2": 0.6780235769350866
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189188,
+          "mae": 9.460395349879953,
+          "rmse": 15.24427963705548,
+          "r2": 0.7057037843764387
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/models/history72/rf/h5",
+      "fit_and_eval_seconds": 64.8374214659998,
+      "feature_importance": [
+        {
+          "feature": "pm25_mean_3h",
+          "importance": 0.10053193670290014
+        },
+        {
+          "feature": "pm25",
+          "importance": 0.06713847788440684
+        },
+        {
+          "feature": "pm25_lag_1h",
+          "importance": 0.050274461528521386
+        },
+        {
+          "feature": "pm25_mean_6h",
+          "importance": 0.04570719472982714
+        },
+        {
+          "feature": "wind_direction_cos",
+          "importance": 0.044518613611279095
+        },
+        {
+          "feature": "city_pm25",
+          "importance": 0.0365510817948804
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25",
+          "importance": 0.032358177400759906
+        },
+        {
+          "feature": "wind_speed_10m",
+          "importance": 0.02490771650048438
+        },
+        {
+          "feature": "pm10",
+          "importance": 0.02212694075203099
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.021055419025572324
+        },
+        {
+          "feature": "pm25_lag_3h",
+          "importance": 0.02067472890398197
+        },
+        {
+          "feature": "regional_beijing_pm25",
+          "importance": 0.019429380015521053
+        },
+        {
+          "feature": "pm25_std_24h",
+          "importance": 0.01780122289980018
+        },
+        {
+          "feature": "weather_wind_speed_10m_change_24h",
+          "importance": 0.017308996334687597
+        },
+        {
+          "feature": "pm25_lag_6h",
+          "importance": 0.014054613219970832
+        },
+        {
+          "feature": "weather_wind_direction_cos_change_24h",
+          "importance": 0.01359024272553928
+        },
+        {
+          "feature": "co",
+          "importance": 0.013243109730889527
+        },
+        {
+          "feature": "pm25_std_3h",
+          "importance": 0.013026920848270326
+        },
+        {
+          "feature": "weather_surface_pressure_lag_24h",
+          "importance": 0.011660905422319373
+        },
+        {
+          "feature": "weather_relative_humidity_2m_change_24h",
+          "importance": 0.011566428150611192
+        },
+        {
+          "feature": "pm25_mean_24h",
+          "importance": 0.011430064540374756
+        },
+        {
+          "feature": "weather_surface_pressure_change_24h",
+          "importance": 0.010599085216406614
+        },
+        {
+          "feature": "regional_tangshan_pm25",
+          "importance": 0.010559434661301353
+        },
+        {
+          "feature": "pm25_std_6h",
+          "importance": 0.009838447097438733
+        },
+        {
+          "feature": "regional_langfang_pm25",
+          "importance": 0.009779193095764789
+        }
+      ]
+    },
+    "history72:rf:h6": {
+      "model": "rf",
+      "variant": "history72",
+      "horizon": 6,
+      "train_rows": 1225376,
+      "feature_count": 150,
+      "features": [
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "o3",
+        "co",
+        "pm25_lag_1h",
+        "pm25_lag_3h",
+        "pm25_lag_6h",
+        "pm25_lag_12h",
+        "pm25_lag_24h",
+        "pm25_lag_48h",
+        "pm25_lag_72h",
+        "pm25_mean_3h",
+        "pm25_std_3h",
+        "pm25_count_3h",
+        "pm25_mean_6h",
+        "pm25_std_6h",
+        "pm25_count_6h",
+        "pm25_mean_24h",
+        "pm25_std_24h",
+        "pm25_count_24h",
+        "pm25_mean_48h",
+        "pm25_std_48h",
+        "pm25_count_48h",
+        "pm25_mean_72h",
+        "pm25_std_72h",
+        "pm25_count_72h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "weekday_sin",
+        "weekday_cos",
+        "latitude",
+        "longitude",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "surface_pressure",
+        "wind_speed_10m",
+        "precipitation",
+        "wind_direction_sin",
+        "wind_direction_cos",
+        "city_pm25",
+        "city_pm25_count",
+        "regional_beijing_pm25",
+        "regional_beijing_pm25_lag_6h",
+        "regional_beijing_pm25_lag_24h",
+        "regional_tianjin_pm25",
+        "regional_tianjin_pm25_lag_6h",
+        "regional_tianjin_pm25_lag_24h",
+        "regional_langfang_pm25",
+        "regional_langfang_pm25_lag_6h",
+        "regional_langfang_pm25_lag_24h",
+        "regional_baoding_pm25",
+        "regional_baoding_pm25_lag_6h",
+        "regional_baoding_pm25_lag_24h",
+        "regional_tangshan_pm25",
+        "regional_tangshan_pm25_lag_6h",
+        "regional_tangshan_pm25_lag_24h",
+        "regional_zhangjiakou_pm25",
+        "regional_zhangjiakou_pm25_lag_6h",
+        "regional_zhangjiakou_pm25_lag_24h",
+        "weather_temperature_2m_lag_6h",
+        "weather_temperature_2m_lag_12h",
+        "weather_temperature_2m_lag_24h",
+        "weather_temperature_2m_lag_48h",
+        "weather_temperature_2m_lag_72h",
+        "weather_temperature_2m_mean_24h",
+        "weather_temperature_2m_std_24h",
+        "weather_temperature_2m_mean_48h",
+        "weather_temperature_2m_std_48h",
+        "weather_temperature_2m_mean_72h",
+        "weather_temperature_2m_std_72h",
+        "weather_temperature_2m_change_24h",
+        "weather_relative_humidity_2m_lag_6h",
+        "weather_relative_humidity_2m_lag_12h",
+        "weather_relative_humidity_2m_lag_24h",
+        "weather_relative_humidity_2m_lag_48h",
+        "weather_relative_humidity_2m_lag_72h",
+        "weather_relative_humidity_2m_mean_24h",
+        "weather_relative_humidity_2m_std_24h",
+        "weather_relative_humidity_2m_mean_48h",
+        "weather_relative_humidity_2m_std_48h",
+        "weather_relative_humidity_2m_mean_72h",
+        "weather_relative_humidity_2m_std_72h",
+        "weather_relative_humidity_2m_change_24h",
+        "weather_surface_pressure_lag_6h",
+        "weather_surface_pressure_lag_12h",
+        "weather_surface_pressure_lag_24h",
+        "weather_surface_pressure_lag_48h",
+        "weather_surface_pressure_lag_72h",
+        "weather_surface_pressure_mean_24h",
+        "weather_surface_pressure_std_24h",
+        "weather_surface_pressure_mean_48h",
+        "weather_surface_pressure_std_48h",
+        "weather_surface_pressure_mean_72h",
+        "weather_surface_pressure_std_72h",
+        "weather_surface_pressure_change_24h",
+        "weather_wind_speed_10m_lag_6h",
+        "weather_wind_speed_10m_lag_12h",
+        "weather_wind_speed_10m_lag_24h",
+        "weather_wind_speed_10m_lag_48h",
+        "weather_wind_speed_10m_lag_72h",
+        "weather_wind_speed_10m_mean_24h",
+        "weather_wind_speed_10m_std_24h",
+        "weather_wind_speed_10m_mean_48h",
+        "weather_wind_speed_10m_std_48h",
+        "weather_wind_speed_10m_mean_72h",
+        "weather_wind_speed_10m_std_72h",
+        "weather_wind_speed_10m_change_24h",
+        "weather_precipitation_lag_6h",
+        "weather_precipitation_lag_12h",
+        "weather_precipitation_lag_24h",
+        "weather_precipitation_lag_48h",
+        "weather_precipitation_lag_72h",
+        "weather_precipitation_mean_24h",
+        "weather_precipitation_std_24h",
+        "weather_precipitation_mean_48h",
+        "weather_precipitation_std_48h",
+        "weather_precipitation_mean_72h",
+        "weather_precipitation_std_72h",
+        "weather_precipitation_change_24h",
+        "weather_wind_direction_sin_lag_6h",
+        "weather_wind_direction_sin_lag_12h",
+        "weather_wind_direction_sin_lag_24h",
+        "weather_wind_direction_sin_lag_48h",
+        "weather_wind_direction_sin_lag_72h",
+        "weather_wind_direction_sin_mean_24h",
+        "weather_wind_direction_sin_std_24h",
+        "weather_wind_direction_sin_mean_48h",
+        "weather_wind_direction_sin_std_48h",
+        "weather_wind_direction_sin_mean_72h",
+        "weather_wind_direction_sin_std_72h",
+        "weather_wind_direction_sin_change_24h",
+        "weather_wind_direction_cos_lag_6h",
+        "weather_wind_direction_cos_lag_12h",
+        "weather_wind_direction_cos_lag_24h",
+        "weather_wind_direction_cos_lag_48h",
+        "weather_wind_direction_cos_lag_72h",
+        "weather_wind_direction_cos_mean_24h",
+        "weather_wind_direction_cos_std_24h",
+        "weather_wind_direction_cos_mean_48h",
+        "weather_wind_direction_cos_std_48h",
+        "weather_wind_direction_cos_mean_72h",
+        "weather_wind_direction_cos_std_72h",
+        "weather_wind_direction_cos_change_24h",
+        "weather_precipitation_sum_24h",
+        "weather_precipitation_sum_48h",
+        "weather_precipitation_sum_72h"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 621462,
+          "mae": 13.383528721209586,
+          "rmse": 21.33390221446979,
+          "r2": 0.5788324095643369
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197818,
+          "mae": 11.351383660141451,
+          "rmse": 18.024864797764483,
+          "r2": 0.6301076977572821
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 590250,
+          "mae": 12.339474984510318,
+          "rmse": 19.704288031201795,
+          "r2": 0.6298101369358126
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 188952,
+          "mae": 10.438950545731302,
+          "rmse": 16.484969873981534,
+          "r2": 0.6561909389511018
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/models/history72/rf/h6",
+      "fit_and_eval_seconds": 63.13921357400068,
+      "feature_importance": [
+        {
+          "feature": "pm25_mean_3h",
+          "importance": 0.10572858354597195
+        },
+        {
+          "feature": "pm25",
+          "importance": 0.07713837818888264
+        },
+        {
+          "feature": "wind_direction_cos",
+          "importance": 0.05287676196446746
+        },
+        {
+          "feature": "pm25_lag_1h",
+          "importance": 0.049959739124489755
+        },
+        {
+          "feature": "pm25_mean_6h",
+          "importance": 0.049516275393971125
+        },
+        {
+          "feature": "city_pm25",
+          "importance": 0.034031350488721204
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25",
+          "importance": 0.02928203152077091
+        },
+        {
+          "feature": "pm10",
+          "importance": 0.02423279487255292
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.022538811564343356
+        },
+        {
+          "feature": "pm25_lag_3h",
+          "importance": 0.020781060070531685
+        },
+        {
+          "feature": "wind_speed_10m",
+          "importance": 0.02013353259326253
+        },
+        {
+          "feature": "pm25_std_24h",
+          "importance": 0.01694928571173524
+        },
+        {
+          "feature": "pm25_lag_6h",
+          "importance": 0.016941525261970635
+        },
+        {
+          "feature": "co",
+          "importance": 0.016474824881087577
+        },
+        {
+          "feature": "weather_wind_speed_10m_change_24h",
+          "importance": 0.01572154315448463
+        },
+        {
+          "feature": "regional_beijing_pm25",
+          "importance": 0.014528910100872794
+        },
+        {
+          "feature": "regional_langfang_pm25",
+          "importance": 0.013830078276535113
+        },
+        {
+          "feature": "weather_wind_direction_cos_change_24h",
+          "importance": 0.012131060718940418
+        },
+        {
+          "feature": "weather_relative_humidity_2m_change_24h",
+          "importance": 0.011867328924486033
+        },
+        {
+          "feature": "pm25_mean_24h",
+          "importance": 0.010920954795814043
+        },
+        {
+          "feature": "pm25_std_3h",
+          "importance": 0.009925691635697542
+        },
+        {
+          "feature": "regional_tangshan_pm25",
+          "importance": 0.008955000687861921
+        },
+        {
+          "feature": "weather_surface_pressure_lag_12h",
+          "importance": 0.008544035322859175
+        },
+        {
+          "feature": "weather_surface_pressure_mean_72h",
+          "importance": 0.008223550854736649
+        },
+        {
+          "feature": "pm25_std_6h",
+          "importance": 0.007925863965964773
+        }
+      ]
+    },
+    "instant_weather:rf:h6": {
+      "model": "rf",
+      "variant": "instant_weather",
+      "horizon": 6,
+      "train_rows": 1225376,
+      "feature_count": 63,
+      "features": [
+        "pm25",
+        "pm10",
+        "so2",
+        "no2",
+        "o3",
+        "co",
+        "pm25_lag_1h",
+        "pm25_lag_3h",
+        "pm25_lag_6h",
+        "pm25_lag_12h",
+        "pm25_lag_24h",
+        "pm25_lag_48h",
+        "pm25_lag_72h",
+        "pm25_mean_3h",
+        "pm25_std_3h",
+        "pm25_count_3h",
+        "pm25_mean_6h",
+        "pm25_std_6h",
+        "pm25_count_6h",
+        "pm25_mean_24h",
+        "pm25_std_24h",
+        "pm25_count_24h",
+        "pm25_mean_48h",
+        "pm25_std_48h",
+        "pm25_count_48h",
+        "pm25_mean_72h",
+        "pm25_std_72h",
+        "pm25_count_72h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "weekday_sin",
+        "weekday_cos",
+        "latitude",
+        "longitude",
+        "temperature_2m",
+        "relative_humidity_2m",
+        "surface_pressure",
+        "wind_speed_10m",
+        "precipitation",
+        "wind_direction_sin",
+        "wind_direction_cos",
+        "city_pm25",
+        "city_pm25_count",
+        "regional_beijing_pm25",
+        "regional_beijing_pm25_lag_6h",
+        "regional_beijing_pm25_lag_24h",
+        "regional_tianjin_pm25",
+        "regional_tianjin_pm25_lag_6h",
+        "regional_tianjin_pm25_lag_24h",
+        "regional_langfang_pm25",
+        "regional_langfang_pm25_lag_6h",
+        "regional_langfang_pm25_lag_24h",
+        "regional_baoding_pm25",
+        "regional_baoding_pm25_lag_6h",
+        "regional_baoding_pm25_lag_24h",
+        "regional_tangshan_pm25",
+        "regional_tangshan_pm25_lag_6h",
+        "regional_tangshan_pm25_lag_24h",
+        "regional_zhangjiakou_pm25",
+        "regional_zhangjiakou_pm25_lag_6h",
+        "regional_zhangjiakou_pm25_lag_24h"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 621462,
+          "mae": 13.299029533043466,
+          "rmse": 21.141627321329576,
+          "r2": 0.5863898672518277
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197818,
+          "mae": 11.31010435767202,
+          "rmse": 17.92560256592092,
+          "r2": 0.6341704453179438
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 590250,
+          "mae": 12.244602874031136,
+          "rmse": 19.47025626459779,
+          "r2": 0.6385515530010465
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 188952,
+          "mae": 10.402277533845552,
+          "rmse": 16.426862261853366,
+          "r2": 0.658610441538378
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/models/instant_weather/rf/h6",
+      "fit_and_eval_seconds": 49.84688785400067,
+      "feature_importance": [
+        {
+          "feature": "pm25_mean_3h",
+          "importance": 0.1149422027681903
+        },
+        {
+          "feature": "pm25_lag_1h",
+          "importance": 0.0820515906410223
+        },
+        {
+          "feature": "pm25",
+          "importance": 0.0788237694565339
+        },
+        {
+          "feature": "wind_direction_cos",
+          "importance": 0.0720799937129459
+        },
+        {
+          "feature": "pm25_mean_6h",
+          "importance": 0.0634034767057493
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25",
+          "importance": 0.04337429170241523
+        },
+        {
+          "feature": "wind_speed_10m",
+          "importance": 0.043216166155973776
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.03647312945123379
+        },
+        {
+          "feature": "pm10",
+          "importance": 0.03588888761158778
+        },
+        {
+          "feature": "regional_beijing_pm25",
+          "importance": 0.02838001350849935
+        },
+        {
+          "feature": "regional_tangshan_pm25",
+          "importance": 0.023807532010599635
+        },
+        {
+          "feature": "pm25_lag_3h",
+          "importance": 0.022821740613250003
+        },
+        {
+          "feature": "pm25_mean_24h",
+          "importance": 0.021675651409614183
+        },
+        {
+          "feature": "city_pm25",
+          "importance": 0.020506603644947625
+        },
+        {
+          "feature": "co",
+          "importance": 0.01664745982082669
+        },
+        {
+          "feature": "regional_zhangjiakou_pm25_lag_6h",
+          "importance": 0.014292359767719429
+        },
+        {
+          "feature": "month_cos",
+          "importance": 0.013551462434255486
+        },
+        {
+          "feature": "temperature_2m",
+          "importance": 0.013221890836219767
+        },
+        {
+          "feature": "regional_baoding_pm25",
+          "importance": 0.012909514513603112
+        },
+        {
+          "feature": "pm25_std_24h",
+          "importance": 0.011890391881424607
+        },
+        {
+          "feature": "pm25_std_48h",
+          "importance": 0.011348404056787881
+        },
+        {
+          "feature": "surface_pressure",
+          "importance": 0.010748816563896703
+        },
+        {
+          "feature": "pm25_lag_6h",
+          "importance": 0.010488463593309877
+        },
+        {
+          "feature": "relative_humidity_2m",
+          "importance": 0.009964175896421984
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.00973159859403852
+        }
+      ]
+    },
+    "tcn72:h1": {
+      "model": "tcn72",
+      "variant": "sequence72",
+      "horizon": 1,
+      "train_rows": 1252207,
+      "feature_count": 35,
+      "history_hours": 72,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 624737,
+          "mae": 4.949647903442383,
+          "rmse": 8.444098472595215,
+          "r2": 0.9340656399726868
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198623,
+          "mae": 3.5242350101470947,
+          "rmse": 6.180217266082764,
+          "r2": 0.9565607905387878
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 594663,
+          "mae": 4.599815368652344,
+          "rmse": 7.918611526489258,
+          "r2": 0.9404160976409912
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 190173,
+          "mae": 3.228228807449341,
+          "rmse": 5.562109470367432,
+          "r2": 0.9610254168510437
+        }
+      ],
+      "model_path": "/mnt/d/Coding/sem5exp/jieduaner/pm25-system/models/station_tcn72.pt"
+    },
+    "tcn72:h2": {
+      "model": "tcn72",
+      "variant": "sequence72",
+      "horizon": 2,
+      "train_rows": 1252207,
+      "feature_count": 35,
+      "history_hours": 72,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 623128,
+          "mae": 7.176877021789551,
+          "rmse": 12.136674880981445,
+          "r2": 0.8637803792953491
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198311,
+          "mae": 5.636477947235107,
+          "rmse": 9.526167869567871,
+          "r2": 0.8966905474662781
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 592753,
+          "mae": 6.61716365814209,
+          "rmse": 11.154414176940918,
+          "r2": 0.8817034959793091
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189705,
+          "mae": 5.139408111572266,
+          "rmse": 8.445697784423828,
+          "r2": 0.909882128238678
+        }
+      ],
+      "model_path": "/mnt/d/Coding/sem5exp/jieduaner/pm25-system/models/station_tcn72.pt"
+    },
+    "tcn72:h3": {
+      "model": "tcn72",
+      "variant": "sequence72",
+      "horizon": 3,
+      "train_rows": 1252207,
+      "feature_count": 35,
+      "history_hours": 72,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 622528,
+          "mae": 8.73890209197998,
+          "rmse": 14.484278678894043,
+          "r2": 0.8061932921409607
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 198143,
+          "mae": 7.112059116363525,
+          "rmse": 11.588501930236816,
+          "r2": 0.847525954246521
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 591735,
+          "mae": 8.002554893493652,
+          "rmse": 13.258609771728516,
+          "r2": 0.8323929309844971
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189352,
+          "mae": 6.488649368286133,
+          "rmse": 10.341012001037598,
+          "r2": 0.8645744919776917
+        }
+      ],
+      "model_path": "/mnt/d/Coding/sem5exp/jieduaner/pm25-system/models/station_tcn72.pt"
+    },
+    "tcn72:h4": {
+      "model": "tcn72",
+      "variant": "sequence72",
+      "horizon": 4,
+      "train_rows": 1252207,
+      "feature_count": 35,
+      "history_hours": 72,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 622016,
+          "mae": 9.95048713684082,
+          "rmse": 16.252904891967773,
+          "r2": 0.7558924555778503
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197992,
+          "mae": 8.225213050842285,
+          "rmse": 13.145928382873535,
+          "r2": 0.8036785125732422
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 591255,
+          "mae": 9.063117027282715,
+          "rmse": 14.882620811462402,
+          "r2": 0.7887254357337952
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189282,
+          "mae": 7.490672588348389,
+          "rmse": 11.801615715026855,
+          "r2": 0.82356196641922
+        }
+      ],
+      "model_path": "/mnt/d/Coding/sem5exp/jieduaner/pm25-system/models/station_tcn72.pt"
+    },
+    "tcn72:h5": {
+      "model": "tcn72",
+      "variant": "sequence72",
+      "horizon": 5,
+      "train_rows": 1252207,
+      "feature_count": 35,
+      "history_hours": 72,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 621667,
+          "mae": 10.92773151397705,
+          "rmse": 17.649154663085938,
+          "r2": 0.7118244171142578
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197884,
+          "mae": 9.144606590270996,
+          "rmse": 14.412395477294922,
+          "r2": 0.7636411786079407
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 590930,
+          "mae": 9.943222045898438,
+          "rmse": 16.239349365234375,
+          "r2": 0.7489179372787476
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 189188,
+          "mae": 8.335831642150879,
+          "rmse": 13.101016998291016,
+          "r2": 0.7826393246650696
+        }
+      ],
+      "model_path": "/mnt/d/Coding/sem5exp/jieduaner/pm25-system/models/station_tcn72.pt"
+    },
+    "tcn72:h6": {
+      "model": "tcn72",
+      "variant": "sequence72",
+      "horizon": 6,
+      "train_rows": 1252207,
+      "feature_count": 35,
+      "history_hours": 72,
+      "metrics": [
+        {
+          "split": "validation",
+          "scope": "all",
+          "n": 621462,
+          "mae": 11.805768966674805,
+          "rmse": 18.81415557861328,
+          "r2": 0.6724452972412109
+        },
+        {
+          "split": "validation",
+          "scope": "beijing",
+          "n": 197818,
+          "mae": 9.976037979125977,
+          "rmse": 15.515206336975098,
+          "r2": 0.7259395122528076
+        },
+        {
+          "split": "test",
+          "scope": "all",
+          "n": 590250,
+          "mae": 10.725544929504395,
+          "rmse": 17.384550094604492,
+          "r2": 0.71184241771698
+        },
+        {
+          "split": "test",
+          "scope": "beijing",
+          "n": 188952,
+          "mae": 9.13609504699707,
+          "rmse": 14.285356521606445,
+          "r2": 0.7418196201324463
+        }
+      ],
+      "model_path": "/mnt/d/Coding/sem5exp/jieduaner/pm25-system/models/station_tcn72.pt"
+    }
+  },
+  "completed": true,
+  "selection_rule": "Minimum Beijing station-hour validation RMSE per horizon; 2025 test is reporting only",
+  "cohort": "Observed origin PM2.5; origin+6h within split; individual target must be observed; first72h excluded",
+  "weather": "City-representative ERA5; 72h historical input; no future realized weather",
+  "spark_completed": true,
+  "gpu": {
+    "device": "NVIDIA GeForce RTX 4080 Laptop GPU",
+    "pytorch": "2.14.1+cu126",
+    "cuda_runtime": "12.6",
+    "cudnn": 91002,
+    "peak_torch_memory_mib": 207.23046875,
+    "peak_gpu_util_percent": 44.0,
+    "telemetry": [
+      {
+        "elapsed_seconds": 0.1,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 2829.0,
+        "power_w": 37.68,
+        "temperature_c": 66.0
+      },
+      {
+        "elapsed_seconds": 2.2,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 3012.0,
+        "power_w": 38.14,
+        "temperature_c": 66.0
+      },
+      {
+        "elapsed_seconds": 4.2,
+        "gpu_util_percent": 32.0,
+        "gpu_memory_mib": 3035.0,
+        "power_w": 58.28,
+        "temperature_c": 67.0
+      },
+      {
+        "elapsed_seconds": 6.3,
+        "gpu_util_percent": 30.0,
+        "gpu_memory_mib": 3159.0,
+        "power_w": 59.36,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 8.4,
+        "gpu_util_percent": 26.0,
+        "gpu_memory_mib": 3045.0,
+        "power_w": 56.13,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 10.5,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3154.0,
+        "power_w": 59.41,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 12.5,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3049.0,
+        "power_w": 71.17,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 14.6,
+        "gpu_util_percent": 44.0,
+        "gpu_memory_mib": 3055.0,
+        "power_w": 76.87,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 16.7,
+        "gpu_util_percent": 44.0,
+        "gpu_memory_mib": 3163.0,
+        "power_w": 75.08,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 18.7,
+        "gpu_util_percent": 43.0,
+        "gpu_memory_mib": 2890.0,
+        "power_w": 77.9,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 20.8,
+        "gpu_util_percent": 34.0,
+        "gpu_memory_mib": 3079.0,
+        "power_w": 56.81,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 22.9,
+        "gpu_util_percent": 33.0,
+        "gpu_memory_mib": 3051.0,
+        "power_w": 58.3,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 25.0,
+        "gpu_util_percent": 33.0,
+        "gpu_memory_mib": 3171.0,
+        "power_w": 59.88,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 27.1,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3054.0,
+        "power_w": 60.72,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 29.1,
+        "gpu_util_percent": 42.0,
+        "gpu_memory_mib": 3169.0,
+        "power_w": 73.98,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 31.2,
+        "gpu_util_percent": 29.0,
+        "gpu_memory_mib": 3044.0,
+        "power_w": 66.71,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 33.3,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3195.0,
+        "power_w": 62.0,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 35.4,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3077.0,
+        "power_w": 60.88,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 37.5,
+        "gpu_util_percent": 35.0,
+        "gpu_memory_mib": 3048.0,
+        "power_w": 71.06,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 39.6,
+        "gpu_util_percent": 33.0,
+        "gpu_memory_mib": 3081.0,
+        "power_w": 68.46,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 41.6,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3060.0,
+        "power_w": 71.72,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 43.7,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3171.0,
+        "power_w": 71.97,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 45.8,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3047.0,
+        "power_w": 73.3,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 47.8,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3166.0,
+        "power_w": 75.35,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 49.9,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3046.0,
+        "power_w": 68.9,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 52.0,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3163.0,
+        "power_w": 63.71,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 54.1,
+        "gpu_util_percent": 29.0,
+        "gpu_memory_mib": 3054.0,
+        "power_w": 59.28,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 56.2,
+        "gpu_util_percent": 26.0,
+        "gpu_memory_mib": 3200.0,
+        "power_w": 54.84,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 58.4,
+        "gpu_util_percent": 28.0,
+        "gpu_memory_mib": 3045.0,
+        "power_w": 53.88,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 60.5,
+        "gpu_util_percent": 33.0,
+        "gpu_memory_mib": 3061.0,
+        "power_w": 58.98,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 62.6,
+        "gpu_util_percent": 32.0,
+        "gpu_memory_mib": 3170.0,
+        "power_w": 58.67,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 64.7,
+        "gpu_util_percent": 29.0,
+        "gpu_memory_mib": 3047.0,
+        "power_w": 57.42,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 66.8,
+        "gpu_util_percent": 35.0,
+        "gpu_memory_mib": 3175.0,
+        "power_w": 61.32,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 68.8,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3051.0,
+        "power_w": 59.08,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 70.9,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3170.0,
+        "power_w": 64.53,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 73.0,
+        "gpu_util_percent": 29.0,
+        "gpu_memory_mib": 3045.0,
+        "power_w": 56.8,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 75.0,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3160.0,
+        "power_w": 62.58,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 77.1,
+        "gpu_util_percent": 32.0,
+        "gpu_memory_mib": 3044.0,
+        "power_w": 60.46,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 79.2,
+        "gpu_util_percent": 31.0,
+        "gpu_memory_mib": 3193.0,
+        "power_w": 55.0,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 81.3,
+        "gpu_util_percent": 42.0,
+        "gpu_memory_mib": 3058.0,
+        "power_w": 64.02,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 83.3,
+        "gpu_util_percent": 39.0,
+        "gpu_memory_mib": 3055.0,
+        "power_w": 73.46,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 85.4,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3046.0,
+        "power_w": 66.04,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 87.5,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3056.0,
+        "power_w": 73.37,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 89.5,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3168.0,
+        "power_w": 67.0,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 91.6,
+        "gpu_util_percent": 39.0,
+        "gpu_memory_mib": 3048.0,
+        "power_w": 64.58,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 93.7,
+        "gpu_util_percent": 39.0,
+        "gpu_memory_mib": 3169.0,
+        "power_w": 71.09,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 95.8,
+        "gpu_util_percent": 35.0,
+        "gpu_memory_mib": 3048.0,
+        "power_w": 68.71,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 97.8,
+        "gpu_util_percent": 34.0,
+        "gpu_memory_mib": 3172.0,
+        "power_w": 72.49,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 99.9,
+        "gpu_util_percent": 41.0,
+        "gpu_memory_mib": 3041.0,
+        "power_w": 66.22,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 101.9,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3161.0,
+        "power_w": 72.83,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 104.0,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3045.0,
+        "power_w": 63.26,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 106.1,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3055.0,
+        "power_w": 64.42,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 108.2,
+        "gpu_util_percent": 39.0,
+        "gpu_memory_mib": 3172.0,
+        "power_w": 63.63,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 110.2,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3051.0,
+        "power_w": 65.47,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 112.3,
+        "gpu_util_percent": 33.0,
+        "gpu_memory_mib": 3167.0,
+        "power_w": 57.73,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 114.4,
+        "gpu_util_percent": 42.0,
+        "gpu_memory_mib": 3046.0,
+        "power_w": 70.74,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 116.4,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3169.0,
+        "power_w": 74.17,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 118.5,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3047.0,
+        "power_w": 68.58,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 120.6,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3163.0,
+        "power_w": 62.5,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 122.6,
+        "gpu_util_percent": 35.0,
+        "gpu_memory_mib": 3052.0,
+        "power_w": 64.26,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 124.7,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3167.0,
+        "power_w": 64.38,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 126.8,
+        "gpu_util_percent": 39.0,
+        "gpu_memory_mib": 3045.0,
+        "power_w": 72.57,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 128.9,
+        "gpu_util_percent": 31.0,
+        "gpu_memory_mib": 3045.0,
+        "power_w": 57.5,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 130.9,
+        "gpu_util_percent": 32.0,
+        "gpu_memory_mib": 3160.0,
+        "power_w": 62.84,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 133.0,
+        "gpu_util_percent": 28.0,
+        "gpu_memory_mib": 3047.0,
+        "power_w": 59.14,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 135.1,
+        "gpu_util_percent": 32.0,
+        "gpu_memory_mib": 3178.0,
+        "power_w": 56.73,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 137.2,
+        "gpu_util_percent": 39.0,
+        "gpu_memory_mib": 3055.0,
+        "power_w": 62.06,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 139.3,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3168.0,
+        "power_w": 63.4,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 141.3,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3170.0,
+        "power_w": 60.0,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 143.4,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3199.0,
+        "power_w": 59.79,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 145.5,
+        "gpu_util_percent": 37.0,
+        "gpu_memory_mib": 3169.0,
+        "power_w": 58.93,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 147.6,
+        "gpu_util_percent": 28.0,
+        "gpu_memory_mib": 3048.0,
+        "power_w": 56.13,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 149.7,
+        "gpu_util_percent": 24.0,
+        "gpu_memory_mib": 3081.0,
+        "power_w": 53.96,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 151.8,
+        "gpu_util_percent": 23.0,
+        "gpu_memory_mib": 3127.0,
+        "power_w": 52.51,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 153.9,
+        "gpu_util_percent": 28.0,
+        "gpu_memory_mib": 3176.0,
+        "power_w": 55.9,
+        "temperature_c": 71.0
+      },
+      {
+        "elapsed_seconds": 155.9,
+        "gpu_util_percent": 36.0,
+        "gpu_memory_mib": 3052.0,
+        "power_w": 61.9,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 158.0,
+        "gpu_util_percent": 41.0,
+        "gpu_memory_mib": 3170.0,
+        "power_w": 76.79,
+        "temperature_c": 74.0
+      },
+      {
+        "elapsed_seconds": 160.1,
+        "gpu_util_percent": 38.0,
+        "gpu_memory_mib": 3046.0,
+        "power_w": 73.61,
+        "temperature_c": 74.0
+      },
+      {
+        "elapsed_seconds": 162.1,
+        "gpu_util_percent": 40.0,
+        "gpu_memory_mib": 3161.0,
+        "power_w": 76.18,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 164.2,
+        "gpu_util_percent": 32.0,
+        "gpu_memory_mib": 3053.0,
+        "power_w": 66.67,
+        "temperature_c": 73.0
+      },
+      {
+        "elapsed_seconds": 166.3,
+        "gpu_util_percent": 34.0,
+        "gpu_memory_mib": 3194.0,
+        "power_w": 59.89,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 168.3,
+        "gpu_util_percent": 32.0,
+        "gpu_memory_mib": 3040.0,
+        "power_w": 59.87,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 170.4,
+        "gpu_util_percent": 33.0,
+        "gpu_memory_mib": 3062.0,
+        "power_w": 58.74,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 172.5,
+        "gpu_util_percent": 14.0,
+        "gpu_memory_mib": 3016.0,
+        "power_w": 54.2,
+        "temperature_c": 72.0
+      },
+      {
+        "elapsed_seconds": 174.5,
+        "gpu_util_percent": 5.0,
+        "gpu_memory_mib": 2894.0,
+        "power_w": 38.83,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 176.6,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 3021.0,
+        "power_w": 39.24,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 178.7,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2900.0,
+        "power_w": 38.59,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 180.8,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3014.0,
+        "power_w": 39.21,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 182.9,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2891.0,
+        "power_w": 38.65,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 185.0,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3010.0,
+        "power_w": 39.26,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 187.0,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2886.0,
+        "power_w": 38.49,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 189.1,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3015.0,
+        "power_w": 39.39,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 191.1,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2889.0,
+        "power_w": 38.3,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 193.2,
+        "gpu_util_percent": 5.0,
+        "gpu_memory_mib": 2894.0,
+        "power_w": 38.63,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 195.3,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 3014.0,
+        "power_w": 38.37,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 197.3,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 2955.0,
+        "power_w": 38.8,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 199.4,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3064.0,
+        "power_w": 39.11,
+        "temperature_c": 69.0
+      },
+      {
+        "elapsed_seconds": 201.4,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3015.0,
+        "power_w": 39.04,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 203.5,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3018.0,
+        "power_w": 39.37,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 205.5,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3018.0,
+        "power_w": 39.26,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 207.6,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3022.0,
+        "power_w": 39.63,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 209.6,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3020.0,
+        "power_w": 39.58,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 211.7,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3015.0,
+        "power_w": 39.55,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 213.7,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3016.0,
+        "power_w": 39.71,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 215.8,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3011.0,
+        "power_w": 39.53,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 217.8,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 3026.0,
+        "power_w": 38.95,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 219.9,
+        "gpu_util_percent": 35.0,
+        "gpu_memory_mib": 3094.0,
+        "power_w": 61.07,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 221.9,
+        "gpu_util_percent": 34.0,
+        "gpu_memory_mib": 3060.0,
+        "power_w": 60.24,
+        "temperature_c": 70.0
+      },
+      {
+        "elapsed_seconds": 224.0,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3021.0,
+        "power_w": 39.23,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 226.1,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3025.0,
+        "power_w": 39.49,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 228.1,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3024.0,
+        "power_w": 39.51,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 230.2,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3020.0,
+        "power_w": 39.52,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 232.3,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3011.0,
+        "power_w": 39.66,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 234.3,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3021.0,
+        "power_w": 39.69,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 236.4,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3029.0,
+        "power_w": 39.62,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 238.5,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 3089.0,
+        "power_w": 38.37,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 240.6,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3008.0,
+        "power_w": 38.8,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 242.7,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2887.0,
+        "power_w": 38.18,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 244.7,
+        "gpu_util_percent": 9.0,
+        "gpu_memory_mib": 3019.0,
+        "power_w": 38.87,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 246.8,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2892.0,
+        "power_w": 38.21,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 248.9,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 3043.0,
+        "power_w": 38.25,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 250.9,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2891.0,
+        "power_w": 38.0,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 253.0,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 2903.0,
+        "power_w": 38.75,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 255.1,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3011.0,
+        "power_w": 38.0,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 257.1,
+        "gpu_util_percent": 5.0,
+        "gpu_memory_mib": 2892.0,
+        "power_w": 37.82,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 259.2,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 3013.0,
+        "power_w": 38.25,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 261.2,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2894.0,
+        "power_w": 37.98,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 263.3,
+        "gpu_util_percent": 7.0,
+        "gpu_memory_mib": 3017.0,
+        "power_w": 38.45,
+        "temperature_c": 68.0
+      },
+      {
+        "elapsed_seconds": 265.4,
+        "gpu_util_percent": 6.0,
+        "gpu_memory_mib": 2893.0,
+        "power_w": 37.79,
+        "temperature_c": 67.0
+      },
+      {
+        "elapsed_seconds": 267.4,
+        "gpu_util_percent": 8.0,
+        "gpu_memory_mib": 3011.0,
+        "power_w": 38.38,
+        "temperature_c": 67.0
+      }
+    ],
+    "train_origins": 1252207,
+    "best_epoch": 6,
+    "epochs": [
+      {
+        "epoch": 1,
+        "train_normalized_mse": 0.5965501365886828,
+        "validation_beijing_h6_rmse": 15.684453010559082,
+        "seconds": 21.4,
+        "learning_rate": 0.001
+      },
+      {
+        "epoch": 2,
+        "train_normalized_mse": 0.4750930617941571,
+        "validation_beijing_h6_rmse": 15.713193893432617,
+        "seconds": 18.19,
+        "learning_rate": 0.001
+      },
+      {
+        "epoch": 3,
+        "train_normalized_mse": 0.4323091009625248,
+        "validation_beijing_h6_rmse": 15.6245698928833,
+        "seconds": 17.84,
+        "learning_rate": 0.001
+      },
+      {
+        "epoch": 4,
+        "train_normalized_mse": 0.41143898396603307,
+        "validation_beijing_h6_rmse": 15.704667091369629,
+        "seconds": 20.91,
+        "learning_rate": 0.001
+      },
+      {
+        "epoch": 5,
+        "train_normalized_mse": 0.39479819358026985,
+        "validation_beijing_h6_rmse": 15.81473445892334,
+        "seconds": 16.73,
+        "learning_rate": 0.0005
+      },
+      {
+        "epoch": 6,
+        "train_normalized_mse": 0.3720529374391138,
+        "validation_beijing_h6_rmse": 15.515206336975098,
+        "seconds": 16.79,
+        "learning_rate": 0.0005
+      },
+      {
+        "epoch": 7,
+        "train_normalized_mse": 0.3649198759027806,
+        "validation_beijing_h6_rmse": 15.7631254196167,
+        "seconds": 16.99,
+        "learning_rate": 0.0005
+      },
+      {
+        "epoch": 8,
+        "train_normalized_mse": 0.36077372499795907,
+        "validation_beijing_h6_rmse": 15.642677307128906,
+        "seconds": 21.29,
+        "learning_rate": 0.00025
+      },
+      {
+        "epoch": 9,
+        "train_normalized_mse": 0.3482665349984103,
+        "validation_beijing_h6_rmse": 15.648782730102539,
+        "seconds": 17.94,
+        "learning_rate": 0.00025
+      }
+    ],
+    "elapsed_seconds": 268.0627117210006,
+    "seed": 42
+  },
+  "recommended_by_horizon": {
+    "1": "tcn72",
+    "2": "tcn72",
+    "3": "tcn72",
+    "4": "tcn72",
+    "5": "tcn72",
+    "6": "tcn72"
+  }
+}

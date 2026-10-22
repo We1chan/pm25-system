@@ -1,0 +1,139 @@
+{
+  "city_correlations": [
+    {
+      "city": "beijing",
+      "other": "beijing",
+      "correlation": 1.0,
+      "n": 93877
+    },
+    {
+      "city": "beijing",
+      "other": "tianjin",
+      "correlation": 0.6927547034774135,
+      "n": 93789
+    },
+    {
+      "city": "beijing",
+      "other": "langfang",
+      "correlation": 0.8184122440346454,
+      "n": 93788
+    },
+    {
+      "city": "beijing",
+      "other": "baoding",
+      "correlation": 0.6865440125411819,
+      "n": 93856
+    },
+    {
+      "city": "beijing",
+      "other": "tangshan",
+      "correlation": 0.710169392466885,
+      "n": 93807
+    },
+    {
+      "city": "beijing",
+      "other": "zhangjiakou",
+      "correlation": 0.5329172618027844,
+      "n": 93743
+    },
+    {
+      "city": "tianjin",
+      "other": "tianjin",
+      "correlation": 1.0,
+      "n": 94028
+    },
+    {
+      "city": "tianjin",
+      "other": "langfang",
+      "correlation": 0.8415044470110634,
+      "n": 93981
+    },
+    {
+      "city": "tianjin",
+      "other": "baoding",
+      "correlation": 0.7393258896662983,
+      "n": 94005
+    },
+    {
+      "city": "tianjin",
+      "other": "tangshan",
+      "correlation": 0.8454133228395339,
+      "n": 94005
+    },
+    {
+      "city": "tianjin",
+      "other": "zhangjiakou",
+      "correlation": 0.36715823580706136,
+      "n": 93967
+    },
+    {
+      "city": "langfang",
+      "other": "langfang",
+      "correlation": 1.0,
+      "n": 94015
+    },
+    {
+      "city": "langfang",
+      "other": "baoding",
+      "correlation": 0.7802595992670938,
+      "n": 94005
+    },
+    {
+      "city": "langfang",
+      "other": "tangshan",
+      "correlation": 0.7949950399476555,
+      "n": 93989
+    },
+    {
+      "city": "langfang",
+      "other": "zhangjiakou",
+      "correlation": 0.42695596563951094,
+      "n": 93941
+    },
+    {
+      "city": "baoding",
+      "other": "baoding",
+      "correlation": 1.0,
+      "n": 94091
+    },
+    {
+      "city": "baoding",
+      "other": "tangshan",
+      "correlation": 0.7171258457419553,
+      "n": 94030
+    },
+    {
+      "city": "baoding",
+      "other": "zhangjiakou",
+      "correlation": 0.3739120410960636,
+      "n": 93959
+    },
+    {
+      "city": "tangshan",
+      "other": "tangshan",
+      "correlation": 1.0,
+      "n": 94045
+    },
+    {
+      "city": "tangshan",
+      "other": "zhangjiakou",
+      "correlation": 0.39135244657031704,
+      "n": 93964
+    },
+    {
+      "city": "zhangjiakou",
+      "other": "zhangjiakou",
+      "correlation": 1.0,
+      "n": 93972
+    }
+  ],
+  "beijing_weather_correlations": {
+    "temperature_2m": -0.10192298851354469,
+    "relative_humidity_2m": 0.24524002891902344,
+    "surface_pressure": -0.009756882801994245,
+    "wind_speed_10m": -0.19180166453841493,
+    "wind_direction_10m": -0.16556067277662223,
+    "precipitation": -0.04064221041527969
+  },
+  "note": "Pairwise Pearson correlation over historical observations; association does not establish causation."
+}

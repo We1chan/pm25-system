@@ -1,0 +1,6 @@
+{
+  "source": "https://github.com/liujun2024/trajrf/blob/39431e678941519ef3538f5c32e5f3e6084bc0ef/NewSiteList.csv",
+  "blob_sha": "6d644cf52c338242a5a2dce7277710993a4de1e8",
+  "coordinate_note": "Static station metadata; historical relocations not resolved. Coordinates are for display, weather remains a city ERA5 representative grid.",
+  "scope": "Original six cities; historical station codes retained, no latest-station survivor filtering."
+}

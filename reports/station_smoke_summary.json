@@ -1,0 +1,659 @@
+{
+  "grid_hours": 3600,
+  "valid_pm25": 259,
+  "stations": 75,
+  "start": "2022-01-01",
+  "end": "2022-01-02",
+  "source_days": 1,
+  "expected_days": 2,
+  "feature_count": 150,
+  "weather_history_hours": 72,
+  "hdfs": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/stations_v2/smoke",
+  "spark_version": "3.5.8",
+  "weather_note": "ERA5 at city representative coordinates shared by stations; static station coordinates do not resolve historical relocation",
+  "status": "smoke_only",
+  "stations_metadata": [
+    {
+      "station_id": "1001A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "万寿西宫",
+      "latitude": 39.8784,
+      "longitude": 116.3621
+    },
+    {
+      "station_id": "1002A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "定陵(对照点)",
+      "latitude": 40.2915,
+      "longitude": 116.2202
+    },
+    {
+      "station_id": "1003A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "东四",
+      "latitude": 39.9289,
+      "longitude": 116.4174
+    },
+    {
+      "station_id": "1004A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "天坛",
+      "latitude": 39.8863,
+      "longitude": 116.4072
+    },
+    {
+      "station_id": "1005A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "农展馆",
+      "latitude": 39.9365,
+      "longitude": 116.462
+    },
+    {
+      "station_id": "1006A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "官园",
+      "latitude": 39.9295,
+      "longitude": 116.3392
+    },
+    {
+      "station_id": "1007A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "海淀万柳",
+      "latitude": 39.9611,
+      "longitude": 116.2878
+    },
+    {
+      "station_id": "1008A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "顺义新城",
+      "latitude": 40.135,
+      "longitude": 116.6636
+    },
+    {
+      "station_id": "1009A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "怀柔镇",
+      "latitude": 40.3275,
+      "longitude": 116.6275
+    },
+    {
+      "station_id": "1010A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "昌平镇",
+      "latitude": 40.217,
+      "longitude": 116.2296
+    },
+    {
+      "station_id": "1011A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "奥体中心",
+      "latitude": 39.9821,
+      "longitude": 116.3966
+    },
+    {
+      "station_id": "1012A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "古城",
+      "latitude": 39.9136,
+      "longitude": 116.184
+    },
+    {
+      "station_id": "1015A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "勤俭道",
+      "latitude": 39.1661,
+      "longitude": 117.1444
+    },
+    {
+      "station_id": "1017A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "大直沽八号路",
+      "latitude": 39.1082,
+      "longitude": 117.237
+    },
+    {
+      "station_id": "1018A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "前进道",
+      "latitude": 39.0927,
+      "longitude": 117.202
+    },
+    {
+      "station_id": "1019A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "淮河道",
+      "latitude": 39.2133,
+      "longitude": 117.1837
+    },
+    {
+      "station_id": "1021A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "跃进路",
+      "latitude": 39.0877,
+      "longitude": 117.307
+    },
+    {
+      "station_id": "1023A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "第四大街",
+      "latitude": 39.0343,
+      "longitude": 117.707
+    },
+    {
+      "station_id": "1024A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "永明路",
+      "latitude": 38.8394,
+      "longitude": 117.457
+    },
+    {
+      "station_id": "1026A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "汉北路",
+      "latitude": 39.1587,
+      "longitude": 117.764
+    },
+    {
+      "station_id": "1027A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "团泊洼(对照点)",
+      "latitude": 38.9194,
+      "longitude": 117.157
+    },
+    {
+      "station_id": "1037A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "雷达站",
+      "latitude": 39.6363,
+      "longitude": 118.131
+    },
+    {
+      "station_id": "1038A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "物资局",
+      "latitude": 39.6334,
+      "longitude": 118.1725
+    },
+    {
+      "station_id": "1040A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "十二中",
+      "latitude": 39.6506,
+      "longitude": 118.1705
+    },
+    {
+      "station_id": "1041A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "小山",
+      "latitude": 39.622,
+      "longitude": 118.1869
+    },
+    {
+      "station_id": "1051A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "游泳馆",
+      "latitude": 38.8632,
+      "longitude": 115.493
+    },
+    {
+      "station_id": "1052A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "华电二区",
+      "latitude": 38.8959,
+      "longitude": 115.5213
+    },
+    {
+      "station_id": "1053A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "接待中心",
+      "latitude": 38.9108,
+      "longitude": 115.4713
+    },
+    {
+      "station_id": "1054A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "地表水厂",
+      "latitude": 38.8416,
+      "longitude": 115.4612
+    },
+    {
+      "station_id": "1055A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "胶片厂",
+      "latitude": 38.8697,
+      "longitude": 115.4323
+    },
+    {
+      "station_id": "1056A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "监测站",
+      "latitude": 38.8639,
+      "longitude": 115.5086
+    },
+    {
+      "station_id": "1057A",
+      "city_id": "zhangjiakou",
+      "city_name": "张家口",
+      "name": "人民公园",
+      "latitude": 40.8336,
+      "longitude": 114.8883
+    },
+    {
+      "station_id": "1059A",
+      "city_id": "zhangjiakou",
+      "city_name": "张家口",
+      "name": "五金库",
+      "latitude": 40.8042,
+      "longitude": 114.8687
+    },
+    {
+      "station_id": "1060A",
+      "city_id": "zhangjiakou",
+      "city_name": "张家口",
+      "name": "世纪豪园",
+      "latitude": 40.762,
+      "longitude": 114.8902
+    },
+    {
+      "station_id": "1061A",
+      "city_id": "zhangjiakou",
+      "city_name": "张家口",
+      "name": "北泵房(对照点)",
+      "latitude": 40.8661,
+      "longitude": 114.8916
+    },
+    {
+      "station_id": "1067A",
+      "city_id": "langfang",
+      "city_name": "廊坊",
+      "name": "药材公司",
+      "latitude": 39.5111,
+      "longitude": 116.6708
+    },
+    {
+      "station_id": "1068A",
+      "city_id": "langfang",
+      "city_name": "廊坊",
+      "name": "开发区",
+      "latitude": 39.5589,
+      "longitude": 116.7214
+    },
+    {
+      "station_id": "1070A",
+      "city_id": "langfang",
+      "city_name": "廊坊",
+      "name": "北华航天学院",
+      "latitude": 39.5269,
+      "longitude": 116.7244
+    },
+    {
+      "station_id": "2858A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "河西一经路",
+      "latitude": 39.2474,
+      "longitude": 117.7918
+    },
+    {
+      "station_id": "2859A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "津沽路",
+      "latitude": 38.9846,
+      "longitude": 117.3747
+    },
+    {
+      "station_id": "2860A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "宾水西道",
+      "latitude": 39.0845,
+      "longitude": 117.1589
+    },
+    {
+      "station_id": "2919A",
+      "city_id": "langfang",
+      "city_name": "廊坊",
+      "name": "河北工业大学",
+      "latitude": 39.5453,
+      "longitude": 116.7022
+    },
+    {
+      "station_id": "2922A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "大理道",
+      "latitude": 39.1067,
+      "longitude": 117.1941
+    },
+    {
+      "station_id": "3020A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "中山北路",
+      "latitude": 39.1699,
+      "longitude": 117.2101
+    },
+    {
+      "station_id": "3051A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "西四道",
+      "latitude": 39.1488,
+      "longitude": 117.3876
+    },
+    {
+      "station_id": "3131A",
+      "city_id": "zhangjiakou",
+      "city_name": "张家口",
+      "name": "烟厂",
+      "latitude": 40.7993,
+      "longitude": 114.879
+    },
+    {
+      "station_id": "3281A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "延庆夏都",
+      "latitude": 40.4529,
+      "longitude": 115.9718
+    },
+    {
+      "station_id": "3323A",
+      "city_id": "zhangjiakou",
+      "city_name": "张家口",
+      "name": "青少年活动中心",
+      "latitude": 40.9724,
+      "longitude": 115.2773
+    },
+    {
+      "station_id": "3325A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "雍阳西道",
+      "latitude": 39.3828,
+      "longitude": 117.0365
+    },
+    {
+      "station_id": "3326A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "辛老路",
+      "latitude": 39.0605,
+      "longitude": 117.0296
+    },
+    {
+      "station_id": "3327A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "地纬路",
+      "latitude": 38.9375,
+      "longitude": 116.9638
+    },
+    {
+      "station_id": "3417A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "平谷新城",
+      "latitude": 40.1465,
+      "longitude": 117.0709
+    },
+    {
+      "station_id": "3418A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "密云新城",
+      "latitude": 40.4095,
+      "longitude": 116.8336
+    },
+    {
+      "station_id": "3457A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "冀东油田职工医院",
+      "latitude": 39.2762,
+      "longitude": 118.4359
+    },
+    {
+      "station_id": "3460A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "北环路",
+      "latitude": 40.0583,
+      "longitude": 117.4067
+    },
+    {
+      "station_id": "3461A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "建设路",
+      "latitude": 39.7169,
+      "longitude": 117.3045
+    },
+    {
+      "station_id": "3462A",
+      "city_id": "tianjin",
+      "city_name": "天津",
+      "name": "滨水东路",
+      "latitude": 39.3521,
+      "longitude": 117.8199
+    },
+    {
+      "station_id": "3575A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "正泰大街热力站",
+      "latitude": 39.58089,
+      "longitude": 118.09279
+    },
+    {
+      "station_id": "3576A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "丰润区政府",
+      "latitude": 39.8322,
+      "longitude": 118.1562
+    },
+    {
+      "station_id": "3577A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "金山小学",
+      "latitude": 39.73809,
+      "longitude": 118.43673
+    },
+    {
+      "station_id": "3578A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "政府服务中心",
+      "latitude": 39.66941,
+      "longitude": 118.24498
+    },
+    {
+      "station_id": "3581A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "满城区生态环境分局",
+      "latitude": 38.95208,
+      "longitude": 115.31981
+    },
+    {
+      "station_id": "3582A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "清苑区第二中学",
+      "latitude": 38.76408,
+      "longitude": 115.47694
+    },
+    {
+      "station_id": "3583A",
+      "city_id": "baoding",
+      "city_name": "保定",
+      "name": "徐水物探局",
+      "latitude": 39.02311,
+      "longitude": 115.62909
+    },
+    {
+      "station_id": "3671A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "门头沟三家店",
+      "latitude": 39.9726,
+      "longitude": 116.088
+    },
+    {
+      "station_id": "3672A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "丰台云岗",
+      "latitude": 39.8204,
+      "longitude": 116.1541
+    },
+    {
+      "station_id": "3673A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "通州东关",
+      "latitude": 39.9081,
+      "longitude": 116.6804
+    },
+    {
+      "station_id": "3674A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "房山燕山",
+      "latitude": 39.7603,
+      "longitude": 115.9577
+    },
+    {
+      "station_id": "3675A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "大兴旧宫",
+      "latitude": 39.7733,
+      "longitude": 116.4672
+    },
+    {
+      "station_id": "3692A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "消防缸窑路中队",
+      "latitude": 39.6585,
+      "longitude": 118.2059
+    },
+    {
+      "station_id": "3693A",
+      "city_id": "tangshan",
+      "city_name": "唐山",
+      "name": "路南电大",
+      "latitude": 39.6202,
+      "longitude": 118.1436
+    },
+    {
+      "station_id": "3694A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "延庆石河营",
+      "latitude": 40.4563,
+      "longitude": 115.986
+    },
+    {
+      "station_id": "3695A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "怀柔新城",
+      "latitude": 40.3053,
+      "longitude": 116.6151
+    },
+    {
+      "station_id": "3696A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "丰台小屯",
+      "latitude": 39.8768,
+      "longitude": 116.2545
+    },
+    {
+      "station_id": "3697A",
+      "city_id": "beijing",
+      "city_name": "北京",
+      "name": "密云镇",
+      "latitude": 40.3844,
+      "longitude": 116.84
+    }
+  ],
+  "sequence_columns": [
+    "pm25",
+    "pm10",
+    "so2",
+    "no2",
+    "o3",
+    "co",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "surface_pressure",
+    "wind_speed_10m",
+    "precipitation",
+    "wind_direction_sin",
+    "wind_direction_cos",
+    "hour_sin",
+    "hour_cos",
+    "month_sin",
+    "month_cos",
+    "weekday_sin",
+    "weekday_cos",
+    "city_pm25",
+    "city_pm25_count",
+    "latitude",
+    "longitude",
+    "regional_beijing_pm25",
+    "regional_tianjin_pm25",
+    "regional_langfang_pm25",
+    "regional_baoding_pm25",
+    "regional_tangshan_pm25",
+    "regional_zhangjiakou_pm25"
+  ],
+  "splits": {
+    "train_end": 2023,
+    "validation": 2024,
+    "test": 2025
+  },
+  "source_format": "CNEMC hourly public Git archive",
+  "sequence_parquet": "/home/hadoop/.cache/pm25/station_smoke_sequences",
+  "raw_archive_bytes": 11205092271,
+  "source_file_count": 34580,
+  "archive_commit": "6853cea3099c222a0da078b22f5dcb534bf36112",
+  "archive_repository": "https://github.com/HeQinWill/CNEMC"
+}

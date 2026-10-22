@@ -1,0 +1,13 @@
+{
+  "local_parquet_readback": "passed",
+  "panel": {
+    "rows": 578592,
+    "valid_pm25": 564028
+  },
+  "features": {
+    "rows": 96432,
+    "valid_h6": 93877
+  },
+  "source_cell_and_target_checks": 48,
+  "unit_tests_passed": 4
+}

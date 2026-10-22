@@ -1,0 +1,3086 @@
+{
+  "completed_at": "2026-10-22T22:51:48.812055+08:00",
+  "model": "forecast_tcn9",
+  "data": {
+    "start": "2024-01-01T00",
+    "hours": 17544,
+    "stations_metadata": [
+      {
+        "station_id": "1001A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "万寿西宫",
+        "latitude": 39.8784,
+        "longitude": 116.3621
+      },
+      {
+        "station_id": "1002A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "定陵",
+        "latitude": 40.2915,
+        "longitude": 116.2202
+      },
+      {
+        "station_id": "1003A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "东四",
+        "latitude": 39.9289,
+        "longitude": 116.4174
+      },
+      {
+        "station_id": "1004A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "天坛",
+        "latitude": 39.8863,
+        "longitude": 116.4072
+      },
+      {
+        "station_id": "1005A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "农展馆",
+        "latitude": 39.9365,
+        "longitude": 116.462
+      },
+      {
+        "station_id": "1006A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "官园",
+        "latitude": 39.9295,
+        "longitude": 116.3392
+      },
+      {
+        "station_id": "1007A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "海淀万柳",
+        "latitude": 39.9611,
+        "longitude": 116.2878
+      },
+      {
+        "station_id": "1008A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "顺义新城",
+        "latitude": 40.135,
+        "longitude": 116.6636
+      },
+      {
+        "station_id": "1009A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "怀柔镇",
+        "latitude": 40.3275,
+        "longitude": 116.6275
+      },
+      {
+        "station_id": "1010A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "昌平镇",
+        "latitude": 40.217,
+        "longitude": 116.2296
+      },
+      {
+        "station_id": "1011A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "奥体中心",
+        "latitude": 39.9821,
+        "longitude": 116.3966
+      },
+      {
+        "station_id": "1012A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "古城",
+        "latitude": 39.9136,
+        "longitude": 116.184
+      },
+      {
+        "station_id": "1015A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "勤俭道",
+        "latitude": 39.1661,
+        "longitude": 117.1444
+      },
+      {
+        "station_id": "1017A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "大直沽八号路",
+        "latitude": 39.1082,
+        "longitude": 117.237
+      },
+      {
+        "station_id": "1018A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "前进道",
+        "latitude": 39.0927,
+        "longitude": 117.202
+      },
+      {
+        "station_id": "1019A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "淮河道",
+        "latitude": 39.2133,
+        "longitude": 117.1837
+      },
+      {
+        "station_id": "1021A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "跃进路",
+        "latitude": 39.0884,
+        "longitude": 117.3083
+      },
+      {
+        "station_id": "1023A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "第四大街",
+        "latitude": 39.0343,
+        "longitude": 117.707
+      },
+      {
+        "station_id": "1024A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "永明路",
+        "latitude": 38.8394,
+        "longitude": 117.457
+      },
+      {
+        "station_id": "1026A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "汉北路",
+        "latitude": 39.1587,
+        "longitude": 117.764
+      },
+      {
+        "station_id": "1027A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "团泊洼",
+        "latitude": 38.9194,
+        "longitude": 117.157
+      },
+      {
+        "station_id": "1037A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "雷达站",
+        "latitude": 39.6363,
+        "longitude": 118.131
+      },
+      {
+        "station_id": "1038A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "物资局",
+        "latitude": 39.6334,
+        "longitude": 118.1725
+      },
+      {
+        "station_id": "1040A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "十二中",
+        "latitude": 39.6506,
+        "longitude": 118.1705
+      },
+      {
+        "station_id": "1041A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "小山",
+        "latitude": 39.622,
+        "longitude": 118.1869
+      },
+      {
+        "station_id": "1051A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "游泳馆",
+        "latitude": 38.8632,
+        "longitude": 115.493
+      },
+      {
+        "station_id": "1052A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "华电二区",
+        "latitude": 38.8959,
+        "longitude": 115.5213
+      },
+      {
+        "station_id": "1053A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "接待中心",
+        "latitude": 38.9108,
+        "longitude": 115.4713
+      },
+      {
+        "station_id": "1054A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "地表水厂",
+        "latitude": 38.8416,
+        "longitude": 115.4612
+      },
+      {
+        "station_id": "1055A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "胶片厂",
+        "latitude": 38.8697,
+        "longitude": 115.4323
+      },
+      {
+        "station_id": "1056A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "监测站",
+        "latitude": 38.8639,
+        "longitude": 115.5086
+      },
+      {
+        "station_id": "1057A",
+        "city_id": "zhangjiakou",
+        "city_name": "张家口",
+        "name": "人民公园",
+        "latitude": 40.8336,
+        "longitude": 114.8883
+      },
+      {
+        "station_id": "1059A",
+        "city_id": "zhangjiakou",
+        "city_name": "张家口",
+        "name": "五金库",
+        "latitude": 40.8042,
+        "longitude": 114.8687
+      },
+      {
+        "station_id": "1060A",
+        "city_id": "zhangjiakou",
+        "city_name": "张家口",
+        "name": "世纪豪园",
+        "latitude": 40.762,
+        "longitude": 114.8902
+      },
+      {
+        "station_id": "1061A",
+        "city_id": "zhangjiakou",
+        "city_name": "张家口",
+        "name": "北泵房",
+        "latitude": 40.8661,
+        "longitude": 114.8916
+      },
+      {
+        "station_id": "1067A",
+        "city_id": "langfang",
+        "city_name": "廊坊",
+        "name": "药材公司",
+        "latitude": 39.5111,
+        "longitude": 116.6708
+      },
+      {
+        "station_id": "1068A",
+        "city_id": "langfang",
+        "city_name": "廊坊",
+        "name": "开发区",
+        "latitude": 39.5589,
+        "longitude": 116.7214
+      },
+      {
+        "station_id": "1070A",
+        "city_id": "langfang",
+        "city_name": "廊坊",
+        "name": "北华航天学院",
+        "latitude": 39.5269,
+        "longitude": 116.7244
+      },
+      {
+        "station_id": "2858A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "河西一经路",
+        "latitude": 39.2474,
+        "longitude": 117.7918
+      },
+      {
+        "station_id": "2859A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "津沽路",
+        "latitude": 38.9846,
+        "longitude": 117.3747
+      },
+      {
+        "station_id": "2860A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "宾水西道",
+        "latitude": 39.0845,
+        "longitude": 117.1589
+      },
+      {
+        "station_id": "2919A",
+        "city_id": "langfang",
+        "city_name": "廊坊",
+        "name": "河北工业大学",
+        "latitude": 39.5453,
+        "longitude": 116.7022
+      },
+      {
+        "station_id": "2922A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "大理道",
+        "latitude": 39.1067,
+        "longitude": 117.1941
+      },
+      {
+        "station_id": "3020A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "中山北路",
+        "latitude": 39.1699,
+        "longitude": 117.2101
+      },
+      {
+        "station_id": "3051A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "西四道",
+        "latitude": 39.1488,
+        "longitude": 117.3876
+      },
+      {
+        "station_id": "3131A",
+        "city_id": "zhangjiakou",
+        "city_name": "张家口",
+        "name": "烟厂",
+        "latitude": 40.7993,
+        "longitude": 114.879
+      },
+      {
+        "station_id": "3281A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "延庆夏都",
+        "latitude": 40.4529,
+        "longitude": 115.9718
+      },
+      {
+        "station_id": "3323A",
+        "city_id": "zhangjiakou",
+        "city_name": "张家口",
+        "name": "青少年活动中心",
+        "latitude": 40.9724,
+        "longitude": 115.2773
+      },
+      {
+        "station_id": "3325A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "雍阳西道",
+        "latitude": 39.3828,
+        "longitude": 117.0365
+      },
+      {
+        "station_id": "3326A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "辛老路",
+        "latitude": 39.0605,
+        "longitude": 117.0296
+      },
+      {
+        "station_id": "3327A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "地纬路",
+        "latitude": 38.9375,
+        "longitude": 116.9638
+      },
+      {
+        "station_id": "3417A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "平谷新城",
+        "latitude": 40.1465,
+        "longitude": 117.0709
+      },
+      {
+        "station_id": "3418A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "密云新城",
+        "latitude": 40.4095,
+        "longitude": 116.8336
+      },
+      {
+        "station_id": "3457A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "冀东油田职工医院",
+        "latitude": 39.2762,
+        "longitude": 118.4359
+      },
+      {
+        "station_id": "3460A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "北环路",
+        "latitude": 40.0583,
+        "longitude": 117.4067
+      },
+      {
+        "station_id": "3461A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "建设路",
+        "latitude": 39.7169,
+        "longitude": 117.3045
+      },
+      {
+        "station_id": "3462A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "滨水东路",
+        "latitude": 39.3521,
+        "longitude": 117.8199
+      },
+      {
+        "station_id": "3575A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "正泰大街热力站",
+        "latitude": 39.58089,
+        "longitude": 118.09279
+      },
+      {
+        "station_id": "3576A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "丰润区政府",
+        "latitude": 39.8322,
+        "longitude": 118.1562
+      },
+      {
+        "station_id": "3577A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "金山小学",
+        "latitude": 39.73809,
+        "longitude": 118.43673
+      },
+      {
+        "station_id": "3578A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "政府服务中心",
+        "latitude": 39.66941,
+        "longitude": 118.24498
+      },
+      {
+        "station_id": "3581A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "满城区生态环境分局",
+        "latitude": 38.95208,
+        "longitude": 115.31981
+      },
+      {
+        "station_id": "3582A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "清苑区第二中学",
+        "latitude": 38.76408,
+        "longitude": 115.47694
+      },
+      {
+        "station_id": "3583A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "徐水物探局",
+        "latitude": 39.02311,
+        "longitude": 115.62909
+      },
+      {
+        "station_id": "3671A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "门头沟三家店",
+        "latitude": 39.9726,
+        "longitude": 116.088
+      },
+      {
+        "station_id": "3672A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "丰台云岗",
+        "latitude": 39.8204,
+        "longitude": 116.1541
+      },
+      {
+        "station_id": "3673A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "通州东关",
+        "latitude": 39.9081,
+        "longitude": 116.6804
+      },
+      {
+        "station_id": "3674A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "房山燕山",
+        "latitude": 39.7603,
+        "longitude": 115.9577
+      },
+      {
+        "station_id": "3675A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "大兴旧宫",
+        "latitude": 39.7733,
+        "longitude": 116.4672
+      },
+      {
+        "station_id": "3692A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "消防缸窑路中队",
+        "latitude": 39.6585,
+        "longitude": 118.2059
+      },
+      {
+        "station_id": "3693A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "路南电大",
+        "latitude": 39.6202,
+        "longitude": 118.1436
+      },
+      {
+        "station_id": "3694A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "延庆石河营",
+        "latitude": 40.4563,
+        "longitude": 115.986
+      },
+      {
+        "station_id": "3695A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "怀柔新城",
+        "latitude": 40.3053,
+        "longitude": 116.6151
+      },
+      {
+        "station_id": "3696A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "丰台小屯",
+        "latitude": 39.8768,
+        "longitude": 116.2545
+      },
+      {
+        "station_id": "3697A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "密云镇",
+        "latitude": 40.3844,
+        "longitude": 116.84
+      },
+      {
+        "station_id": "4004A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "双鹰农机",
+        "latitude": 38.8656,
+        "longitude": 115.4202
+      },
+      {
+        "station_id": "4034A",
+        "city_id": "baoding",
+        "city_name": "保定",
+        "name": "植保所站",
+        "latitude": 38.859,
+        "longitude": 115.515
+      },
+      {
+        "station_id": "4182A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "八角北路9号",
+        "latitude": 39.9158,
+        "longitude": 116.1942
+      },
+      {
+        "station_id": "4194A",
+        "city_id": "beijing",
+        "city_name": "北京",
+        "name": "洳河巡河路",
+        "latitude": 40.1518,
+        "longitude": 117.079
+      },
+      {
+        "station_id": "4196A",
+        "city_id": "tianjin",
+        "city_name": "天津",
+        "name": "光华路",
+        "latitude": 39.1029,
+        "longitude": 117.2437
+      },
+      {
+        "station_id": "4197A",
+        "city_id": "tangshan",
+        "city_name": "唐山",
+        "name": "友谊北路34号",
+        "latitude": 39.636,
+        "longitude": 118.1309
+      }
+    ],
+    "cities": [
+      "beijing",
+      "tianjin",
+      "tangshan",
+      "baoding",
+      "zhangjiakou",
+      "langfang"
+    ],
+    "sequence_columns": [
+      "pm25",
+      "pm10",
+      "so2",
+      "no2",
+      "o3",
+      "co",
+      "temperature_2m",
+      "relative_humidity_2m",
+      "surface_pressure",
+      "wind_speed_10m",
+      "precipitation",
+      "wind_direction_sin",
+      "wind_direction_cos",
+      "hour_sin",
+      "hour_cos",
+      "month_sin",
+      "month_cos",
+      "weekday_sin",
+      "weekday_cos",
+      "city_pm25",
+      "city_pm25_count",
+      "latitude",
+      "longitude",
+      "regional_beijing_pm25",
+      "regional_tianjin_pm25",
+      "regional_langfang_pm25",
+      "regional_baoding_pm25",
+      "regional_tangshan_pm25",
+      "regional_zhangjiakou_pm25"
+    ],
+    "weather_columns": [
+      "temperature_2m",
+      "relative_humidity_2m",
+      "surface_pressure",
+      "wind_speed_10m",
+      "precipitation",
+      "wind_direction_sin",
+      "wind_direction_cos"
+    ],
+    "weather_model": "gfs_global",
+    "weather_lead_hours": 24,
+    "weather_valid_hours": 102552,
+    "hdfs": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/forecast_v3",
+    "spark_version": "3.5.8",
+    "source_manifest_sha256": "7bb108c2fae6e277444d42dd7073126988602b2091a6f8b916498f5d4bf73179",
+    "splits": {
+      "train": "2024-01-01..2024-08-31",
+      "selection": "2024-09-01..2024-10-31",
+      "calibration": "2024-11-01..2024-12-31",
+      "test": "2025-01-01..2025-12-31"
+    }
+  },
+  "samples": {
+    "train": 382388,
+    "selection": 34041,
+    "calibration": 34656,
+    "test": 193411
+  },
+  "runs": {
+    "history_only": {
+      "selection": {
+        "by_horizon": [
+          {
+            "horizon": 1,
+            "n": 33413,
+            "mae": 3.745509147644043,
+            "rmse": 7.701976776123047,
+            "baseline_rmse": 6.141618728637695,
+            "coverage": 0.8574207643731482,
+            "mean_width": 12.022974014282227
+          },
+          {
+            "horizon": 2,
+            "n": 33339,
+            "mae": 5.75714635848999,
+            "rmse": 10.605277061462402,
+            "baseline_rmse": 10.394885063171387,
+            "coverage": 0.8218902786526291,
+            "mean_width": 17.3177547454834
+          },
+          {
+            "horizon": 3,
+            "n": 33297,
+            "mae": 7.584484577178955,
+            "rmse": 13.343360900878906,
+            "baseline_rmse": 13.739230155944824,
+            "coverage": 0.806408985794516,
+            "mean_width": 21.066123962402344
+          },
+          {
+            "horizon": 4,
+            "n": 33263,
+            "mae": 9.09199333190918,
+            "rmse": 15.56054973602295,
+            "baseline_rmse": 16.564746856689453,
+            "coverage": 0.8037158404232931,
+            "mean_width": 24.837942123413086
+          },
+          {
+            "horizon": 5,
+            "n": 33254,
+            "mae": 10.207942962646484,
+            "rmse": 17.334003448486328,
+            "baseline_rmse": 18.990863800048828,
+            "coverage": 0.7974078306369159,
+            "mean_width": 27.198381423950195
+          },
+          {
+            "horizon": 6,
+            "n": 33268,
+            "mae": 11.210409164428711,
+            "rmse": 18.895282745361328,
+            "baseline_rmse": 21.123674392700195,
+            "coverage": 0.8002885655885535,
+            "mean_width": 29.660724639892578
+          },
+          {
+            "horizon": 7,
+            "n": 33269,
+            "mae": 12.11357593536377,
+            "rmse": 20.34484100341797,
+            "baseline_rmse": 23.047161102294922,
+            "coverage": 0.8012864829120202,
+            "mean_width": 31.459888458251953
+          },
+          {
+            "horizon": 8,
+            "n": 33275,
+            "mae": 12.889896392822266,
+            "rmse": 21.556222915649414,
+            "baseline_rmse": 24.777400970458984,
+            "coverage": 0.804297520661157,
+            "mean_width": 33.21614456176758
+          },
+          {
+            "horizon": 9,
+            "n": 33280,
+            "mae": 13.504258155822754,
+            "rmse": 22.390413284301758,
+            "baseline_rmse": 26.353599548339844,
+            "coverage": 0.801171875,
+            "mean_width": 34.67770767211914
+          }
+        ],
+        "city_by_horizon": [
+          {
+            "horizon": 1,
+            "n": 1348,
+            "rmse": 4.935299858628748,
+            "baseline_rmse": 3.876408158567322,
+            "coverage": 0.9428783382789317,
+            "mean_width": 12.094690311984158
+          },
+          {
+            "horizon": 2,
+            "n": 1316,
+            "rmse": 7.218443926570686,
+            "baseline_rmse": 7.370299182012561,
+            "coverage": 0.9217325227963525,
+            "mean_width": 17.46174624865647
+          },
+          {
+            "horizon": 3,
+            "n": 1297,
+            "rmse": 9.860628149137026,
+            "baseline_rmse": 10.4813861829186,
+            "coverage": 0.8774094063222821,
+            "mean_width": 19.8713042259439
+          },
+          {
+            "horizon": 4,
+            "n": 1291,
+            "rmse": 12.116205920966337,
+            "baseline_rmse": 13.242537117611997,
+            "coverage": 0.8079008520526724,
+            "mean_width": 21.637041173366608
+          },
+          {
+            "horizon": 5,
+            "n": 1284,
+            "rmse": 13.942136114047278,
+            "baseline_rmse": 15.655115203594114,
+            "coverage": 0.7881619937694704,
+            "mean_width": 22.659483616958553
+          },
+          {
+            "horizon": 6,
+            "n": 1277,
+            "rmse": 15.465862801589227,
+            "baseline_rmse": 17.75728355624234,
+            "coverage": 0.8026624902114331,
+            "mean_width": 25.084446068564663
+          },
+          {
+            "horizon": 7,
+            "n": 1270,
+            "rmse": 16.98817074099736,
+            "baseline_rmse": 19.60645296713558,
+            "coverage": 0.8086614173228347,
+            "mean_width": 26.951001359403854
+          },
+          {
+            "horizon": 8,
+            "n": 1270,
+            "rmse": 18.223955686411884,
+            "baseline_rmse": 21.17646826248634,
+            "coverage": 0.8086614173228347,
+            "mean_width": 29.226023707613415
+          },
+          {
+            "horizon": 9,
+            "n": 1264,
+            "rmse": 19.20777240039121,
+            "baseline_rmse": 22.778134144640163,
+            "coverage": 0.8006329113924051,
+            "mean_width": 30.660894928003863
+          }
+        ],
+        "regimes": {
+          "pm_lt35": [
+            {
+              "horizon": 1,
+              "n": 23779,
+              "mae": 2.2027997970581055,
+              "rmse": 4.331204414367676,
+              "baseline_rmse": 4.966196537017822,
+              "coverage": 0.8708944867319904,
+              "mean_width": 7.652856826782227
+            },
+            {
+              "horizon": 2,
+              "n": 23679,
+              "mae": 3.5098636150360107,
+              "rmse": 6.857291221618652,
+              "baseline_rmse": 8.754881858825684,
+              "coverage": 0.8549769838253305,
+              "mean_width": 11.794646263122559
+            },
+            {
+              "horizon": 3,
+              "n": 23616,
+              "mae": 4.581067085266113,
+              "rmse": 8.309476852416992,
+              "baseline_rmse": 11.793950080871582,
+              "coverage": 0.8597984417344173,
+              "mean_width": 15.424209594726562
+            },
+            {
+              "horizon": 4,
+              "n": 23562,
+              "mae": 5.483107566833496,
+              "rmse": 9.401567459106445,
+              "baseline_rmse": 14.440653800964355,
+              "coverage": 0.8735251676428147,
+              "mean_width": 18.932388305664062
+            },
+            {
+              "horizon": 5,
+              "n": 23532,
+              "mae": 6.004187107086182,
+              "rmse": 10.182086944580078,
+              "baseline_rmse": 16.75932502746582,
+              "coverage": 0.880715621281659,
+              "mean_width": 21.109548568725586
+            },
+            {
+              "horizon": 6,
+              "n": 23510,
+              "mae": 6.511069297790527,
+              "rmse": 10.931854248046875,
+              "baseline_rmse": 18.835582733154297,
+              "coverage": 0.8975754997873245,
+              "mean_width": 23.624832153320312
+            },
+            {
+              "horizon": 7,
+              "n": 23510,
+              "mae": 6.927639961242676,
+              "rmse": 11.455836296081543,
+              "baseline_rmse": 20.708147048950195,
+              "coverage": 0.9055720969800085,
+              "mean_width": 25.322166442871094
+            },
+            {
+              "horizon": 8,
+              "n": 23498,
+              "mae": 7.388442039489746,
+              "rmse": 12.236844062805176,
+              "baseline_rmse": 22.39775848388672,
+              "coverage": 0.9132692144012257,
+              "mean_width": 27.27819061279297
+            },
+            {
+              "horizon": 9,
+              "n": 23484,
+              "mae": 7.88691520690918,
+              "rmse": 13.186600685119629,
+              "baseline_rmse": 23.91474151611328,
+              "coverage": 0.9078521546584909,
+              "mean_width": 28.421247482299805
+            }
+          ],
+          "pm_35_75": [
+            {
+              "horizon": 1,
+              "n": 6345,
+              "mae": 4.600905418395996,
+              "rmse": 6.528672218322754,
+              "baseline_rmse": 7.4066081047058105,
+              "coverage": 0.8447596532702916,
+              "mean_width": 16.78390884399414
+            },
+            {
+              "horizon": 2,
+              "n": 6353,
+              "mae": 7.925607681274414,
+              "rmse": 10.568748474121094,
+              "baseline_rmse": 11.784951210021973,
+              "coverage": 0.7654651345820872,
+              "mean_width": 23.59454345703125
+            },
+            {
+              "horizon": 3,
+              "n": 6350,
+              "mae": 10.20296573638916,
+              "rmse": 13.078993797302246,
+              "baseline_rmse": 14.762593269348145,
+              "coverage": 0.7267716535433071,
+              "mean_width": 28.060636520385742
+            },
+            {
+              "horizon": 4,
+              "n": 6344,
+              "mae": 11.858968734741211,
+              "rmse": 14.955669403076172,
+              "baseline_rmse": 17.050020217895508,
+              "coverage": 0.7099621689785625,
+              "mean_width": 32.35893249511719
+            },
+            {
+              "horizon": 5,
+              "n": 6343,
+              "mae": 13.45993709564209,
+              "rmse": 16.66770362854004,
+              "baseline_rmse": 18.90969467163086,
+              "coverage": 0.6779126596247832,
+              "mean_width": 35.03486633300781
+            },
+            {
+              "horizon": 6,
+              "n": 6353,
+              "mae": 14.742497444152832,
+              "rmse": 18.09462547302246,
+              "baseline_rmse": 20.414409637451172,
+              "coverage": 0.6592161183692744,
+              "mean_width": 37.28116989135742
+            },
+            {
+              "horizon": 7,
+              "n": 6336,
+              "mae": 15.817920684814453,
+              "rmse": 19.2141056060791,
+              "baseline_rmse": 21.687763214111328,
+              "coverage": 0.6502525252525253,
+              "mean_width": 39.00774002075195
+            },
+            {
+              "horizon": 8,
+              "n": 6329,
+              "mae": 16.62872886657715,
+              "rmse": 20.06155014038086,
+              "baseline_rmse": 22.72835922241211,
+              "coverage": 0.6478116606098909,
+              "mean_width": 40.382328033447266
+            },
+            {
+              "horizon": 9,
+              "n": 6328,
+              "mae": 17.127700805664062,
+              "rmse": 20.502914428710938,
+              "baseline_rmse": 23.62511444091797,
+              "coverage": 0.6542351453855879,
+              "mean_width": 42.07664489746094
+            }
+          ],
+          "pm_ge75": [
+            {
+              "horizon": 1,
+              "n": 3289,
+              "mae": 13.248881340026855,
+              "rmse": 19.615873336791992,
+              "baseline_rmse": 9.95251750946045,
+              "coverage": 0.7844329583460018,
+              "mean_width": 34.43368911743164
+            },
+            {
+              "horizon": 2,
+              "n": 3307,
+              "mae": 17.68250846862793,
+              "rmse": 24.13697052001953,
+              "baseline_rmse": 16.543790817260742,
+              "coverage": 0.6933776837012398,
+              "mean_width": 44.806480407714844
+            },
+            {
+              "horizon": 3,
+              "n": 3331,
+              "mae": 23.886295318603516,
+              "rmse": 31.05044937133789,
+              "baseline_rmse": 22.029653549194336,
+              "coverage": 0.5797057940558391,
+              "mean_width": 47.73207473754883
+            },
+            {
+              "horizon": 4,
+              "n": 3357,
+              "mae": 29.192935943603516,
+              "rmse": 36.82509231567383,
+              "baseline_rmse": 26.56705093383789,
+              "coverage": 0.4909145070002979,
+              "mean_width": 52.074607849121094
+            },
+            {
+              "horizon": 5,
+              "n": 3379,
+              "mae": 33.37911605834961,
+              "rmse": 41.39442443847656,
+              "baseline_rmse": 30.364721298217773,
+              "coverage": 0.44155075466114235,
+              "mean_width": 54.89165496826172
+            },
+            {
+              "horizon": 6,
+              "n": 3405,
+              "mae": 37.06713104248047,
+              "rmse": 45.30234146118164,
+              "baseline_rmse": 33.6521110534668,
+              "coverage": 0.39177679882525696,
+              "mean_width": 57.117740631103516
+            },
+            {
+              "horizon": 7,
+              "n": 3423,
+              "mae": 40.875083923339844,
+              "rmse": 49.37812805175781,
+              "baseline_rmse": 36.69689178466797,
+              "coverage": 0.36459246275197194,
+              "mean_width": 59.644107818603516
+            },
+            {
+              "horizon": 8,
+              "n": 3448,
+              "mae": 43.519283294677734,
+              "rmse": 52.2024040222168,
+              "baseline_rmse": 39.46699523925781,
+              "coverage": 0.34889791183294666,
+              "mean_width": 60.52916717529297
+            },
+            {
+              "horizon": 9,
+              "n": 3468,
+              "mae": 44.931175231933594,
+              "rmse": 53.53866195678711,
+              "baseline_rmse": 42.11318588256836,
+              "coverage": 0.3468858131487889,
+              "mean_width": 63.54340744018555
+            }
+          ],
+          "abrupt_ge20": [
+            {
+              "horizon": 1,
+              "n": 529,
+              "mae": 26.17151641845703,
+              "rmse": 29.199237823486328,
+              "baseline_rmse": 36.32236099243164,
+              "coverage": 0.19281663516068054,
+              "mean_width": 29.54052734375
+            },
+            {
+              "horizon": 2,
+              "n": 1677,
+              "mae": 28.241945266723633,
+              "rmse": 32.17325973510742,
+              "baseline_rmse": 39.25698471069336,
+              "coverage": 0.20333929636255219,
+              "mean_width": 36.74809646606445
+            },
+            {
+              "horizon": 3,
+              "n": 2903,
+              "mae": 29.322704315185547,
+              "rmse": 34.1002311706543,
+              "baseline_rmse": 41.60808181762695,
+              "coverage": 0.20461591457113332,
+              "mean_width": 38.06056213378906
+            },
+            {
+              "horizon": 4,
+              "n": 3961,
+              "mae": 30.190778732299805,
+              "rmse": 35.80624008178711,
+              "baseline_rmse": 44.135093688964844,
+              "coverage": 0.2342842716485736,
+              "mean_width": 41.31926345825195
+            },
+            {
+              "horizon": 5,
+              "n": 4943,
+              "mae": 30.471309661865234,
+              "rmse": 36.81492233276367,
+              "baseline_rmse": 46.06970977783203,
+              "coverage": 0.28221727695731336,
+              "mean_width": 43.25043487548828
+            },
+            {
+              "horizon": 6,
+              "n": 5741,
+              "mae": 30.994033813476562,
+              "rmse": 37.98181915283203,
+              "baseline_rmse": 48.06645584106445,
+              "coverage": 0.3164953840794287,
+              "mean_width": 44.766761779785156
+            },
+            {
+              "horizon": 7,
+              "n": 6498,
+              "mae": 31.395761489868164,
+              "rmse": 39.103206634521484,
+              "baseline_rmse": 49.706783294677734,
+              "coverage": 0.36657433056325023,
+              "mean_width": 46.4589958190918
+            },
+            {
+              "horizon": 8,
+              "n": 7149,
+              "mae": 31.817487716674805,
+              "rmse": 39.96794891357422,
+              "baseline_rmse": 51.232269287109375,
+              "coverage": 0.38914533501188975,
+              "mean_width": 47.306800842285156
+            },
+            {
+              "horizon": 9,
+              "n": 7796,
+              "mae": 32.42681121826172,
+              "rmse": 40.5612678527832,
+              "baseline_rmse": 52.43373489379883,
+              "coverage": 0.4025141097998974,
+              "mean_width": 49.42509841918945
+            }
+          ]
+        }
+      },
+      "test": {
+        "by_horizon": [
+          {
+            "horizon": 1,
+            "n": 189203,
+            "mae": 3.532501697540283,
+            "rmse": 6.551501750946045,
+            "baseline_rmse": 6.1153130531311035,
+            "coverage": 0.828956200483079,
+            "mean_width": 11.627693176269531
+          },
+          {
+            "horizon": 2,
+            "n": 188736,
+            "mae": 5.410709857940674,
+            "rmse": 9.262858390808105,
+            "baseline_rmse": 9.917323112487793,
+            "coverage": 0.8036516615801966,
+            "mean_width": 16.638408660888672
+          },
+          {
+            "horizon": 3,
+            "n": 188391,
+            "mae": 6.996142387390137,
+            "rmse": 11.57007884979248,
+            "baseline_rmse": 12.732636451721191,
+            "coverage": 0.7959775148494355,
+            "mean_width": 20.740825653076172
+          },
+          {
+            "horizon": 4,
+            "n": 188322,
+            "mae": 8.326961517333984,
+            "rmse": 13.4130859375,
+            "baseline_rmse": 14.97712516784668,
+            "coverage": 0.8032571871581653,
+            "mean_width": 24.768648147583008
+          },
+          {
+            "horizon": 5,
+            "n": 188226,
+            "mae": 9.318102836608887,
+            "rmse": 14.894769668579102,
+            "baseline_rmse": 16.89237403869629,
+            "coverage": 0.8045859764325863,
+            "mean_width": 27.340715408325195
+          },
+          {
+            "horizon": 6,
+            "n": 187991,
+            "mae": 10.23560905456543,
+            "rmse": 16.194854736328125,
+            "baseline_rmse": 18.47213363647461,
+            "coverage": 0.8097994052906788,
+            "mean_width": 30.172460556030273
+          },
+          {
+            "horizon": 7,
+            "n": 187870,
+            "mae": 11.003575325012207,
+            "rmse": 17.317611694335938,
+            "baseline_rmse": 19.818378448486328,
+            "coverage": 0.8093522116357056,
+            "mean_width": 32.15986633300781
+          },
+          {
+            "horizon": 8,
+            "n": 187909,
+            "mae": 11.708219528198242,
+            "rmse": 18.364410400390625,
+            "baseline_rmse": 20.941274642944336,
+            "coverage": 0.8116801217610652,
+            "mean_width": 34.08992004394531
+          },
+          {
+            "horizon": 9,
+            "n": 187674,
+            "mae": 12.27092456817627,
+            "rmse": 19.14598274230957,
+            "baseline_rmse": 21.975778579711914,
+            "coverage": 0.8088174174366188,
+            "mean_width": 35.657684326171875
+          }
+        ],
+        "city_by_horizon": [
+          {
+            "horizon": 1,
+            "n": 7872,
+            "rmse": 4.144722978904604,
+            "baseline_rmse": 3.487517913591262,
+            "coverage": 0.945630081300813,
+            "mean_width": 11.633956206297883
+          },
+          {
+            "horizon": 2,
+            "n": 7667,
+            "rmse": 6.005112558037281,
+            "baseline_rmse": 6.3699599040818855,
+            "coverage": 0.9264379809573496,
+            "mean_width": 16.598556165620984
+          },
+          {
+            "horizon": 3,
+            "n": 7537,
+            "rmse": 8.226709971779508,
+            "baseline_rmse": 8.79821750052854,
+            "coverage": 0.8782008756799787,
+            "mean_width": 19.310391855605538
+          },
+          {
+            "horizon": 4,
+            "n": 7455,
+            "rmse": 10.198663727561511,
+            "baseline_rmse": 10.929931073345491,
+            "coverage": 0.8346076458752515,
+            "mean_width": 21.278125117025294
+          },
+          {
+            "horizon": 5,
+            "n": 7388,
+            "rmse": 11.706410338721783,
+            "baseline_rmse": 12.814536589061122,
+            "coverage": 0.8122631293990255,
+            "mean_width": 22.451218000626838
+          },
+          {
+            "horizon": 6,
+            "n": 7340,
+            "rmse": 13.05749509999806,
+            "baseline_rmse": 14.41334553500478,
+            "coverage": 0.8181198910081744,
+            "mean_width": 25.193220307347534
+          },
+          {
+            "horizon": 7,
+            "n": 7294,
+            "rmse": 14.265669010309063,
+            "baseline_rmse": 15.746732994667592,
+            "coverage": 0.8147792706333973,
+            "mean_width": 27.18166790383084
+          },
+          {
+            "horizon": 8,
+            "n": 7261,
+            "rmse": 15.403340484660282,
+            "baseline_rmse": 16.868918837741468,
+            "coverage": 0.8215121884038011,
+            "mean_width": 29.647205308295042
+          },
+          {
+            "horizon": 9,
+            "n": 7224,
+            "rmse": 16.279250941445724,
+            "baseline_rmse": 17.95331522564398,
+            "coverage": 0.8147840531561462,
+            "mean_width": 31.12760616618713
+          }
+        ],
+        "regimes": {
+          "pm_lt35": [
+            {
+              "horizon": 1,
+              "n": 139265,
+              "mae": 2.5422589778900146,
+              "rmse": 4.456250190734863,
+              "baseline_rmse": 4.759867191314697,
+              "coverage": 0.8318888450077191,
+              "mean_width": 8.45383358001709
+            },
+            {
+              "horizon": 2,
+              "n": 139000,
+              "mae": 3.986762046813965,
+              "rmse": 6.917054653167725,
+              "baseline_rmse": 8.040155410766602,
+              "coverage": 0.8160503597122302,
+              "mean_width": 12.58155632019043
+            },
+            {
+              "horizon": 3,
+              "n": 138781,
+              "mae": 5.1668219566345215,
+              "rmse": 8.573174476623535,
+              "baseline_rmse": 10.51352596282959,
+              "coverage": 0.8178929392351979,
+              "mean_width": 16.54391098022461
+            },
+            {
+              "horizon": 4,
+              "n": 138726,
+              "mae": 6.200069904327393,
+              "rmse": 9.937723159790039,
+              "baseline_rmse": 12.531011581420898,
+              "coverage": 0.832302524400617,
+              "mean_width": 20.32566261291504
+            },
+            {
+              "horizon": 5,
+              "n": 138667,
+              "mae": 6.9037089347839355,
+              "rmse": 10.993721961975098,
+              "baseline_rmse": 14.3132905960083,
+              "coverage": 0.8389811562952973,
+              "mean_width": 22.775890350341797
+            },
+            {
+              "horizon": 6,
+              "n": 138481,
+              "mae": 7.632063388824463,
+              "rmse": 11.997387886047363,
+              "baseline_rmse": 15.775142669677734,
+              "coverage": 0.8497050136841877,
+              "mean_width": 25.592330932617188
+            },
+            {
+              "horizon": 7,
+              "n": 138368,
+              "mae": 8.18073558807373,
+              "rmse": 12.708673477172852,
+              "baseline_rmse": 17.039146423339844,
+              "coverage": 0.8515552728954672,
+              "mean_width": 27.492496490478516
+            },
+            {
+              "horizon": 8,
+              "n": 138311,
+              "mae": 8.722824096679688,
+              "rmse": 13.460293769836426,
+              "baseline_rmse": 18.04998016357422,
+              "coverage": 0.8573504638098199,
+              "mean_width": 29.569948196411133
+            },
+            {
+              "horizon": 9,
+              "n": 138124,
+              "mae": 9.236055374145508,
+              "rmse": 14.304571151733398,
+              "baseline_rmse": 18.981853485107422,
+              "coverage": 0.8515826358923866,
+              "mean_width": 30.874181747436523
+            }
+          ],
+          "pm_35_75": [
+            {
+              "horizon": 1,
+              "n": 37736,
+              "mae": 4.890600204467773,
+              "rmse": 7.328341484069824,
+              "baseline_rmse": 8.024161338806152,
+              "coverage": 0.8174422302310791,
+              "mean_width": 16.26986312866211
+            },
+            {
+              "horizon": 2,
+              "n": 37594,
+              "mae": 7.8371381759643555,
+              "rmse": 10.971027374267578,
+              "baseline_rmse": 12.3818941116333,
+              "coverage": 0.7636856945257222,
+              "mean_width": 22.732526779174805
+            },
+            {
+              "horizon": 3,
+              "n": 37498,
+              "mae": 9.615594863891602,
+              "rmse": 12.941370964050293,
+              "baseline_rmse": 15.482215881347656,
+              "coverage": 0.7547069177022775,
+              "mean_width": 27.739267349243164
+            },
+            {
+              "horizon": 4,
+              "n": 37477,
+              "mae": 10.813857078552246,
+              "rmse": 14.164984703063965,
+              "baseline_rmse": 17.81730842590332,
+              "coverage": 0.7648157536622462,
+              "mean_width": 32.49125289916992
+            },
+            {
+              "horizon": 5,
+              "n": 37419,
+              "mae": 11.856378555297852,
+              "rmse": 15.215556144714355,
+              "baseline_rmse": 19.588409423828125,
+              "coverage": 0.7641037975360111,
+              "mean_width": 35.522857666015625
+            },
+            {
+              "horizon": 6,
+              "n": 37384,
+              "mae": 12.596109390258789,
+              "rmse": 15.939802169799805,
+              "baseline_rmse": 20.896560668945312,
+              "coverage": 0.7689653327626792,
+              "mean_width": 38.53038024902344
+            },
+            {
+              "horizon": 7,
+              "n": 37363,
+              "mae": 13.24221134185791,
+              "rmse": 16.563446044921875,
+              "baseline_rmse": 21.825897216796875,
+              "coverage": 0.7714048657763027,
+              "mean_width": 40.65472412109375
+            },
+            {
+              "horizon": 8,
+              "n": 37433,
+              "mae": 13.815403938293457,
+              "rmse": 17.190628051757812,
+              "baseline_rmse": 22.60285758972168,
+              "coverage": 0.772126198808538,
+              "mean_width": 42.32585525512695
+            },
+            {
+              "horizon": 9,
+              "n": 37390,
+              "mae": 14.284945487976074,
+              "rmse": 17.70196533203125,
+              "baseline_rmse": 23.353593826293945,
+              "coverage": 0.7768387269323348,
+              "mean_width": 44.306243896484375
+            }
+          ],
+          "pm_ge75": [
+            {
+              "horizon": 1,
+              "n": 12202,
+              "mae": 10.63436508178711,
+              "rmse": 16.51704216003418,
+              "baseline_rmse": 11.052933692932129,
+              "coverage": 0.8310932633994427,
+              "mean_width": 33.4954833984375
+            },
+            {
+              "horizon": 2,
+              "n": 12142,
+              "mae": 14.199180603027344,
+              "rmse": 20.32952880859375,
+              "baseline_rmse": 17.72261619567871,
+              "coverage": 0.785455443913688,
+              "mean_width": 44.21213912963867
+            },
+            {
+              "horizon": 3,
+              "n": 12112,
+              "mae": 19.847087860107422,
+              "rmse": 26.860809326171875,
+              "baseline_rmse": 22.649900436401367,
+              "coverage": 0.6726387054161163,
+              "mean_width": 47.16291809082031
+            },
+            {
+              "horizon": 4,
+              "n": 12119,
+              "mae": 24.98294448852539,
+              "rmse": 32.32241439819336,
+              "baseline_rmse": 26.58053207397461,
+              "coverage": 0.5896526116016173,
+              "mean_width": 51.74589538574219
+            },
+            {
+              "horizon": 5,
+              "n": 12140,
+              "mae": 29.07238006591797,
+              "rmse": 36.683074951171875,
+              "baseline_rmse": 30.02483367919922,
+              "coverage": 0.5364909390444811,
+              "mean_width": 54.261871337890625
+            },
+            {
+              "horizon": 6,
+              "n": 12126,
+              "mae": 32.69121551513672,
+              "rmse": 40.48405838012695,
+              "baseline_rmse": 33.19308090209961,
+              "coverage": 0.47996041563582387,
+              "mean_width": 56.71120834350586
+            },
+            {
+              "horizon": 7,
+              "n": 12139,
+              "mae": 36.28973388671875,
+              "rmse": 44.22663879394531,
+              "baseline_rmse": 36.09811019897461,
+              "coverage": 0.44509432407941346,
+              "mean_width": 59.21490478515625
+            },
+            {
+              "horizon": 8,
+              "n": 12165,
+              "mae": 39.16689682006836,
+              "rmse": 47.33018112182617,
+              "baseline_rmse": 38.69953918457031,
+              "coverage": 0.4141389231401562,
+              "mean_width": 60.13731002807617
+            },
+            {
+              "horizon": 9,
+              "n": 12160,
+              "mae": 40.55086898803711,
+              "rmse": 48.6798210144043,
+              "baseline_rmse": 41.03372573852539,
+              "coverage": 0.42138157894736844,
+              "mean_width": 63.40000915527344
+            }
+          ],
+          "abrupt_ge20": [
+            {
+              "horizon": 1,
+              "n": 3161,
+              "mae": 26.645137786865234,
+              "rmse": 29.80406951904297,
+              "baseline_rmse": 33.44158172607422,
+              "coverage": 0.12907307813982916,
+              "mean_width": 25.244834899902344
+            },
+            {
+              "horizon": 2,
+              "n": 9345,
+              "mae": 26.377384185791016,
+              "rmse": 30.3653621673584,
+              "baseline_rmse": 36.13565444946289,
+              "coverage": 0.1902621722846442,
+              "mean_width": 31.27320098876953
+            },
+            {
+              "horizon": 3,
+              "n": 15941,
+              "mae": 26.055978775024414,
+              "rmse": 30.537900924682617,
+              "baseline_rmse": 37.58013153076172,
+              "coverage": 0.2194341634778245,
+              "mean_width": 33.47475814819336
+            },
+            {
+              "horizon": 4,
+              "n": 21950,
+              "mae": 26.01089096069336,
+              "rmse": 30.974458694458008,
+              "baseline_rmse": 38.856136322021484,
+              "coverage": 0.27945330296127563,
+              "mean_width": 37.11048889160156
+            },
+            {
+              "horizon": 5,
+              "n": 27217,
+              "mae": 25.88966941833496,
+              "rmse": 31.44527244567871,
+              "baseline_rmse": 40.110477447509766,
+              "coverage": 0.3454826027850241,
+              "mean_width": 39.44075393676758
+            },
+            {
+              "horizon": 6,
+              "n": 31963,
+              "mae": 25.903337478637695,
+              "rmse": 31.947843551635742,
+              "baseline_rmse": 41.00168228149414,
+              "coverage": 0.39864843725557675,
+              "mean_width": 41.680213928222656
+            },
+            {
+              "horizon": 7,
+              "n": 36063,
+              "mae": 25.69391441345215,
+              "rmse": 32.268592834472656,
+              "baseline_rmse": 41.8146858215332,
+              "coverage": 0.44699553559049443,
+              "mean_width": 43.41263198852539
+            },
+            {
+              "horizon": 8,
+              "n": 39744,
+              "mae": 25.93401336669922,
+              "rmse": 32.91627883911133,
+              "baseline_rmse": 42.4232063293457,
+              "coverage": 0.47249899355877617,
+              "mean_width": 44.659847259521484
+            },
+            {
+              "horizon": 9,
+              "n": 43031,
+              "mae": 26.49686622619629,
+              "rmse": 33.61803436279297,
+              "baseline_rmse": 43.03336715698242,
+              "coverage": 0.4869512676907346,
+              "mean_width": 46.79807662963867
+            }
+          ]
+        }
+      },
+      "station_adjustment": [
+        0.0,
+        0.0,
+        0.6991615295410156,
+        1.7486209869384766,
+        2.6530752182006836,
+        3.5200729370117188,
+        3.9862060546875,
+        4.3777313232421875,
+        4.524417877197266
+      ],
+      "city_adjustment": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.16876127322514822,
+        0.9658414125442505,
+        1.4036214351654053,
+        2.028995354970295,
+        2.111839930216469
+      ],
+      "city_calibration_hours": [
+        1374,
+        1349,
+        1341,
+        1334,
+        1329,
+        1325,
+        1321,
+        1314,
+        1313
+      ],
+      "best_epoch": 1,
+      "epochs": [
+        {
+          "epoch": 1,
+          "loss": 0.24203490234791913,
+          "selection_h6_rmse": 18.895282745361328,
+          "seconds": 9.85
+        },
+        {
+          "epoch": 2,
+          "loss": 0.19486746347364894,
+          "selection_h6_rmse": 18.94692611694336,
+          "seconds": 4.08
+        },
+        {
+          "epoch": 3,
+          "loss": 0.18075064191206253,
+          "selection_h6_rmse": 19.441822052001953,
+          "seconds": 3.95
+        },
+        {
+          "epoch": 4,
+          "loss": 0.1727337002913582,
+          "selection_h6_rmse": 19.338632583618164,
+          "seconds": 3.91
+        }
+      ]
+    },
+    "future_weather": {
+      "selection": {
+        "by_horizon": [
+          {
+            "horizon": 1,
+            "n": 33413,
+            "mae": 3.776501178741455,
+            "rmse": 7.699659824371338,
+            "baseline_rmse": 6.141618728637695,
+            "coverage": 0.8797474037051447,
+            "mean_width": 13.217733383178711
+          },
+          {
+            "horizon": 2,
+            "n": 33339,
+            "mae": 5.732757568359375,
+            "rmse": 10.529937744140625,
+            "baseline_rmse": 10.394885063171387,
+            "coverage": 0.8137016707159783,
+            "mean_width": 16.878999710083008
+          },
+          {
+            "horizon": 3,
+            "n": 33297,
+            "mae": 7.396176815032959,
+            "rmse": 13.098199844360352,
+            "baseline_rmse": 13.739230155944824,
+            "coverage": 0.8265008859657026,
+            "mean_width": 22.050981521606445
+          },
+          {
+            "horizon": 4,
+            "n": 33263,
+            "mae": 8.78842830657959,
+            "rmse": 15.213580131530762,
+            "baseline_rmse": 16.564746856689453,
+            "coverage": 0.823828277665875,
+            "mean_width": 25.335113525390625
+          },
+          {
+            "horizon": 5,
+            "n": 33254,
+            "mae": 9.769579887390137,
+            "rmse": 16.736501693725586,
+            "baseline_rmse": 18.990863800048828,
+            "coverage": 0.8170746376375775,
+            "mean_width": 27.339094161987305
+          },
+          {
+            "horizon": 6,
+            "n": 33268,
+            "mae": 10.624123573303223,
+            "rmse": 18.078569412231445,
+            "baseline_rmse": 21.123674392700195,
+            "coverage": 0.8150474930864494,
+            "mean_width": 29.232919692993164
+          },
+          {
+            "horizon": 7,
+            "n": 33269,
+            "mae": 11.329156875610352,
+            "rmse": 19.22346305847168,
+            "baseline_rmse": 23.047161102294922,
+            "coverage": 0.8121073672187321,
+            "mean_width": 30.436092376708984
+          },
+          {
+            "horizon": 8,
+            "n": 33275,
+            "mae": 11.98021125793457,
+            "rmse": 20.270700454711914,
+            "baseline_rmse": 24.777400970458984,
+            "coverage": 0.8052592036063111,
+            "mean_width": 31.557382583618164
+          },
+          {
+            "horizon": 9,
+            "n": 33280,
+            "mae": 12.516444206237793,
+            "rmse": 20.971532821655273,
+            "baseline_rmse": 26.353599548339844,
+            "coverage": 0.804296875,
+            "mean_width": 32.99745559692383
+          }
+        ],
+        "city_by_horizon": [
+          {
+            "horizon": 1,
+            "n": 1348,
+            "rmse": 4.908780861112489,
+            "baseline_rmse": 3.876408158567322,
+            "coverage": 0.9465875370919882,
+            "mean_width": 12.44654266028201
+          },
+          {
+            "horizon": 2,
+            "n": 1316,
+            "rmse": 7.231372067293707,
+            "baseline_rmse": 7.370299182012561,
+            "coverage": 0.9133738601823708,
+            "mean_width": 16.78537558554165
+          },
+          {
+            "horizon": 3,
+            "n": 1297,
+            "rmse": 9.66492407918003,
+            "baseline_rmse": 10.4813861829186,
+            "coverage": 0.8789514263685428,
+            "mean_width": 19.574398723023016
+          },
+          {
+            "horizon": 4,
+            "n": 1291,
+            "rmse": 11.750355427312309,
+            "baseline_rmse": 13.242537117611997,
+            "coverage": 0.8481797056545314,
+            "mean_width": 22.090920626392684
+          },
+          {
+            "horizon": 5,
+            "n": 1284,
+            "rmse": 13.335764404789964,
+            "baseline_rmse": 15.655115203594114,
+            "coverage": 0.8387850467289719,
+            "mean_width": 23.58633763591606
+          },
+          {
+            "horizon": 6,
+            "n": 1277,
+            "rmse": 14.633414186524316,
+            "baseline_rmse": 17.75728355624234,
+            "coverage": 0.8386844166014096,
+            "mean_width": 25.37990929935225
+          },
+          {
+            "horizon": 7,
+            "n": 1270,
+            "rmse": 15.780354869068201,
+            "baseline_rmse": 19.60645296713558,
+            "coverage": 0.8346456692913385,
+            "mean_width": 26.264350249584673
+          },
+          {
+            "horizon": 8,
+            "n": 1270,
+            "rmse": 16.77236829053043,
+            "baseline_rmse": 21.17646826248634,
+            "coverage": 0.8212598425196851,
+            "mean_width": 27.196561689307348
+          },
+          {
+            "horizon": 9,
+            "n": 1264,
+            "rmse": 17.547814178370864,
+            "baseline_rmse": 22.778134144640163,
+            "coverage": 0.819620253164557,
+            "mean_width": 29.000559533925003
+          }
+        ],
+        "regimes": {
+          "pm_lt35": [
+            {
+              "horizon": 1,
+              "n": 23779,
+              "mae": 2.2212610244750977,
+              "rmse": 4.290571212768555,
+              "baseline_rmse": 4.966196537017822,
+              "coverage": 0.9012994659153034,
+              "mean_width": 9.059137344360352
+            },
+            {
+              "horizon": 2,
+              "n": 23679,
+              "mae": 3.5104007720947266,
+              "rmse": 6.799893856048584,
+              "baseline_rmse": 8.754881858825684,
+              "coverage": 0.8484733307994425,
+              "mean_width": 11.467044830322266
+            },
+            {
+              "horizon": 3,
+              "n": 23616,
+              "mae": 4.491477966308594,
+              "rmse": 8.245590209960938,
+              "baseline_rmse": 11.793950080871582,
+              "coverage": 0.8780911246612466,
+              "mean_width": 16.502229690551758
+            },
+            {
+              "horizon": 4,
+              "n": 23562,
+              "mae": 5.349964141845703,
+              "rmse": 9.29598617553711,
+              "baseline_rmse": 14.440653800964355,
+              "coverage": 0.8899923605805958,
+              "mean_width": 19.68137550354004
+            },
+            {
+              "horizon": 5,
+              "n": 23532,
+              "mae": 5.874614715576172,
+              "rmse": 10.125106811523438,
+              "baseline_rmse": 16.75932502746582,
+              "coverage": 0.8935492095869454,
+              "mean_width": 21.447160720825195
+            },
+            {
+              "horizon": 6,
+              "n": 23510,
+              "mae": 6.390725135803223,
+              "rmse": 10.938701629638672,
+              "baseline_rmse": 18.835582733154297,
+              "coverage": 0.9004253509145045,
+              "mean_width": 23.47965431213379
+            },
+            {
+              "horizon": 7,
+              "n": 23510,
+              "mae": 6.789022445678711,
+              "rmse": 11.452542304992676,
+              "baseline_rmse": 20.708147048950195,
+              "coverage": 0.900765631646108,
+              "mean_width": 24.627424240112305
+            },
+            {
+              "horizon": 8,
+              "n": 23498,
+              "mae": 7.204594612121582,
+              "rmse": 12.083646774291992,
+              "baseline_rmse": 22.39775848388672,
+              "coverage": 0.8958634777427866,
+              "mean_width": 25.962438583374023
+            },
+            {
+              "horizon": 9,
+              "n": 23484,
+              "mae": 7.595944881439209,
+              "rmse": 12.780488967895508,
+              "baseline_rmse": 23.91474151611328,
+              "coverage": 0.8945665133708056,
+              "mean_width": 26.979581832885742
+            }
+          ],
+          "pm_35_75": [
+            {
+              "horizon": 1,
+              "n": 6345,
+              "mae": 4.680659770965576,
+              "rmse": 6.591731071472168,
+              "baseline_rmse": 7.4066081047058105,
+              "coverage": 0.8532702915681639,
+              "mean_width": 17.292198181152344
+            },
+            {
+              "horizon": 2,
+              "n": 6353,
+              "mae": 7.649404525756836,
+              "rmse": 10.313592910766602,
+              "baseline_rmse": 11.784951210021973,
+              "coverage": 0.7568078073351173,
+              "mean_width": 22.12895965576172
+            },
+            {
+              "horizon": 3,
+              "n": 6350,
+              "mae": 9.55087947845459,
+              "rmse": 12.43532657623291,
+              "baseline_rmse": 14.762593269348145,
+              "coverage": 0.7636220472440944,
+              "mean_width": 28.04072380065918
+            },
+            {
+              "horizon": 4,
+              "n": 6344,
+              "mae": 10.840703010559082,
+              "rmse": 13.942986488342285,
+              "baseline_rmse": 17.050020217895508,
+              "coverage": 0.7537831021437579,
+              "mean_width": 31.775787353515625
+            },
+            {
+              "horizon": 5,
+              "n": 6343,
+              "mae": 12.09160327911377,
+              "rmse": 15.352337837219238,
+              "baseline_rmse": 18.90969467163086,
+              "coverage": 0.7288349361500868,
+              "mean_width": 34.22858810424805
+            },
+            {
+              "horizon": 6,
+              "n": 6353,
+              "mae": 12.925437927246094,
+              "rmse": 16.27147102355957,
+              "baseline_rmse": 20.414409637451172,
+              "coverage": 0.7184007555485598,
+              "mean_width": 36.14463424682617
+            },
+            {
+              "horizon": 7,
+              "n": 6336,
+              "mae": 13.556063652038574,
+              "rmse": 16.987985610961914,
+              "baseline_rmse": 21.687763214111328,
+              "coverage": 0.7178030303030303,
+              "mean_width": 37.45370101928711
+            },
+            {
+              "horizon": 8,
+              "n": 6329,
+              "mae": 14.01810073852539,
+              "rmse": 17.492637634277344,
+              "baseline_rmse": 22.72835922241211,
+              "coverage": 0.714962869331648,
+              "mean_width": 38.274295806884766
+            },
+            {
+              "horizon": 9,
+              "n": 6328,
+              "mae": 14.709389686584473,
+              "rmse": 18.155277252197266,
+              "baseline_rmse": 23.62511444091797,
+              "coverage": 0.713811630847029,
+              "mean_width": 40.06194305419922
+            }
+          ],
+          "pm_ge75": [
+            {
+              "horizon": 1,
+              "n": 3289,
+              "mae": 13.276399612426758,
+              "rmse": 19.630502700805664,
+              "baseline_rmse": 9.95251750946045,
+              "coverage": 0.7750076010945576,
+              "mean_width": 35.423500061035156
+            },
+            {
+              "horizon": 2,
+              "n": 3307,
+              "mae": 17.96339988708496,
+              "rmse": 24.132747650146484,
+              "baseline_rmse": 16.543790817260742,
+              "coverage": 0.6740247958875113,
+              "mean_width": 45.544471740722656
+            },
+            {
+              "horizon": 3,
+              "n": 3331,
+              "mae": 23.882221221923828,
+              "rmse": 30.629026412963867,
+              "baseline_rmse": 22.029653549194336,
+              "coverage": 0.580606424497148,
+              "mean_width": 49.97187423706055
+            },
+            {
+              "horizon": 4,
+              "n": 3357,
+              "mae": 29.043861389160156,
+              "rmse": 36.3242073059082,
+              "baseline_rmse": 26.56705093383789,
+              "coverage": 0.49180816204944894,
+              "mean_width": 52.845924377441406
+            },
+            {
+              "horizon": 5,
+              "n": 3379,
+              "mae": 32.536006927490234,
+              "rmse": 40.00346755981445,
+              "baseline_rmse": 30.364721298217773,
+              "coverage": 0.4501331754957088,
+              "mean_width": 55.43878936767578
+            },
+            {
+              "horizon": 6,
+              "n": 3405,
+              "mae": 35.560089111328125,
+              "rmse": 43.279701232910156,
+              "baseline_rmse": 33.6521110534668,
+              "coverage": 0.40587371512481646,
+              "mean_width": 56.060848236083984
+            },
+            {
+              "horizon": 7,
+              "n": 3423,
+              "mae": 38.389888763427734,
+              "rmse": 46.43961715698242,
+              "baseline_rmse": 36.69689178466797,
+              "coverage": 0.37773882559158634,
+              "mean_width": 57.341800689697266
+            },
+            {
+              "horizon": 8,
+              "n": 3448,
+              "mae": 40.78520965576172,
+              "rmse": 49.0781135559082,
+              "baseline_rmse": 39.46699523925781,
+              "coverage": 0.353538283062645,
+              "mean_width": 57.35743713378906
+            },
+            {
+              "horizon": 9,
+              "n": 3468,
+              "mae": 41.83478927612305,
+              "rmse": 50.1296501159668,
+              "baseline_rmse": 42.11318588256836,
+              "coverage": 0.35813148788927335,
+              "mean_width": 60.85783767700195
+            }
+          ],
+          "abrupt_ge20": [
+            {
+              "horizon": 1,
+              "n": 529,
+              "mae": 25.73575210571289,
+              "rmse": 28.78270721435547,
+              "baseline_rmse": 36.32236099243164,
+              "coverage": 0.1890359168241966,
+              "mean_width": 29.947254180908203
+            },
+            {
+              "horizon": 2,
+              "n": 1677,
+              "mae": 27.75860595703125,
+              "rmse": 31.720130920410156,
+              "baseline_rmse": 39.25698471069336,
+              "coverage": 0.2045319022063208,
+              "mean_width": 36.95188903808594
+            },
+            {
+              "horizon": 3,
+              "n": 2903,
+              "mae": 28.734752655029297,
+              "rmse": 33.4078483581543,
+              "baseline_rmse": 41.60808181762695,
+              "coverage": 0.2228728901136755,
+              "mean_width": 39.972862243652344
+            },
+            {
+              "horizon": 4,
+              "n": 3961,
+              "mae": 29.386293411254883,
+              "rmse": 34.90256881713867,
+              "baseline_rmse": 44.135093688964844,
+              "coverage": 0.2668518050997223,
+              "mean_width": 42.155601501464844
+            },
+            {
+              "horizon": 5,
+              "n": 4943,
+              "mae": 29.48272132873535,
+              "rmse": 35.640995025634766,
+              "baseline_rmse": 46.06970977783203,
+              "coverage": 0.32025085980173984,
+              "mean_width": 44.078243255615234
+            },
+            {
+              "horizon": 6,
+              "n": 5741,
+              "mae": 29.81769561767578,
+              "rmse": 36.55599594116211,
+              "baseline_rmse": 48.06645584106445,
+              "coverage": 0.35760320501654763,
+              "mean_width": 44.700016021728516
+            },
+            {
+              "horizon": 7,
+              "n": 6498,
+              "mae": 29.84431266784668,
+              "rmse": 37.22988510131836,
+              "baseline_rmse": 49.706783294677734,
+              "coverage": 0.3999692212988612,
+              "mean_width": 45.677101135253906
+            },
+            {
+              "horizon": 8,
+              "n": 7149,
+              "mae": 29.989635467529297,
+              "rmse": 37.790889739990234,
+              "baseline_rmse": 51.232269287109375,
+              "coverage": 0.40900825290250387,
+              "mean_width": 45.68669509887695
+            },
+            {
+              "horizon": 9,
+              "n": 7796,
+              "mae": 30.2839412689209,
+              "rmse": 38.07820510864258,
+              "baseline_rmse": 52.43373489379883,
+              "coverage": 0.42970754232939967,
+              "mean_width": 47.86358642578125
+            }
+          ]
+        }
+      },
+      "test": {
+        "by_horizon": [
+          {
+            "horizon": 1,
+            "n": 189203,
+            "mae": 3.623863697052002,
+            "rmse": 6.291281223297119,
+            "baseline_rmse": 6.1153130531311035,
+            "coverage": 0.8230842005676443,
+            "mean_width": 12.511096954345703
+          },
+          {
+            "horizon": 2,
+            "n": 188736,
+            "mae": 5.3690338134765625,
+            "rmse": 8.954445838928223,
+            "baseline_rmse": 9.917323112487793,
+            "coverage": 0.7920534503221431,
+            "mean_width": 16.176729202270508
+          },
+          {
+            "horizon": 3,
+            "n": 188391,
+            "mae": 6.86044979095459,
+            "rmse": 11.008696556091309,
+            "baseline_rmse": 12.732636451721191,
+            "coverage": 0.8085099606669108,
+            "mean_width": 21.471548080444336
+          },
+          {
+            "horizon": 4,
+            "n": 188322,
+            "mae": 8.006732940673828,
+            "rmse": 12.560794830322266,
+            "baseline_rmse": 14.97712516784668,
+            "coverage": 0.8148702753794034,
+            "mean_width": 25.003332138061523
+          },
+          {
+            "horizon": 5,
+            "n": 188226,
+            "mae": 8.816323280334473,
+            "rmse": 13.705718994140625,
+            "baseline_rmse": 16.89237403869629,
+            "coverage": 0.8144145867202193,
+            "mean_width": 27.102436065673828
+          },
+          {
+            "horizon": 6,
+            "n": 187991,
+            "mae": 9.56383228302002,
+            "rmse": 14.730029106140137,
+            "baseline_rmse": 18.47213363647461,
+            "coverage": 0.8145868685203015,
+            "mean_width": 29.090600967407227
+          },
+          {
+            "horizon": 7,
+            "n": 187870,
+            "mae": 10.1195068359375,
+            "rmse": 15.515314102172852,
+            "baseline_rmse": 19.818378448486328,
+            "coverage": 0.8139351679352744,
+            "mean_width": 30.487836837768555
+          },
+          {
+            "horizon": 8,
+            "n": 187909,
+            "mae": 10.642723083496094,
+            "rmse": 16.291156768798828,
+            "baseline_rmse": 20.941274642944336,
+            "coverage": 0.8119994252537133,
+            "mean_width": 31.725223541259766
+          },
+          {
+            "horizon": 9,
+            "n": 187674,
+            "mae": 11.117388725280762,
+            "rmse": 16.948598861694336,
+            "baseline_rmse": 21.975778579711914,
+            "coverage": 0.8110606690324712,
+            "mean_width": 33.28621292114258
+          }
+        ],
+        "city_by_horizon": [
+          {
+            "horizon": 1,
+            "n": 7872,
+            "rmse": 3.813408254197664,
+            "baseline_rmse": 3.487517913591262,
+            "coverage": 0.8995172764227642,
+            "mean_width": 11.657696665155592
+          },
+          {
+            "horizon": 2,
+            "n": 7667,
+            "rmse": 5.589551974621115,
+            "baseline_rmse": 6.3699599040818855,
+            "coverage": 0.9136559280031303,
+            "mean_width": 15.881110592076054
+          },
+          {
+            "horizon": 3,
+            "n": 7537,
+            "rmse": 7.473237183912477,
+            "baseline_rmse": 8.79821750052854,
+            "coverage": 0.8581663791959666,
+            "mean_width": 18.658549867077046
+          },
+          {
+            "horizon": 4,
+            "n": 7455,
+            "rmse": 9.099498265529387,
+            "baseline_rmse": 10.929931073345491,
+            "coverage": 0.8489604292421193,
+            "mean_width": 21.352224563408214
+          },
+          {
+            "horizon": 5,
+            "n": 7388,
+            "rmse": 10.184260397864445,
+            "baseline_rmse": 12.814536589061122,
+            "coverage": 0.839469409853817,
+            "mean_width": 22.87817536069422
+          },
+          {
+            "horizon": 6,
+            "n": 7340,
+            "rmse": 11.24514132213946,
+            "baseline_rmse": 14.41334553500478,
+            "coverage": 0.8362397820163487,
+            "mean_width": 24.747431353560614
+          },
+          {
+            "horizon": 7,
+            "n": 7294,
+            "rmse": 12.073778441075447,
+            "baseline_rmse": 15.746732994667592,
+            "coverage": 0.8286262681656156,
+            "mean_width": 25.80101086775478
+          },
+          {
+            "horizon": 8,
+            "n": 7261,
+            "rmse": 12.93898566179306,
+            "baseline_rmse": 16.868918837741468,
+            "coverage": 0.8222007987880458,
+            "mean_width": 26.87789265115125
+          },
+          {
+            "horizon": 9,
+            "n": 7224,
+            "rmse": 13.701106549347866,
+            "baseline_rmse": 17.95331522564398,
+            "coverage": 0.8221207087486158,
+            "mean_width": 28.75216767898864
+          }
+        ],
+        "regimes": {
+          "pm_lt35": [
+            {
+              "horizon": 1,
+              "n": 139265,
+              "mae": 2.7428886890411377,
+              "rmse": 4.435115337371826,
+              "baseline_rmse": 4.759867191314697,
+              "coverage": 0.8185258320468172,
+              "mean_width": 9.48690414428711
+            },
+            {
+              "horizon": 2,
+              "n": 139000,
+              "mae": 4.024936676025391,
+              "rmse": 6.683250427246094,
+              "baseline_rmse": 8.040155410766602,
+              "coverage": 0.8011007194244605,
+              "mean_width": 12.270716667175293
+            },
+            {
+              "horizon": 3,
+              "n": 138781,
+              "mae": 5.186110019683838,
+              "rmse": 8.181892395019531,
+              "baseline_rmse": 10.51352596282959,
+              "coverage": 0.825610133952054,
+              "mean_width": 17.3487606048584
+            },
+            {
+              "horizon": 4,
+              "n": 138726,
+              "mae": 6.064746379852295,
+              "rmse": 9.267901420593262,
+              "baseline_rmse": 12.531011581420898,
+              "coverage": 0.8391505557718092,
+              "mean_width": 20.645668029785156
+            },
+            {
+              "horizon": 5,
+              "n": 138667,
+              "mae": 6.672945976257324,
+              "rmse": 10.139582633972168,
+              "baseline_rmse": 14.3132905960083,
+              "coverage": 0.843639798942791,
+              "mean_width": 22.638893127441406
+            },
+            {
+              "horizon": 6,
+              "n": 138481,
+              "mae": 7.277325630187988,
+              "rmse": 10.9341459274292,
+              "baseline_rmse": 15.775142669677734,
+              "coverage": 0.8465998945703743,
+              "mean_width": 24.635372161865234
+            },
+            {
+              "horizon": 7,
+              "n": 138368,
+              "mae": 7.669108867645264,
+              "rmse": 11.410868644714355,
+              "baseline_rmse": 17.039146423339844,
+              "coverage": 0.8492642807585569,
+              "mean_width": 25.957748413085938
+            },
+            {
+              "horizon": 8,
+              "n": 138311,
+              "mae": 8.055134773254395,
+              "rmse": 11.935388565063477,
+              "baseline_rmse": 18.04998016357422,
+              "coverage": 0.8503878939491436,
+              "mean_width": 27.261178970336914
+            },
+            {
+              "horizon": 9,
+              "n": 138124,
+              "mae": 8.451208114624023,
+              "rmse": 12.5487699508667,
+              "baseline_rmse": 18.981853485107422,
+              "coverage": 0.846826040369523,
+              "mean_width": 28.4923095703125
+            }
+          ],
+          "pm_35_75": [
+            {
+              "horizon": 1,
+              "n": 37736,
+              "mae": 4.960965156555176,
+              "rmse": 7.318606853485107,
+              "baseline_rmse": 8.024161338806152,
+              "coverage": 0.8351441594233623,
+              "mean_width": 17.151512145996094
+            },
+            {
+              "horizon": 2,
+              "n": 37594,
+              "mae": 7.7584228515625,
+              "rmse": 10.826083183288574,
+              "baseline_rmse": 12.3818941116333,
+              "coverage": 0.7606798957280417,
+              "mean_width": 22.191553115844727
+            },
+            {
+              "horizon": 3,
+              "n": 37498,
+              "mae": 9.443546295166016,
+              "rmse": 12.726188659667969,
+              "baseline_rmse": 15.482215881347656,
+              "coverage": 0.7767080910981919,
+              "mean_width": 28.460405349731445
+            },
+            {
+              "horizon": 4,
+              "n": 37477,
+              "mae": 10.546069145202637,
+              "rmse": 13.902520179748535,
+              "baseline_rmse": 17.81730842590332,
+              "coverage": 0.7821597246311071,
+              "mean_width": 32.696876525878906
+            },
+            {
+              "horizon": 5,
+              "n": 37419,
+              "mae": 11.455458641052246,
+              "rmse": 14.899457931518555,
+              "baseline_rmse": 19.588409423828125,
+              "coverage": 0.77457975894599,
+              "mean_width": 35.13742446899414
+            },
+            {
+              "horizon": 6,
+              "n": 37384,
+              "mae": 11.992834091186523,
+              "rmse": 15.431106567382812,
+              "baseline_rmse": 20.896560668945312,
+              "coverage": 0.7805745773592981,
+              "mean_width": 37.31488800048828
+            },
+            {
+              "horizon": 7,
+              "n": 37363,
+              "mae": 12.503705024719238,
+              "rmse": 15.937209129333496,
+              "baseline_rmse": 21.825897216796875,
+              "coverage": 0.7774536305971148,
+              "mean_width": 38.893436431884766
+            },
+            {
+              "horizon": 8,
+              "n": 37433,
+              "mae": 12.876450538635254,
+              "rmse": 16.29977035522461,
+              "baseline_rmse": 22.60285758972168,
+              "coverage": 0.7754120695642882,
+              "mean_width": 39.98495864868164
+            },
+            {
+              "horizon": 9,
+              "n": 37390,
+              "mae": 13.346807479858398,
+              "rmse": 16.77409553527832,
+              "baseline_rmse": 23.353593826293945,
+              "coverage": 0.7802353570473388,
+              "mean_width": 42.0795783996582
+            }
+          ],
+          "pm_ge75": [
+            {
+              "horizon": 1,
+              "n": 12202,
+              "mae": 9.543557167053223,
+              "rmse": 14.952539443969727,
+              "baseline_rmse": 11.052933692932129,
+              "coverage": 0.8378134732011145,
+              "mean_width": 32.67610168457031
+            },
+            {
+              "horizon": 2,
+              "n": 12142,
+              "mae": 13.358071327209473,
+              "rmse": 19.290937423706055,
+              "baseline_rmse": 17.72261619567871,
+              "coverage": 0.7856201614231593,
+              "mean_width": 42.26918411254883
+            },
+            {
+              "horizon": 3,
+              "n": 12112,
+              "mae": 18.048168182373047,
+              "rmse": 24.830806732177734,
+              "baseline_rmse": 22.649900436401367,
+              "coverage": 0.7110303830911493,
+              "mean_width": 47.0739860534668
+            },
+            {
+              "horizon": 4,
+              "n": 12119,
+              "mae": 22.38394546508789,
+              "rmse": 29.50893211364746,
+              "baseline_rmse": 26.58053207397461,
+              "coverage": 0.6380889512336001,
+              "mean_width": 51.09381103515625
+            },
+            {
+              "horizon": 5,
+              "n": 12140,
+              "mae": 25.164091110229492,
+              "rmse": 32.46382141113281,
+              "baseline_rmse": 30.02483367919922,
+              "coverage": 0.6033772652388797,
+              "mean_width": 53.32030487060547
+            },
+            {
+              "horizon": 6,
+              "n": 12126,
+              "mae": 28.187610626220703,
+              "rmse": 35.55722427368164,
+              "baseline_rmse": 33.19308090209961,
+              "coverage": 0.553851228764638,
+              "mean_width": 54.6148567199707
+            },
+            {
+              "horizon": 7,
+              "n": 12139,
+              "mae": 30.712299346923828,
+              "rmse": 38.20504379272461,
+              "baseline_rmse": 36.09811019897461,
+              "coverage": 0.5235192355218716,
+              "mean_width": 56.25276565551758
+            },
+            {
+              "horizon": 8,
+              "n": 12165,
+              "mae": 33.189109802246094,
+              "rmse": 40.77265167236328,
+              "baseline_rmse": 38.69953918457031,
+              "coverage": 0.48812166050143857,
+              "mean_width": 57.0634880065918
+            },
+            {
+              "horizon": 9,
+              "n": 12160,
+              "mae": 34.547119140625,
+              "rmse": 42.18464279174805,
+              "baseline_rmse": 41.03372573852539,
+              "coverage": 0.4995888157894737,
+              "mean_width": 60.701480865478516
+            }
+          ],
+          "abrupt_ge20": [
+            {
+              "horizon": 1,
+              "n": 3161,
+              "mae": 25.16621208190918,
+              "rmse": 28.29145050048828,
+              "baseline_rmse": 33.44158172607422,
+              "coverage": 0.1486871243277444,
+              "mean_width": 25.82823944091797
+            },
+            {
+              "horizon": 2,
+              "n": 9345,
+              "mae": 25.431245803833008,
+              "rmse": 29.102500915527344,
+              "baseline_rmse": 36.13565444946289,
+              "coverage": 0.206848582129481,
+              "mean_width": 31.20461082458496
+            },
+            {
+              "horizon": 3,
+              "n": 15941,
+              "mae": 24.770462036132812,
+              "rmse": 28.86842155456543,
+              "baseline_rmse": 37.58013153076172,
+              "coverage": 0.2666081174330343,
+              "mean_width": 34.692020416259766
+            },
+            {
+              "horizon": 4,
+              "n": 21950,
+              "mae": 24.197853088378906,
+              "rmse": 28.72783851623535,
+              "baseline_rmse": 38.856136322021484,
+              "coverage": 0.33840546697038726,
+              "mean_width": 37.47892761230469
+            },
+            {
+              "horizon": 5,
+              "n": 27217,
+              "mae": 23.931278228759766,
+              "rmse": 28.84041404724121,
+              "baseline_rmse": 40.110477447509766,
+              "coverage": 0.3990888047911232,
+              "mean_width": 39.530330657958984
+            },
+            {
+              "horizon": 6,
+              "n": 31963,
+              "mae": 23.61868667602539,
+              "rmse": 28.928348541259766,
+              "baseline_rmse": 41.00168228149414,
+              "coverage": 0.4459844194850296,
+              "mean_width": 40.68754577636719
+            },
+            {
+              "horizon": 7,
+              "n": 36063,
+              "mae": 23.104528427124023,
+              "rmse": 28.812171936035156,
+              "baseline_rmse": 41.8146858215332,
+              "coverage": 0.49025316806699387,
+              "mean_width": 41.7421760559082
+            },
+            {
+              "horizon": 8,
+              "n": 39744,
+              "mae": 23.05001449584961,
+              "rmse": 29.054412841796875,
+              "baseline_rmse": 42.4232063293457,
+              "coverage": 0.5046296296296297,
+              "mean_width": 42.32712936401367
+            },
+            {
+              "horizon": 9,
+              "n": 43031,
+              "mae": 23.40688133239746,
+              "rmse": 29.545949935913086,
+              "baseline_rmse": 43.03336715698242,
+              "coverage": 0.524273198391857,
+              "mean_width": 44.51545715332031
+            }
+          ]
+        }
+      },
+      "station_adjustment": [
+        0.43167686462402344,
+        0.12702012062072754,
+        1.4096832275390625,
+        2.356928825378418,
+        2.996591567993164,
+        3.4269018173217773,
+        3.7222251892089844,
+        3.7469959259033203,
+        4.0043487548828125
+      ],
+      "city_adjustment": [
+        0.0,
+        0.0,
+        0.0,
+        0.4954261382420855,
+        0.8311924934387207,
+        1.1784334381421409,
+        1.2830946644147234,
+        1.1946869293848668,
+        1.6108454068501779
+      ],
+      "city_calibration_hours": [
+        1374,
+        1349,
+        1341,
+        1334,
+        1329,
+        1325,
+        1321,
+        1314,
+        1313
+      ],
+      "best_epoch": 1,
+      "epochs": [
+        {
+          "epoch": 1,
+          "loss": 0.23769197648859278,
+          "selection_h6_rmse": 18.078569412231445,
+          "seconds": 4.12
+        },
+        {
+          "epoch": 2,
+          "loss": 0.1918450585581402,
+          "selection_h6_rmse": 18.453330993652344,
+          "seconds": 4.01
+        },
+        {
+          "epoch": 3,
+          "loss": 0.17809727871641118,
+          "selection_h6_rmse": 19.142995834350586,
+          "seconds": 4.13
+        },
+        {
+          "epoch": 4,
+          "loss": 0.16976864998512728,
+          "selection_h6_rmse": 19.019445419311523,
+          "seconds": 4.2
+        }
+      ],
+      "worst_test_h6": [
+        {
+          "station_id": "3697A",
+          "origin": "2025-01-28T20",
+          "prediction": 40.6171875,
+          "actual": 274.0,
+          "absolute_error": 233.3828125
+        },
+        {
+          "station_id": "3697A",
+          "origin": "2025-01-28T19",
+          "prediction": 25.21630859375,
+          "actual": 248.0,
+          "absolute_error": 222.78369140625
+        },
+        {
+          "station_id": "3672A",
+          "origin": "2025-01-28T20",
+          "prediction": 39.888671875,
+          "actual": 236.0,
+          "absolute_error": 196.111328125
+        },
+        {
+          "station_id": "3696A",
+          "origin": "2025-01-28T19",
+          "prediction": 28.0556640625,
+          "actual": 222.0,
+          "absolute_error": 193.9443359375
+        },
+        {
+          "station_id": "3696A",
+          "origin": "2025-01-28T21",
+          "prediction": 38.267578125,
+          "actual": 227.0,
+          "absolute_error": 188.732421875
+        },
+        {
+          "station_id": "3696A",
+          "origin": "2025-01-28T20",
+          "prediction": 31.44244384765625,
+          "actual": 207.0,
+          "absolute_error": 175.55755615234375
+        },
+        {
+          "station_id": "3672A",
+          "origin": "2025-01-28T19",
+          "prediction": 41.21240234375,
+          "actual": 215.0,
+          "absolute_error": 173.78759765625
+        },
+        {
+          "station_id": "3673A",
+          "origin": "2025-01-28T23",
+          "prediction": 50.511962890625,
+          "actual": 218.0,
+          "absolute_error": 167.488037109375
+        },
+        {
+          "station_id": "3697A",
+          "origin": "2025-01-28T18",
+          "prediction": 16.701171875,
+          "actual": 183.0,
+          "absolute_error": 166.298828125
+        },
+        {
+          "station_id": "3697A",
+          "origin": "2025-01-28T21",
+          "prediction": 49.8203125,
+          "actual": 205.0,
+          "absolute_error": 155.1796875
+        },
+        {
+          "station_id": "3673A",
+          "origin": "2025-01-29T00",
+          "prediction": 51.279296875,
+          "actual": 205.0,
+          "absolute_error": 153.720703125
+        },
+        {
+          "station_id": "3673A",
+          "origin": "2025-01-28T22",
+          "prediction": 45.29833984375,
+          "actual": 190.0,
+          "absolute_error": 144.70166015625
+        },
+        {
+          "station_id": "3675A",
+          "origin": "2025-01-28T22",
+          "prediction": 37.69482421875,
+          "actual": 175.0,
+          "absolute_error": 137.30517578125
+        },
+        {
+          "station_id": "3697A",
+          "origin": "2025-02-12T17",
+          "prediction": 5.51953125,
+          "actual": 141.0,
+          "absolute_error": 135.48046875
+        },
+        {
+          "station_id": "1001A",
+          "origin": "2025-01-28T21",
+          "prediction": 30.9410400390625,
+          "actual": 166.0,
+          "absolute_error": 135.0589599609375
+        },
+        {
+          "station_id": "3696A",
+          "origin": "2025-02-12T17",
+          "prediction": 7.47265625,
+          "actual": 142.0,
+          "absolute_error": 134.52734375
+        },
+        {
+          "station_id": "3697A",
+          "origin": "2025-11-04T20",
+          "prediction": 68.060302734375,
+          "actual": 202.0,
+          "absolute_error": 133.939697265625
+        },
+        {
+          "station_id": "3672A",
+          "origin": "2025-01-28T21",
+          "prediction": 40.36328125,
+          "actual": 174.0,
+          "absolute_error": 133.63671875
+        },
+        {
+          "station_id": "3671A",
+          "origin": "2025-03-01T06",
+          "prediction": 61.671875,
+          "actual": 192.0,
+          "absolute_error": 130.328125
+        },
+        {
+          "station_id": "3673A",
+          "origin": "2025-01-28T21",
+          "prediction": 26.40185546875,
+          "actual": 155.0,
+          "absolute_error": 128.59814453125
+        }
+      ]
+    }
+  },
+  "interval_note": "80% nominal CQR; Nov-Dec 2024 calibration is separate from model selection and 2025 test. Time/station dependence and domain shifts prevent a universal coverage guarantee.",
+  "weather_note": "Every weather value is a GFS forecast issued 24 hours before its valid time; all nine future inputs were available before origin. Identical historical and live weather contract.",
+  "checkpoint_sha256": "90a9fbbd5415a6a1a68e357d97c5eb83c8b6e5b74c8db6077b868249d502a81c",
+  "gpu": {
+    "device": "NVIDIA GeForce RTX 4080 Laptop GPU",
+    "pytorch": "2.14.1+cu126",
+    "peak_util_percent": 47.0,
+    "peak_torch_mib": 207.51953125,
+    "seconds": 43.54,
+    "telemetry": [
+      {
+        "seconds": 0.1,
+        "gpu_util_percent": 10.0,
+        "memory_mib": 2588.0
+      },
+      {
+        "seconds": 2.2,
+        "gpu_util_percent": 7.0,
+        "memory_mib": 2638.0
+      },
+      {
+        "seconds": 4.3,
+        "gpu_util_percent": 9.0,
+        "memory_mib": 2897.0
+      },
+      {
+        "seconds": 6.4,
+        "gpu_util_percent": 35.0,
+        "memory_mib": 2922.0
+      },
+      {
+        "seconds": 8.4,
+        "gpu_util_percent": 43.0,
+        "memory_mib": 3043.0
+      },
+      {
+        "seconds": 10.5,
+        "gpu_util_percent": 43.0,
+        "memory_mib": 3297.0
+      },
+      {
+        "seconds": 12.5,
+        "gpu_util_percent": 41.0,
+        "memory_mib": 2957.0
+      },
+      {
+        "seconds": 14.6,
+        "gpu_util_percent": 47.0,
+        "memory_mib": 3054.0
+      },
+      {
+        "seconds": 16.6,
+        "gpu_util_percent": 47.0,
+        "memory_mib": 2927.0
+      },
+      {
+        "seconds": 18.7,
+        "gpu_util_percent": 47.0,
+        "memory_mib": 3059.0
+      },
+      {
+        "seconds": 20.7,
+        "gpu_util_percent": 46.0,
+        "memory_mib": 2928.0
+      },
+      {
+        "seconds": 22.8,
+        "gpu_util_percent": 46.0,
+        "memory_mib": 3047.0
+      },
+      {
+        "seconds": 24.8,
+        "gpu_util_percent": 41.0,
+        "memory_mib": 2815.0
+      },
+      {
+        "seconds": 26.9,
+        "gpu_util_percent": 46.0,
+        "memory_mib": 3046.0
+      },
+      {
+        "seconds": 28.9,
+        "gpu_util_percent": 46.0,
+        "memory_mib": 2923.0
+      },
+      {
+        "seconds": 31.0,
+        "gpu_util_percent": 47.0,
+        "memory_mib": 2941.0
+      },
+      {
+        "seconds": 33.0,
+        "gpu_util_percent": 46.0,
+        "memory_mib": 3043.0
+      },
+      {
+        "seconds": 35.1,
+        "gpu_util_percent": 46.0,
+        "memory_mib": 2928.0
+      },
+      {
+        "seconds": 37.1,
+        "gpu_util_percent": 45.0,
+        "memory_mib": 3048.0
+      },
+      {
+        "seconds": 39.2,
+        "gpu_util_percent": 45.0,
+        "memory_mib": 2941.0
+      },
+      {
+        "seconds": 41.2,
+        "gpu_util_percent": 47.0,
+        "memory_mib": 3065.0
+      },
+      {
+        "seconds": 43.3,
+        "gpu_util_percent": 35.0,
+        "memory_mib": 2943.0
+      }
+    ]
+  }
+}

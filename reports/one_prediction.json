@@ -1,0 +1,37 @@
+{
+  "origin": "2025-12-30 12:00:00",
+  "current": 6.0,
+  "engine": "Spark ML PipelineModel loaded from HDFS",
+  "points": [
+    {
+      "horizon": 1,
+      "model": "rf",
+      "prediction": 6.005896304086376
+    },
+    {
+      "horizon": 2,
+      "model": "rf",
+      "prediction": 6.0681906669729475
+    },
+    {
+      "horizon": 3,
+      "model": "rf",
+      "prediction": 6.218762673501281
+    },
+    {
+      "horizon": 4,
+      "model": "rf",
+      "prediction": 6.377109295951125
+    },
+    {
+      "horizon": 5,
+      "model": "rf",
+      "prediction": 7.086926003763895
+    },
+    {
+      "horizon": 6,
+      "model": "rf",
+      "prediction": 7.368758187587791
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "screenshots": [
+    "station-overview.jpg",
+    "station-map-interaction.jpg",
+    "station-evaluation.jpg",
+    "station-gpu-evidence.jpg",
+    "station-quality.jpg",
+    "station-mobile.jpg"
+  ],
+  "url": "http://localhost:8000/#stations",
+  "status": "passed",
+  "checks": [
+    "Live station inventory: 81 sites, 2503919 valid PM2.5 hours",
+    "City Beijing/Tianjin and station controls",
+    "Map click selected 3325A and wheel zoom changed map",
+    "72h meteorology variable and 2022 daily trend",
+    "2024 validation and all-city metrics; restored Beijing 2025 test",
+    "RF model selection and actual 6-row CSV download",
+    "Missing PM2.5 origin and cross-year window messages",
+    "390px responsive layout without document overflow",
+    "Temporary viewport override reset; no browser console errors"
+  ],
+  "verified_at_utc": "2026-10-21T16:44:53.4449135Z",
+  "download": "C:/Users/we1ch/Downloads/station_1015A_forecast.csv"
+}

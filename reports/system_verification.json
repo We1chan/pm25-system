@@ -1,0 +1,57 @@
+{
+  "verified_at_utc": "2026-10-22T15:49:27.457778+00:00",
+  "health": {
+    "status": "ok",
+    "app_id": "beijing-pm25",
+    "data_ready": true,
+    "models_ready": true
+  },
+  "unit_and_integration_tests": {
+    "count": 13,
+    "status": "passed",
+    "log": "logs/tests.log"
+  },
+  "registry_sha256": "c9b0f05e1c572324cb4cd8d575cb354842b0f695c29fbbc622271381a2f671b3",
+  "direct_spark_inference_vs_served_cache": {
+    "origin": "2025-12-30 12:00:00",
+    "status": "passed",
+    "comparisons": [
+      {
+        "horizon": 1,
+        "direct": 6.005896304086376,
+        "served": 6.005896304086376,
+        "absolute_difference": 0.0
+      },
+      {
+        "horizon": 2,
+        "direct": 6.0681906669729475,
+        "served": 6.0681906669729475,
+        "absolute_difference": 0.0
+      },
+      {
+        "horizon": 3,
+        "direct": 6.218762673501281,
+        "served": 6.218762673501281,
+        "absolute_difference": 0.0
+      },
+      {
+        "horizon": 4,
+        "direct": 6.377109295951125,
+        "served": 6.377109295951125,
+        "absolute_difference": 0.0
+      },
+      {
+        "horizon": 5,
+        "direct": 7.086926003763895,
+        "served": 7.086926003763895,
+        "absolute_difference": 0.0
+      },
+      {
+        "horizon": 6,
+        "direct": 7.368758187587791,
+        "served": 7.368758187587791,
+        "absolute_difference": 0.0
+      }
+    ]
+  }
+}

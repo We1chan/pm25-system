@@ -1,0 +1,3710 @@
+{
+  "schema_version": 1,
+  "engine": "Spark ML 3.5.8",
+  "target": "Beijing city mean PM2.5 (ug/m3)",
+  "method": "Residual regression: predicted change + observed current PM2.5, clipped at zero",
+  "train_period": "2015-2023",
+  "validation_period": "2024",
+  "test_period": "2025",
+  "weather": "ERA5 historical reanalysis; retrospective evaluation",
+  "runs": {
+    "regional:persistence:h1": {
+      "model": "persistence",
+      "variant": "regional",
+      "horizon": 1,
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8616,
+          "mae": 2.2485,
+          "rmse": 4.0006,
+          "r2": 0.97909
+        },
+        {
+          "split": "test",
+          "n": 8298,
+          "mae": 2.0243,
+          "rmse": 3.5784,
+          "r2": 0.982
+        }
+      ],
+      "feature_count": 1
+    },
+    "regional:persistence:h2": {
+      "model": "persistence",
+      "variant": "regional",
+      "horizon": 2,
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8602,
+          "mae": 4.2259,
+          "rmse": 7.3544,
+          "r2": 0.92938
+        },
+        {
+          "split": "test",
+          "n": 8280,
+          "mae": 3.7877,
+          "rmse": 6.5488,
+          "r2": 0.93961
+        }
+      ],
+      "feature_count": 1
+    },
+    "regional:persistence:h3": {
+      "model": "persistence",
+      "variant": "regional",
+      "horizon": 3,
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8598,
+          "mae": 5.9642,
+          "rmse": 10.1736,
+          "r2": 0.86494
+        },
+        {
+          "split": "test",
+          "n": 8264,
+          "mae": 5.327,
+          "rmse": 9.0536,
+          "r2": 0.88441
+        }
+      ],
+      "feature_count": 1
+    },
+    "regional:persistence:h4": {
+      "model": "persistence",
+      "variant": "regional",
+      "horizon": 4,
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8593,
+          "mae": 7.5042,
+          "rmse": 12.5507,
+          "r2": 0.79461
+        },
+        {
+          "split": "test",
+          "n": 8256,
+          "mae": 6.7102,
+          "rmse": 11.1923,
+          "r2": 0.82343
+        }
+      ],
+      "feature_count": 1
+    },
+    "regional:persistence:h5": {
+      "model": "persistence",
+      "variant": "regional",
+      "horizon": 5,
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8588,
+          "mae": 8.8634,
+          "rmse": 14.5643,
+          "r2": 0.7235
+        },
+        {
+          "split": "test",
+          "n": 8247,
+          "mae": 7.9475,
+          "rmse": 13.0595,
+          "r2": 0.75967
+        }
+      ],
+      "feature_count": 1
+    },
+    "regional:persistence:h6": {
+      "model": "persistence",
+      "variant": "regional",
+      "horizon": 6,
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8585,
+          "mae": 10.0813,
+          "rmse": 16.2861,
+          "r2": 0.65411
+        },
+        {
+          "split": "test",
+          "n": 8239,
+          "mae": 9.0336,
+          "rmse": 14.6395,
+          "r2": 0.69787
+        }
+      ],
+      "feature_count": 1
+    },
+    "regional:rf:h1": {
+      "model": "rf",
+      "variant": "regional",
+      "horizon": 1,
+      "train_rows": 75794,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8616,
+          "mae": 1.9855,
+          "rmse": 3.4245,
+          "r2": 0.98468
+        },
+        {
+          "split": "test",
+          "n": 8298,
+          "mae": 1.8068,
+          "rmse": 3.0519,
+          "r2": 0.98691
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/rf/h1",
+      "fit_seconds": 6.06,
+      "feature_importance": [
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.0557572504962086
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.04611161749402712
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.040762979686152216
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.03899645390831397
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.038554117644704566
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.037075764275333996
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.03451936503178337
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.027935964646687253
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.027294799051005222
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.02693763118932104
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.026668092102464777
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.025952615988678852
+        },
+        {
+          "feature": "tangshan_wind_direction_cos",
+          "importance": 0.022985919034282883
+        },
+        {
+          "feature": "langfang_wind_speed_10m",
+          "importance": 0.022719105459285113
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.020121670702038352
+        },
+        {
+          "feature": "langfang_wind_direction_cos",
+          "importance": 0.019570954361647283
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.01930898099664367
+        },
+        {
+          "feature": "beijing_pm25_mean_24h",
+          "importance": 0.018688435333526158
+        },
+        {
+          "feature": "baoding_wind_direction_cos",
+          "importance": 0.018452306064599033
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.018151067678934162
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "regional:gbt:h1": {
+      "model": "gbt",
+      "variant": "regional",
+      "horizon": 1,
+      "train_rows": 75794,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8616,
+          "mae": 2.0764,
+          "rmse": 3.9668,
+          "r2": 0.97944
+        },
+        {
+          "split": "test",
+          "n": 8298,
+          "mae": 1.8058,
+          "rmse": 2.9921,
+          "r2": 0.98741
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/gbt/h1",
+      "fit_seconds": 7.3,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.14500249776835847
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.07550139972685964
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.0737096348706022
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.05148648833870728
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.05050694367059818
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.04317082379465173
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.04086647855978383
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.038822945662494175
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.032913716759967154
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.028863973969571625
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.028041070838264705
+        },
+        {
+          "feature": "beijing_co",
+          "importance": 0.02666363790922865
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.023165555066980977
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.0207168888789454
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.01995721846576167
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.01918988577548854
+        },
+        {
+          "feature": "tianjin_wind_direction_cos",
+          "importance": 0.017225502490168913
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.015338159854439133
+        },
+        {
+          "feature": "tianjin_wind_direction_sin",
+          "importance": 0.01481109482634765
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_cos",
+          "importance": 0.011957846501812404
+        }
+      ],
+      "parameters": {
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "all",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "lossType": "squared",
+        "maxBins": "32",
+        "maxDepth": "4",
+        "maxIter": "30",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "20",
+        "minWeightFractionPerNode": "0.0",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "stepSize": "0.08",
+        "subsamplingRate": "0.85",
+        "validationTol": "0.01"
+      }
+    },
+    "regional:rf:h2": {
+      "model": "rf",
+      "variant": "regional",
+      "horizon": 2,
+      "train_rows": 75640,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8602,
+          "mae": 3.6467,
+          "rmse": 6.207,
+          "r2": 0.94969
+        },
+        {
+          "split": "test",
+          "n": 8280,
+          "mae": 3.2928,
+          "rmse": 5.5066,
+          "r2": 0.9573
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/rf/h2",
+      "fit_seconds": 5.88,
+      "feature_importance": [
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.04940079214662125
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.046399830281758925
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.04421411441484139
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.04013474133467485
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.03913937149918386
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.0378792595527313
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.03731141473694214
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.03398994771893558
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.03046033708338132
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.02739506692498768
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.026906401082076772
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.024015804264882996
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.0228918633254173
+        },
+        {
+          "feature": "tianjin_wind_direction_cos",
+          "importance": 0.02176517934977966
+        },
+        {
+          "feature": "langfang_wind_direction_cos",
+          "importance": 0.021692123962931784
+        },
+        {
+          "feature": "tangshan_wind_direction_cos",
+          "importance": 0.0209349672286261
+        },
+        {
+          "feature": "baoding_wind_direction_cos",
+          "importance": 0.01992276375568266
+        },
+        {
+          "feature": "langfang_wind_speed_10m",
+          "importance": 0.01979042377301049
+        },
+        {
+          "feature": "langfang_pm25_lag_1h",
+          "importance": 0.01920933790369858
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.017893484927648497
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "regional:gbt:h2": {
+      "model": "gbt",
+      "variant": "regional",
+      "horizon": 2,
+      "train_rows": 75640,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8602,
+          "mae": 3.8804,
+          "rmse": 7.4865,
+          "r2": 0.92682
+        },
+        {
+          "split": "test",
+          "n": 8280,
+          "mae": 3.3663,
+          "rmse": 5.4847,
+          "r2": 0.95764
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/gbt/h2",
+      "fit_seconds": 6.6,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.15049408351865692
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.06734606833059047
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.06425964412267957
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.06000716952167625
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.04084362565864859
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.038128697330444696
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.03593648569530976
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.034320753034733864
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.028752362096464684
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.027673727448637834
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.027192788495972273
+        },
+        {
+          "feature": "tianjin_pm25",
+          "importance": 0.02308532462573766
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.019365054129427742
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.017619702748680174
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.017174855494852877
+        },
+        {
+          "feature": "baoding_pm25_lag_6h",
+          "importance": 0.016214241872777785
+        },
+        {
+          "feature": "baoding_pm25",
+          "importance": 0.0161344134674215
+        },
+        {
+          "feature": "tianjin_wind_direction_cos",
+          "importance": 0.015664711282565774
+        },
+        {
+          "feature": "tangshan_temperature_2m",
+          "importance": 0.015477835050149694
+        },
+        {
+          "feature": "tangshan_pm25_lag_24h",
+          "importance": 0.015354421470920634
+        }
+      ],
+      "parameters": {
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "all",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "lossType": "squared",
+        "maxBins": "32",
+        "maxDepth": "4",
+        "maxIter": "30",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "20",
+        "minWeightFractionPerNode": "0.0",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "stepSize": "0.08",
+        "subsamplingRate": "0.85",
+        "validationTol": "0.01"
+      }
+    },
+    "regional:rf:h3": {
+      "model": "rf",
+      "variant": "regional",
+      "horizon": 3,
+      "train_rows": 75530,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8598,
+          "mae": 5.098,
+          "rmse": 8.4373,
+          "r2": 0.90711
+        },
+        {
+          "split": "test",
+          "n": 8264,
+          "mae": 4.586,
+          "rmse": 7.4692,
+          "r2": 0.92132
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/rf/h3",
+      "fit_seconds": 5.62,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.05524025529324786
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.044135717648819246
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.04410689291250764
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.04371620142756966
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.0397907755856253
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.03947235612786084
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.03647026408555282
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.03612056643120196
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.03238220037720138
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.024306204303009317
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.023978262373283866
+        },
+        {
+          "feature": "tianjin_wind_direction_cos",
+          "importance": 0.023207544325951044
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.0231801568434818
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.022108845724211613
+        },
+        {
+          "feature": "baoding_wind_direction_cos",
+          "importance": 0.02121566328403118
+        },
+        {
+          "feature": "tangshan_wind_direction_cos",
+          "importance": 0.020787447463444724
+        },
+        {
+          "feature": "langfang_wind_direction_cos",
+          "importance": 0.019481685206043518
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.016707500969118994
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.016322145069345054
+        },
+        {
+          "feature": "langfang_wind_speed_10m",
+          "importance": 0.016074435516783853
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "regional:gbt:h3": {
+      "model": "gbt",
+      "variant": "regional",
+      "horizon": 3,
+      "train_rows": 75530,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8598,
+          "mae": 5.2944,
+          "rmse": 9.8137,
+          "r2": 0.87433
+        },
+        {
+          "split": "test",
+          "n": 8264,
+          "mae": 4.7334,
+          "rmse": 7.651,
+          "r2": 0.91745
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/gbt/h3",
+      "fit_seconds": 8.08,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.13584186431492642
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.06989138664284669
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.061112067942742966
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.04537139493596705
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.03604147082053541
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.03532508046981092
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.034036474219087856
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.03316394371107768
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.02903408194493212
+        },
+        {
+          "feature": "tangshan_temperature_2m",
+          "importance": 0.027542323368616214
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.026676691539105596
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.026244091895066053
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.025693651418761718
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.022841846384699428
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.022755110470159236
+        },
+        {
+          "feature": "tianjin_pm25",
+          "importance": 0.01814099388666393
+        },
+        {
+          "feature": "baoding_pm25",
+          "importance": 0.017922585387848602
+        },
+        {
+          "feature": "langfang_wind_speed_10m",
+          "importance": 0.017753256920024215
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.017370351379703948
+        },
+        {
+          "feature": "baoding_pm25_lag_3h",
+          "importance": 0.017095571094668086
+        }
+      ],
+      "parameters": {
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "all",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "lossType": "squared",
+        "maxBins": "32",
+        "maxDepth": "4",
+        "maxIter": "30",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "20",
+        "minWeightFractionPerNode": "0.0",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "stepSize": "0.08",
+        "subsamplingRate": "0.85",
+        "validationTol": "0.01"
+      }
+    },
+    "regional:rf:h4": {
+      "model": "rf",
+      "variant": "regional",
+      "horizon": 4,
+      "train_rows": 75432,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8593,
+          "mae": 6.4327,
+          "rmse": 10.3606,
+          "r2": 0.86004
+        },
+        {
+          "split": "test",
+          "n": 8256,
+          "mae": 5.7961,
+          "rmse": 9.1877,
+          "r2": 0.88102
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/rf/h4",
+      "fit_seconds": 5.3,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.060733943412914625
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.044276046800871126
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.042184957955224325
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.040710232015892654
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.03904209551075615
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.03764659748736884
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.03425787504374852
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.029380197201839885
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.02889730496378683
+        },
+        {
+          "feature": "baoding_wind_direction_cos",
+          "importance": 0.02660388161183643
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.024242836105657865
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.023535246759115443
+        },
+        {
+          "feature": "tianjin_wind_direction_cos",
+          "importance": 0.02349640212995119
+        },
+        {
+          "feature": "langfang_wind_direction_cos",
+          "importance": 0.022106211013638893
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.022084925065394702
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.022002378676229277
+        },
+        {
+          "feature": "langfang_wind_speed_10m",
+          "importance": 0.021784627914470004
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.017450593901299504
+        },
+        {
+          "feature": "tangshan_wind_direction_cos",
+          "importance": 0.015509475850173739
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.015332263931284095
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "regional:gbt:h4": {
+      "model": "gbt",
+      "variant": "regional",
+      "horizon": 4,
+      "train_rows": 75432,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8593,
+          "mae": 6.5842,
+          "rmse": 10.6566,
+          "r2": 0.85193
+        },
+        {
+          "split": "test",
+          "n": 8256,
+          "mae": 5.9444,
+          "rmse": 9.317,
+          "r2": 0.87764
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/gbt/h4",
+      "fit_seconds": 6.0,
+      "feature_importance": [
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.09006145285219364
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.08176484319437767
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.058060205414953193
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.0430821413235123
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.041297247209652534
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.041280199981587586
+        },
+        {
+          "feature": "tianjin_pm25",
+          "importance": 0.03513489774084753
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.03309016888747829
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.031561165450742265
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.031058321345584148
+        },
+        {
+          "feature": "baoding_pm25_lag_3h",
+          "importance": 0.030985459774709352
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.03084220769782853
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.029576038828470066
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.028567394852211818
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.027317202454080432
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.02266560023552614
+        },
+        {
+          "feature": "baoding_pm25_lag_6h",
+          "importance": 0.021899354985015766
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.017401178776180762
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.016464282388750025
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.014602036761399123
+        }
+      ],
+      "parameters": {
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "all",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "lossType": "squared",
+        "maxBins": "32",
+        "maxDepth": "4",
+        "maxIter": "30",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "20",
+        "minWeightFractionPerNode": "0.0",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "stepSize": "0.08",
+        "subsamplingRate": "0.85",
+        "validationTol": "0.01"
+      }
+    },
+    "regional:rf:h5": {
+      "model": "rf",
+      "variant": "regional",
+      "horizon": 5,
+      "train_rows": 75341,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8588,
+          "mae": 7.5383,
+          "rmse": 11.9105,
+          "r2": 0.81508
+        },
+        {
+          "split": "test",
+          "n": 8247,
+          "mae": 6.8551,
+          "rmse": 10.5963,
+          "r2": 0.84178
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/rf/h5",
+      "fit_seconds": 4.92,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.06972510174314124
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.045311014024810796
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.043155864224838365
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.041690117660244136
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.038110135350938934
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.0378972207372126
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.03684939723856057
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.029261612902093326
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.02750076935303624
+        },
+        {
+          "feature": "langfang_wind_direction_cos",
+          "importance": 0.02601040196388051
+        },
+        {
+          "feature": "baoding_wind_direction_cos",
+          "importance": 0.023863195015404435
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.023330282365977194
+        },
+        {
+          "feature": "tianjin_wind_direction_cos",
+          "importance": 0.020256746948231912
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.019510043627178536
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.01937043175683478
+        },
+        {
+          "feature": "langfang_wind_speed_10m",
+          "importance": 0.019281268826341062
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.019244231612332352
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.01747928947902102
+        },
+        {
+          "feature": "tangshan_wind_direction_cos",
+          "importance": 0.01680277243353117
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.01626239012380774
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "regional:gbt:h5": {
+      "model": "gbt",
+      "variant": "regional",
+      "horizon": 5,
+      "train_rows": 75341,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8588,
+          "mae": 7.7375,
+          "rmse": 12.2519,
+          "r2": 0.80433
+        },
+        {
+          "split": "test",
+          "n": 8247,
+          "mae": 6.9805,
+          "rmse": 10.5955,
+          "r2": 0.84181
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/gbt/h5",
+      "fit_seconds": 7.29,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.0890768586285341
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.07066870272573778
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.04466870521162129
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.04344411792897689
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.04311505945005644
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.041539443719501024
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.04117982964290554
+        },
+        {
+          "feature": "tianjin_pm25",
+          "importance": 0.037289794765499325
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.03687692648039213
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.03602005185287919
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.034237524733926515
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.030632023279511752
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.02999751474876289
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.025416969041196526
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_cos",
+          "importance": 0.024810838992878646
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.018285629670323218
+        },
+        {
+          "feature": "baoding_pm25_lag_3h",
+          "importance": 0.01771619295748757
+        },
+        {
+          "feature": "baoding_pm25_lag_6h",
+          "importance": 0.017031337997785403
+        },
+        {
+          "feature": "zhangjiakou_temperature_2m",
+          "importance": 0.01680802939138443
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.016623156235316714
+        }
+      ],
+      "parameters": {
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "all",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "lossType": "squared",
+        "maxBins": "32",
+        "maxDepth": "4",
+        "maxIter": "30",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "20",
+        "minWeightFractionPerNode": "0.0",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "stepSize": "0.08",
+        "subsamplingRate": "0.85",
+        "validationTol": "0.01"
+      }
+    },
+    "regional:rf:h6": {
+      "model": "rf",
+      "variant": "regional",
+      "horizon": 6,
+      "train_rows": 75293,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8585,
+          "mae": 8.5508,
+          "rmse": 13.23,
+          "r2": 0.77174
+        },
+        {
+          "split": "test",
+          "n": 8239,
+          "mae": 7.7986,
+          "rmse": 11.8791,
+          "r2": 0.80106
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/rf/h6",
+      "fit_seconds": 5.04,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.06629197348465281
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.06245147554348234
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.05110155173980958
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.037668556103976215
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.03670613309884288
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.036692366145389003
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.03542260743903879
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.02835055850363194
+        },
+        {
+          "feature": "baoding_wind_direction_cos",
+          "importance": 0.027582790746746223
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.0273396206307994
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.02476896145452257
+        },
+        {
+          "feature": "langfang_wind_direction_cos",
+          "importance": 0.022740788814739538
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_cos",
+          "importance": 0.021688119592965325
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.020973410154793575
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.020961270426843842
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.020845994361101395
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.018548644366839756
+        },
+        {
+          "feature": "tianjin_wind_direction_cos",
+          "importance": 0.017861364330768542
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.016057496887985714
+        },
+        {
+          "feature": "zhangjiakou_pm25_lag_1h",
+          "importance": 0.014997881536584332
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "regional:gbt:h6": {
+      "model": "gbt",
+      "variant": "regional",
+      "horizon": 6,
+      "train_rows": 75293,
+      "feature_count": 89,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos",
+        "tianjin_pm25",
+        "tianjin_pm25_lag_1h",
+        "tianjin_pm25_lag_3h",
+        "tianjin_pm25_lag_6h",
+        "tianjin_pm25_lag_24h",
+        "tianjin_temperature_2m",
+        "tianjin_relative_humidity_2m",
+        "tianjin_surface_pressure",
+        "tianjin_wind_speed_10m",
+        "tianjin_precipitation",
+        "tianjin_wind_direction_sin",
+        "tianjin_wind_direction_cos",
+        "langfang_pm25",
+        "langfang_pm25_lag_1h",
+        "langfang_pm25_lag_3h",
+        "langfang_pm25_lag_6h",
+        "langfang_pm25_lag_24h",
+        "langfang_temperature_2m",
+        "langfang_relative_humidity_2m",
+        "langfang_surface_pressure",
+        "langfang_wind_speed_10m",
+        "langfang_precipitation",
+        "langfang_wind_direction_sin",
+        "langfang_wind_direction_cos",
+        "baoding_pm25",
+        "baoding_pm25_lag_1h",
+        "baoding_pm25_lag_3h",
+        "baoding_pm25_lag_6h",
+        "baoding_pm25_lag_24h",
+        "baoding_temperature_2m",
+        "baoding_relative_humidity_2m",
+        "baoding_surface_pressure",
+        "baoding_wind_speed_10m",
+        "baoding_precipitation",
+        "baoding_wind_direction_sin",
+        "baoding_wind_direction_cos",
+        "tangshan_pm25",
+        "tangshan_pm25_lag_1h",
+        "tangshan_pm25_lag_3h",
+        "tangshan_pm25_lag_6h",
+        "tangshan_pm25_lag_24h",
+        "tangshan_temperature_2m",
+        "tangshan_relative_humidity_2m",
+        "tangshan_surface_pressure",
+        "tangshan_wind_speed_10m",
+        "tangshan_precipitation",
+        "tangshan_wind_direction_sin",
+        "tangshan_wind_direction_cos",
+        "zhangjiakou_pm25",
+        "zhangjiakou_pm25_lag_1h",
+        "zhangjiakou_pm25_lag_3h",
+        "zhangjiakou_pm25_lag_6h",
+        "zhangjiakou_pm25_lag_24h",
+        "zhangjiakou_temperature_2m",
+        "zhangjiakou_relative_humidity_2m",
+        "zhangjiakou_surface_pressure",
+        "zhangjiakou_wind_speed_10m",
+        "zhangjiakou_precipitation",
+        "zhangjiakou_wind_direction_sin",
+        "zhangjiakou_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8585,
+          "mae": 8.7032,
+          "rmse": 13.4767,
+          "r2": 0.76315
+        },
+        {
+          "split": "test",
+          "n": 8239,
+          "mae": 7.9264,
+          "rmse": 11.7817,
+          "r2": 0.80431
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/regional/gbt/h6",
+      "fit_seconds": 7.02,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.06422950243445974
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.06229406183980517
+        },
+        {
+          "feature": "zhangjiakou_pm25",
+          "importance": 0.06193971974716065
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.05450914035031771
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.04057371983944941
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.038643458252161436
+        },
+        {
+          "feature": "langfang_pm25",
+          "importance": 0.037718657634451494
+        },
+        {
+          "feature": "zhangjiakou_wind_speed_10m",
+          "importance": 0.03487714720911325
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.02775502086708201
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.02708933888347909
+        },
+        {
+          "feature": "tangshan_pm25",
+          "importance": 0.02382468758909949
+        },
+        {
+          "feature": "tianjin_pm25",
+          "importance": 0.02368140418645868
+        },
+        {
+          "feature": "baoding_pm25_lag_6h",
+          "importance": 0.02278286902751173
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.022387720498345174
+        },
+        {
+          "feature": "baoding_pm25",
+          "importance": 0.021796873450507744
+        },
+        {
+          "feature": "zhangjiakou_wind_direction_sin",
+          "importance": 0.02159398760428217
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.021481861028890395
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.0214347566276804
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.021406827278475215
+        },
+        {
+          "feature": "tangshan_wind_direction_cos",
+          "importance": 0.02079028232027525
+        }
+      ],
+      "parameters": {
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "all",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "lossType": "squared",
+        "maxBins": "32",
+        "maxDepth": "4",
+        "maxIter": "30",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "20",
+        "minWeightFractionPerNode": "0.0",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "stepSize": "0.08",
+        "subsamplingRate": "0.85",
+        "validationTol": "0.01"
+      }
+    },
+    "beijing:rf:h1": {
+      "model": "rf",
+      "variant": "beijing",
+      "horizon": 1,
+      "train_rows": 75794,
+      "feature_count": 22,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8616,
+          "mae": 2.0432,
+          "rmse": 3.5578,
+          "r2": 0.98346
+        },
+        {
+          "split": "test",
+          "n": 8298,
+          "mae": 1.89,
+          "rmse": 3.2224,
+          "r2": 0.9854
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/beijing/rf/h1",
+      "fit_seconds": 4.32,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.12642485566424438
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.12188254663103293
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.09069328659557198
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.07711290158772897
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.07486964370737832
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.07133845561494205
+        },
+        {
+          "feature": "beijing_co",
+          "importance": 0.05445749459633518
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.05350250143705442
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.04675474070614424
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.04272352600204521
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.03800310671425579
+        },
+        {
+          "feature": "beijing_o3",
+          "importance": 0.03792396967291257
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.03511415305945748
+        },
+        {
+          "feature": "beijing_pm25_mean_24h",
+          "importance": 0.02930453933771952
+        },
+        {
+          "feature": "beijing_pm25_lag_24h",
+          "importance": 0.02905286477429179
+        },
+        {
+          "feature": "month_cos",
+          "importance": 0.02158903707153001
+        },
+        {
+          "feature": "month_sin",
+          "importance": 0.013624333927014417
+        },
+        {
+          "feature": "day_of_week_sin",
+          "importance": 0.012883522753802794
+        },
+        {
+          "feature": "beijing_pm25_count_24h",
+          "importance": 0.01053283662372632
+        },
+        {
+          "feature": "day_of_week_cos",
+          "importance": 0.009662717005024161
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "beijing:rf:h3": {
+      "model": "rf",
+      "variant": "beijing",
+      "horizon": 3,
+      "train_rows": 75530,
+      "feature_count": 22,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8598,
+          "mae": 5.4324,
+          "rmse": 9.2314,
+          "r2": 0.8888
+        },
+        {
+          "split": "test",
+          "n": 8264,
+          "mae": 4.9821,
+          "rmse": 8.3735,
+          "r2": 0.90112
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/beijing/rf/h3",
+      "fit_seconds": 3.81,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.11347736559271442
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.09010763890199947
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.08874069493742491
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.0705139807834548
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.07047695646388223
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.07009561614791528
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.06204790994207298
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.0566746359259001
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.05470992892326602
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.04243520042085377
+        },
+        {
+          "feature": "beijing_o3",
+          "importance": 0.03863322746512828
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.038328865849037504
+        },
+        {
+          "feature": "beijing_co",
+          "importance": 0.03742391449475361
+        },
+        {
+          "feature": "month_cos",
+          "importance": 0.03644357742432224
+        },
+        {
+          "feature": "beijing_pm25_lag_24h",
+          "importance": 0.03374536486638113
+        },
+        {
+          "feature": "beijing_pm25_mean_24h",
+          "importance": 0.03213945714085092
+        },
+        {
+          "feature": "month_sin",
+          "importance": 0.02087266102035053
+        },
+        {
+          "feature": "day_of_week_sin",
+          "importance": 0.020041456380815167
+        },
+        {
+          "feature": "day_of_week_cos",
+          "importance": 0.012557388979702244
+        },
+        {
+          "feature": "beijing_pm25_count_24h",
+          "importance": 0.00835678263675407
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "beijing:rf:h6": {
+      "model": "rf",
+      "variant": "beijing",
+      "horizon": 6,
+      "train_rows": 75293,
+      "feature_count": 22,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8585,
+          "mae": 9.3253,
+          "rmse": 14.7761,
+          "r2": 0.71527
+        },
+        {
+          "split": "test",
+          "n": 8239,
+          "mae": 8.711,
+          "rmse": 13.7219,
+          "r2": 0.73455
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/beijing/rf/h6",
+      "fit_seconds": 4.33,
+      "feature_importance": [
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.11576143316931574
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.09805297143499953
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.07211298908459554
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.0700269660358002
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.06298722124903382
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.060525236491784866
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.05274594112663794
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.052649436213525885
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.05146220635687102
+        },
+        {
+          "feature": "month_cos",
+          "importance": 0.047330171302704484
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.04641074242298197
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.04541300024440333
+        },
+        {
+          "feature": "beijing_pm25_lag_24h",
+          "importance": 0.04179328462541195
+        },
+        {
+          "feature": "beijing_o3",
+          "importance": 0.03991567963154168
+        },
+        {
+          "feature": "beijing_co",
+          "importance": 0.03230278874277903
+        },
+        {
+          "feature": "beijing_pm25_mean_24h",
+          "importance": 0.031571422443238316
+        },
+        {
+          "feature": "month_sin",
+          "importance": 0.029703822357139965
+        },
+        {
+          "feature": "day_of_week_sin",
+          "importance": 0.018172863082271673
+        },
+        {
+          "feature": "day_of_week_cos",
+          "importance": 0.016077217620080405
+        },
+        {
+          "feature": "beijing_pm25_count_24h",
+          "importance": 0.011959415454425172
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "weather:rf:h1": {
+      "model": "rf",
+      "variant": "weather",
+      "horizon": 1,
+      "train_rows": 75794,
+      "feature_count": 29,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8616,
+          "mae": 1.9942,
+          "rmse": 3.4893,
+          "r2": 0.98409
+        },
+        {
+          "split": "test",
+          "n": 8298,
+          "mae": 1.8054,
+          "rmse": 3.0664,
+          "r2": 0.98678
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/weather/rf/h1",
+      "fit_seconds": 4.37,
+      "feature_importance": [
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.10645121023533144
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.08737437324753987
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.08270177664659825
+        },
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.08269789148223411
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.05949001177083274
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.0524004373204967
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.05207481085203449
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.05163601013350518
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.0422204659627351
+        },
+        {
+          "feature": "beijing_relative_humidity_2m",
+          "importance": 0.03763488333023836
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.037109347848728214
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.035262924231314795
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.03402838447033189
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.029933232896307643
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.02953975892255156
+        },
+        {
+          "feature": "beijing_pm25_mean_24h",
+          "importance": 0.028247506535088618
+        },
+        {
+          "feature": "beijing_co",
+          "importance": 0.02506258793278283
+        },
+        {
+          "feature": "beijing_temperature_2m",
+          "importance": 0.022530266564907295
+        },
+        {
+          "feature": "beijing_o3",
+          "importance": 0.02249830359320161
+        },
+        {
+          "feature": "beijing_pm25_lag_24h",
+          "importance": 0.019077642609581235
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "weather:rf:h3": {
+      "model": "rf",
+      "variant": "weather",
+      "horizon": 3,
+      "train_rows": 75530,
+      "feature_count": 29,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8598,
+          "mae": 5.2236,
+          "rmse": 8.8432,
+          "r2": 0.89795
+        },
+        {
+          "split": "test",
+          "n": 8264,
+          "mae": 4.6696,
+          "rmse": 7.6956,
+          "r2": 0.91648
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/weather/rf/h3",
+      "fit_seconds": 5.33,
+      "feature_importance": [
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.10941265517413995
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.10470655779602982
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.09084889720568934
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.07868109616325902
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.06151529379898693
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.055667681317274655
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.0522581694665184
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.04600543814494407
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.04224057576922618
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.037046827812157145
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.03548895348251368
+        },
+        {
+          "feature": "beijing_temperature_2m",
+          "importance": 0.030482207083435645
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.02845510149115704
+        },
+        {
+          "feature": "beijing_relative_humidity_2m",
+          "importance": 0.028200304068049676
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.02689193753243689
+        },
+        {
+          "feature": "beijing_pm25_mean_24h",
+          "importance": 0.02503526442268031
+        },
+        {
+          "feature": "month_cos",
+          "importance": 0.019735224148270947
+        },
+        {
+          "feature": "beijing_surface_pressure",
+          "importance": 0.01948504635697865
+        },
+        {
+          "feature": "beijing_o3",
+          "importance": 0.018622343055711445
+        },
+        {
+          "feature": "beijing_pm25_lag_24h",
+          "importance": 0.01786608075648141
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    },
+    "weather:rf:h6": {
+      "model": "rf",
+      "variant": "weather",
+      "horizon": 6,
+      "train_rows": 75293,
+      "feature_count": 29,
+      "features": [
+        "beijing_pm25",
+        "beijing_pm10",
+        "beijing_so2",
+        "beijing_no2",
+        "beijing_o3",
+        "beijing_co",
+        "beijing_pm25_lag_1h",
+        "beijing_pm25_lag_3h",
+        "beijing_pm25_lag_6h",
+        "beijing_pm25_lag_24h",
+        "beijing_pm25_mean_3h",
+        "beijing_pm25_count_3h",
+        "beijing_pm25_mean_6h",
+        "beijing_pm25_count_6h",
+        "beijing_pm25_mean_24h",
+        "beijing_pm25_count_24h",
+        "hour_sin",
+        "hour_cos",
+        "month_sin",
+        "month_cos",
+        "day_of_week_sin",
+        "day_of_week_cos",
+        "beijing_temperature_2m",
+        "beijing_relative_humidity_2m",
+        "beijing_surface_pressure",
+        "beijing_wind_speed_10m",
+        "beijing_precipitation",
+        "beijing_wind_direction_sin",
+        "beijing_wind_direction_cos"
+      ],
+      "metrics": [
+        {
+          "split": "validation",
+          "n": 8585,
+          "mae": 8.8529,
+          "rmse": 13.8171,
+          "r2": 0.75103
+        },
+        {
+          "split": "test",
+          "n": 8239,
+          "mae": 8.1175,
+          "rmse": 12.4857,
+          "r2": 0.78023
+        }
+      ],
+      "model_path": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/models/weather/rf/h6",
+      "fit_seconds": 3.95,
+      "feature_importance": [
+        {
+          "feature": "beijing_wind_direction_sin",
+          "importance": 0.116179162826833
+        },
+        {
+          "feature": "beijing_pm25_mean_3h",
+          "importance": 0.09302939231459474
+        },
+        {
+          "feature": "beijing_wind_direction_cos",
+          "importance": 0.07949710061388736
+        },
+        {
+          "feature": "beijing_pm25_mean_6h",
+          "importance": 0.07043247352675479
+        },
+        {
+          "feature": "beijing_pm25_lag_1h",
+          "importance": 0.06873368767748357
+        },
+        {
+          "feature": "beijing_wind_speed_10m",
+          "importance": 0.0614917164729575
+        },
+        {
+          "feature": "beijing_pm25_lag_3h",
+          "importance": 0.05901303669168023
+        },
+        {
+          "feature": "hour_cos",
+          "importance": 0.04495778269665442
+        },
+        {
+          "feature": "beijing_so2",
+          "importance": 0.03884181290483738
+        },
+        {
+          "feature": "beijing_pm25",
+          "importance": 0.038456835698028484
+        },
+        {
+          "feature": "beijing_temperature_2m",
+          "importance": 0.03204388407824786
+        },
+        {
+          "feature": "hour_sin",
+          "importance": 0.029715939606825725
+        },
+        {
+          "feature": "month_cos",
+          "importance": 0.02665054190035392
+        },
+        {
+          "feature": "beijing_pm10",
+          "importance": 0.025797486651258184
+        },
+        {
+          "feature": "beijing_pm25_mean_24h",
+          "importance": 0.02520465555533422
+        },
+        {
+          "feature": "beijing_co",
+          "importance": 0.024851222806982588
+        },
+        {
+          "feature": "beijing_pm25_lag_6h",
+          "importance": 0.023379970041654822
+        },
+        {
+          "feature": "beijing_surface_pressure",
+          "importance": 0.021883083584865265
+        },
+        {
+          "feature": "beijing_no2",
+          "importance": 0.0198853993583045
+        },
+        {
+          "feature": "beijing_o3",
+          "importance": 0.019558742400663093
+        }
+      ],
+      "parameters": {
+        "bootstrap": "True",
+        "cacheNodeIds": "False",
+        "checkpointInterval": "10",
+        "featureSubsetStrategy": "sqrt",
+        "featuresCol": "features",
+        "impurity": "variance",
+        "labelCol": "label",
+        "leafCol": "",
+        "maxBins": "32",
+        "maxDepth": "8",
+        "maxMemoryInMB": "256",
+        "minInfoGain": "0.0",
+        "minInstancesPerNode": "12",
+        "minWeightFractionPerNode": "0.0",
+        "numTrees": "48",
+        "predictionCol": "residual_prediction",
+        "seed": "42",
+        "subsamplingRate": "1.0"
+      }
+    }
+  },
+  "selection_rule": "Minimum validation RMSE separately for each horizon; test never selects models",
+  "updated_at_utc": "2026-10-21T14:22:43.281184+00:00",
+  "recommended_by_horizon": {
+    "1": "rf",
+    "2": "rf",
+    "3": "rf",
+    "4": "rf",
+    "5": "rf",
+    "6": "rf"
+  },
+  "completed": true
+}

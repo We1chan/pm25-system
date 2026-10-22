@@ -1,0 +1,30 @@
+[
+  {
+    "date": "20160101",
+    "source_url": "https://quotsoft.net/air/data/china_cities_20160101.csv",
+    "mirror_path": "城市_20160101-20161231/城市_20160101-20161231/china_cities_20160101.csv",
+    "same_after_newline_normalization": true,
+    "normalized_sha256": "6acfc17a1080ea2cd43a614dda61c8ddc20526b7525acc1331ce03458d3efdd5"
+  },
+  {
+    "date": "20200101",
+    "source_url": "https://quotsoft.net/air/data/china_cities_20200101.csv",
+    "mirror_path": "城市_20200101-20201231/城市_20200101-20201231/china_cities_20200101.csv",
+    "same_after_newline_normalization": true,
+    "normalized_sha256": "7b3076a838280a58d150fd93607f7bd093ca3b948e6694d3afc762a1f896b801"
+  },
+  {
+    "date": "20220101",
+    "source_url": "https://quotsoft.net/air/data/china_cities_20220101.csv",
+    "mirror_path": "城市_20220101-20221231/城市_20220101-20221231/china_cities_20220101.csv",
+    "same_after_newline_normalization": true,
+    "normalized_sha256": "3fb3ea83b1defdaef006e3c830a593df3f2a571b33051bdd2a97d0e5f8072f61"
+  },
+  {
+    "date": "20250101",
+    "source_url": "https://quotsoft.net/air/data/china_cities_20250101.csv",
+    "mirror_path": "城市_20250101-20251231/城市_20250101-20251231/china_cities_20250101.csv",
+    "same_after_newline_normalization": true,
+    "normalized_sha256": "5f5865592cab7e6b125561ca39e7fa6a72f63203d0c806a3af0728945101dd6f"
+  }
+]

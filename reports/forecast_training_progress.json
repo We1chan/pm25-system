@@ -1,0 +1,8 @@
+{
+  "phase": "complete",
+  "device": "NVIDIA GeForce RTX 4080 Laptop GPU",
+  "best_epochs": {
+    "history_only": 1,
+    "future_weather": 1
+  }
+}

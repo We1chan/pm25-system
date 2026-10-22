@@ -1,0 +1,51 @@
+{
+  "verified_at": "2026-10-22T23:50:09.234863+08:00",
+  "cycle_id": "20261022T234453_9e034fe5",
+  "comparisons": 360,
+  "maximum_difference": 0.0,
+  "raw_hashes_verified": true,
+  "official_pm25_checks": 69,
+  "raw_weather_checks": 3402,
+  "future_weather_sensitivity_max_ugm3": 2.537405490875244,
+  "sensitivity_perturbation": "future temperature +1 training standard deviation; past inputs unchanged",
+  "checkpoint_sha256": "90a9fbbd5415a6a1a68e357d97c5eb83c8b6e5b74c8db6077b868249d502a81c",
+  "device": "NVIDIA GeForce RTX 4080 Laptop GPU",
+  "targets": [
+    {
+      "horizon": 1,
+      "target": "2026-10-23T00:00:00+08:00",
+      "lead_from_observation": 1,
+      "method": "direct"
+    },
+    {
+      "horizon": 2,
+      "target": "2026-10-23T01:00:00+08:00",
+      "lead_from_observation": 2,
+      "method": "direct"
+    },
+    {
+      "horizon": 3,
+      "target": "2026-10-23T02:00:00+08:00",
+      "lead_from_observation": 3,
+      "method": "direct"
+    },
+    {
+      "horizon": 4,
+      "target": "2026-10-23T03:00:00+08:00",
+      "lead_from_observation": 4,
+      "method": "direct"
+    },
+    {
+      "horizon": 5,
+      "target": "2026-10-23T04:00:00+08:00",
+      "lead_from_observation": 5,
+      "method": "direct"
+    },
+    {
+      "horizon": 6,
+      "target": "2026-10-23T05:00:00+08:00",
+      "lead_from_observation": 6,
+      "method": "direct"
+    }
+  ]
+}

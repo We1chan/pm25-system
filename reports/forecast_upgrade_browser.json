@@ -1,0 +1,55 @@
+{
+  "verified_at": "2026-10-22T23:07:22.942317+08:00",
+  "urls": [
+    "http://localhost:8000/#live",
+    "http://localhost:8000/#online"
+  ],
+  "model": "forecast_tcn9",
+  "current_checkpoint": "90a9fbbd5415a6a1a68e357d97c5eb83c8b6e5b74c8db6077b868249d502a81c",
+  "real_manual_refresh_completed": true,
+  "whole_hour_automatic_refresh_completed": "20261022T230035_9cae9be2",
+  "station_switch": "1001A then mean",
+  "reference_line_changed": {
+    "value": 35,
+    "observed_notice": "6 future median values reached reference",
+    "restored": 75
+  },
+  "evaluation_filters_checked": {
+    "start": "2026-10-22",
+    "end": "2026-10-22",
+    "station_id": "1001A",
+    "horizon": 6,
+    "model": "b8552e87fedf240758fd57e32f93325fb86bcdcae9161c5ef89a7658b1c7fd05",
+    "matched": 2
+  },
+  "downloaded_files": [
+    "C:\\Users\\we1ch\\Downloads\\beijing_live_1001A (2).csv",
+    "C:\\Users\\we1ch\\Downloads\\live_online_evaluation.csv"
+  ],
+  "offline_details_expanded": true,
+  "high_pollution_and_abrupt_undercoverage_visible": true,
+  "model_horizon_rows_checked": 9,
+  "mobile": {
+    "width": 390,
+    "height": 844,
+    "document_width": 375,
+    "pages_checked": [
+      "live",
+      "online"
+    ],
+    "overflow": false
+  },
+  "viewport_override_reset": true,
+  "console_errors": [],
+  "visible_alerts_after_completion": [],
+  "screenshots": [
+    "reports/screenshots/forecast-model-comparison.png",
+    "reports/screenshots/online-mobile.png",
+    "reports/screenshots/forecast-upgrade-mobile.png"
+  ],
+  "tests": {
+    "passed": 33,
+    "log": "logs/forecast_upgrade_tests.log"
+  },
+  "independent_numerical_check": "reports/forecast_upgrade_verification.json"
+}

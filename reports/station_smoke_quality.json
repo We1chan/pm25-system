@@ -1,0 +1,752 @@
+[
+  {
+    "station_id": "1001A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 39.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1002A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "1003A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 40.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1004A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 37.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1005A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 50.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1006A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 34.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1007A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "1008A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "1009A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "1010A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 24.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1011A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 40.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1012A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 31.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1015A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 85.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1017A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 81.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1018A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 82.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1019A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 63.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1021A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 81.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1023A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 85.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1024A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 85.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1026A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 61.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1027A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 87.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1037A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 56.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1038A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 104.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1040A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 68.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1041A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 52.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1051A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 63.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1052A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 66.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1053A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 3,
+    "mean_pm25": 62.333333333333336,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1054A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 66.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1055A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 70.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1056A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 55.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1057A",
+    "year": 2022,
+    "city_id": "zhangjiakou",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 24.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1059A",
+    "year": 2022,
+    "city_id": "zhangjiakou",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 33.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1060A",
+    "year": 2022,
+    "city_id": "zhangjiakou",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 33.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1061A",
+    "year": 2022,
+    "city_id": "zhangjiakou",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 32.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1067A",
+    "year": 2022,
+    "city_id": "langfang",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 49.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1068A",
+    "year": 2022,
+    "city_id": "langfang",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 40.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "1070A",
+    "year": 2022,
+    "city_id": "langfang",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 44.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "2858A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 58.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "2859A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 81.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "2860A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 81.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "2919A",
+    "year": 2022,
+    "city_id": "langfang",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 45.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "2922A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 79.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3020A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 75.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3051A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 75.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3131A",
+    "year": 2022,
+    "city_id": "zhangjiakou",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 29.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3281A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "3323A",
+    "year": 2022,
+    "city_id": "zhangjiakou",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 30.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3325A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 48.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3326A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 101.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3327A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 126.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3417A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 33.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3418A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 35.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3457A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 70.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3460A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 23.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3461A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 52.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3462A",
+    "year": 2022,
+    "city_id": "tianjin",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 47.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3575A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 43.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3576A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 58.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3577A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 33.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3578A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 47.75,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3581A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 68.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3582A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 94.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3583A",
+    "year": 2022,
+    "city_id": "baoding",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 47.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3671A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 30.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3672A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 31.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3673A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "3674A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "3675A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 44.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3692A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "3693A",
+    "year": 2022,
+    "city_id": "tangshan",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 43.25,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3694A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "3695A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 0,
+    "mean_pm25": null,
+    "first_observed": null,
+    "last_observed": null
+  },
+  {
+    "station_id": "3696A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 31.5,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  },
+  {
+    "station_id": "3697A",
+    "year": 2022,
+    "city_id": "beijing",
+    "grid_hours": 48,
+    "valid_pm25": 4,
+    "mean_pm25": 29.0,
+    "first_observed": "2022-01-01 00:00:00",
+    "last_observed": "2022-01-01 03:00:00"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "mirror_commit": "167aadf1086dff71569bfe799a4a1f64e3ac7b94",
+  "imported": 3811,
+  "retained_and_compared": 200,
+  "not_in_mirror": [
+    "20150101",
+    "20181222",
+    "20181223",
+    "20181224",
+    "20181225",
+    "20181226",
+    "20190824"
+  ],
+  "invalid_in_mirror": [],
+  "next_step": "Run download_data.py to resolve dates absent from the mirror."
+}

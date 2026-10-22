@@ -1,0 +1,52 @@
+{
+  "verified_at_utc": "2026-10-21T15:03:34.1488344Z",
+  "method": "Manual interaction through browser UI",
+  "desktop_viewport": "1440x1000",
+  "responsive_viewport": "390x844, restored to app default afterward",
+  "pages_checked": [
+    "overview",
+    "analysis",
+    "forecast",
+    "models",
+    "quality"
+  ],
+  "checks_passed": [
+    "year and city filters",
+    "weather variable filter",
+    "map hour slider and playback",
+    "monthly and daily trend modes",
+    "forecast model selection",
+    "validation and test split toggle",
+    "ablation horizon selection",
+    "data coverage filtering",
+    "CSV downloads",
+    "responsive layout without page overflow",
+    "no new browser errors after final chart lifecycle fix"
+  ],
+  "downloads": {
+    "forecast_rows": 6,
+    "observations_rows": 8760
+  },
+  "screenshots": [
+    {
+      "sha256": "1728cd0cae7aae876d1a75c7c02de3dcee4f4191e7a8943e81876954dbe713e8",
+      "file": "reports/screenshots/analysis-desktop.jpg",
+      "bytes": 165563
+    },
+    {
+      "sha256": "320eb2984c66de5bb90a5712d135139292661616a176473f12b583e018dd45ce",
+      "file": "reports/screenshots/forecast-desktop.jpg",
+      "bytes": 125917
+    },
+    {
+      "sha256": "94fcc0e54fac024aa1eb062a5274774384580152d1cc7c286dcc000dc298393d",
+      "file": "reports/screenshots/overview-desktop.jpg",
+      "bytes": 132553
+    },
+    {
+      "sha256": "fc4d1e2c66cd5477be6065c0c54f72ec50b0d47c1ebdb21613707d902db72f73",
+      "file": "reports/screenshots/overview-small-screen.jpg",
+      "bytes": 96501
+    }
+  ]
+}

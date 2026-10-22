@@ -1,0 +1,99 @@
+{
+  "spark_version": "3.5.8",
+  "spark_master": "local[4]",
+  "start_date": "2015-01-01",
+  "end_date": "2025-12-31",
+  "timezone": "Asia/Shanghai",
+  "cities": [
+    {
+      "id": "beijing",
+      "name": "北京",
+      "latitude": 39.9042,
+      "longitude": 116.4074
+    },
+    {
+      "id": "tianjin",
+      "name": "天津",
+      "latitude": 39.0842,
+      "longitude": 117.2009
+    },
+    {
+      "id": "langfang",
+      "name": "廊坊",
+      "latitude": 39.5378,
+      "longitude": 116.6838
+    },
+    {
+      "id": "baoding",
+      "name": "保定",
+      "latitude": 38.8745,
+      "longitude": 115.4648
+    },
+    {
+      "id": "tangshan",
+      "name": "唐山",
+      "latitude": 39.6305,
+      "longitude": 118.1802
+    },
+    {
+      "id": "zhangjiakou",
+      "name": "张家口",
+      "latitude": 40.7676,
+      "longitude": 114.8863
+    }
+  ],
+  "panel_rows": 578592,
+  "distinct_city_hour_keys": 578592,
+  "beijing_feature_rows": 96432,
+  "parquet_output": "hdfs://localhost:9000/user/hadoop/pm25_beijing/2015_2025/processed",
+  "beijing_valid_label_counts": {
+    "h1": 93877,
+    "h2": 93877,
+    "h3": 93877,
+    "h4": 93877,
+    "h5": 93877,
+    "h6": 93877,
+    "current_and_all_six_targets": 88027
+  },
+  "pm25_valid_hours_all_cities": 564028,
+  "raw_bytes": 1699384831,
+  "source_missing_dates": [
+    "20150101",
+    "20181222",
+    "20181223",
+    "20181224",
+    "20181225",
+    "20181226",
+    "20190824"
+  ],
+  "download_summary": {
+    "air": {
+      "missing": 7,
+      "ok": 4011
+    },
+    "weather": {
+      "ok": 66
+    }
+  },
+  "units": {
+    "pm25": "ug/m3",
+    "pm10": "ug/m3",
+    "so2": "ug/m3",
+    "no2": "ug/m3",
+    "o3": "ug/m3",
+    "co": "mg/m3",
+    "temperature_2m": "C",
+    "surface_pressure": "hPa",
+    "relative_humidity_2m": "%",
+    "wind_speed_10m": "m/s",
+    "wind_direction_10m": "degree",
+    "precipitation": "mm"
+  },
+  "notes": [
+    "Missing observations and targets are retained as null.",
+    "Weather is ERA5 reanalysis at city representative coordinates, not direct station observations.",
+    "Historical backtests do not certify real-time availability of reanalysis inputs.",
+    "Train/validation/test must be chronological; all target timestamps must lie inside their split.",
+    "Source CO uses mg/m3; other pollutant concentrations use ug/m3."
+  ]
+}

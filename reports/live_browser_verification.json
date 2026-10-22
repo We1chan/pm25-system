@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-22T16:14:07.151292+08:00",
+  "url": "http://localhost:8000/#live",
+  "cycle_id": "20261022T160752_b1e6564e",
+  "real_refresh_clicked": true,
+  "completed_current_cycle": true,
+  "observations_at": "2026-10-22T15:00:00+08:00",
+  "future_targets": [
+    "2026-10-22T17:00:00+08:00",
+    "2026-10-22T18:00:00+08:00",
+    "2026-10-22T19:00:00+08:00",
+    "2026-10-22T20:00:00+08:00",
+    "2026-10-22T21:00:00+08:00",
+    "2026-10-22T22:00:00+08:00"
+  ],
+  "station_switch": "1001A, then mean",
+  "weather_switch": "relative_humidity_2m",
+  "actual_csv_download": "C:\\Users\\we1ch\\Downloads\\beijing_live_1001A (1).csv",
+  "csv_rows_checked": 6,
+  "mobile_viewport": {
+    "width": 390,
+    "height": 844,
+    "document_width": 375,
+    "horizontal_document_overflow": false
+  },
+  "viewport_override_reset": true,
+  "console_errors": [],
+  "visible_alerts_after_completion": [],
+  "expired_forecast_hidden_before_update": true,
+  "online_matched_after_new_observations": 114,
+  "screenshots": [
+    "reports/screenshots/live-overview.jpg",
+    "reports/screenshots/live-forecast.jpg",
+    "reports/screenshots/live-mobile.jpg"
+  ],
+  "independent_backend_report": "reports/live_api_verification.json",
+  "source_and_model_verification": "reports/live_verification.json",
+  "frontend_build": "npm --prefix frontend run build succeeded",
+  "startup_collection_note": "First refresh after WSL restart timed out; the subsequent actual page refresh fetched all 17 sources and completed Spark, CUDA inference and HDFS publication. The service keeps retrying automatically."
+}
