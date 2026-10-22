@@ -17,7 +17,7 @@
 - `verify_delivery.py` 仍核验原有 13 项城市测试日志；本次全量 34 项的独立日志是
   `logs/baseline/tests.log`，两者没有混作一份结果。
 
-## 阶段 1：代码可读性整理（进行中）
+## 阶段 1：代码可读性整理（完成）
 
 - 实时组：整理 8 个模块，拆开复合语句，行宽不超过 100，补充中文输入输出和函数说明。
   去掉 docstring 后，全部文件的 AST 与修改前一致；34 项全量测试通过。
@@ -40,4 +40,11 @@
   `logs/phase1-rest-ast.json`。四组共 36 个文件，去掉 docstring 后 AST 均与原文件一致。
 - 已恢复服务，并重新运行三类交付核验。与 `logs/baseline/` 的三个 JSON 报告逐字段比较，
   仅 `verified_at` / `verified_at_utc` 改变，所有数值、源数据核对和模型版本完全一致。
-  比较证据保存在 `logs/phase1-verification/`。在线刷新已接受，正在等待采集轮次结束。
+  比较证据保存在 `logs/phase1-verification/`。
+- 手动 `POST /api/live/refresh` 返回 `accepted=true`；首轮 Windows 采集进程退出未发布，
+  后续排队轮次 `20261023T000013_50496442` 已完整成功，最终状态为 `complete`。
+  发布时刻 `2026-10-23T00:02:41+08:00`，实测起点 `2026-10-22T23:00:00+08:00`，
+  本轮 14 个北京站点可预测。证据：`logs/phase1-refresh.json` 和 `logs/live_cycle.log`。
+- 刷新时公共日文件源出现 429，午夜新日文件尚未发布。将已有成功轮次中 SHA-256 校验一致的
+  2026-10-21 站点原始文件补入既有旧日缓存，未覆盖任何文件、未修改程序行为。
+  复用证据：`logs/phase1-cache-reuse.json`。没有把可选来源失败隐藏为采集成功。
