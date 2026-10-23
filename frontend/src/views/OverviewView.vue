@@ -1,71 +1,548 @@
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
-import { ArrowDownRight, ArrowUpRight, ArrowRight, Play, Pause, Activity, MapPin, Clock3, Wind, Droplets, Thermometer, Database } from '@lucide/vue'
-import * as echarts from 'echarts'
+/*
+ * 区域概览页（第一代，2015—2025 城市小时均值）。
+ * 数据：/api/meta（城市坐标与年份）、/api/overview（年度统计与城市相关）、
+ *       /api/snapshot（某一时刻六城浓度与北京气象）、/api/trend（城市浓度曲线）。
+ * 城市均值会平滑单个站点的极值；气象为 ERA5 再分析资料。
+ */
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import {
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  Database,
+  Droplets,
+  Pause,
+  Play,
+  Thermometer,
+  TrendingUp,
+  Wind,
+} from '@lucide/vue'
 import Chart from '../components/Chart.vue'
-import { api, fmt, colors, cityNames, lineOption, baseChart } from '../lib/api'
-const props = defineProps({ meta: Object, year: String })
-const overview = ref(null), snapshot = ref(null), trend = ref(null), error = ref(''), busy = ref(true)
-const snapshotDate = ref('2025-12-30'), hour = ref(12), period = ref('all'), activeCities = ref(['beijing', 'tianjin', 'langfang'])
-let playTimer, snapshotRequest = 0, trendRequest = 0, yearRequest = 0
+import Notice from '../components/Notice.vue'
+import PanelCard from '../components/PanelCard.vue'
+import PmLegend from '../components/PmLegend.vue'
+import Segmented from '../components/Segmented.vue'
+import StatCard from '../components/StatCard.vue'
+import YearBar from '../components/YearBar.vue'
+import { api } from '../lib/api'
+import { fmt, fmtPercent } from '../lib/format'
+import { cityIds, cityNames } from '../lib/labels'
+import { historyYear, loadHistoryMeta } from '../lib/state'
+import {
+  axisTime,
+  baseOption,
+  cityColors,
+  lineSeries,
+  pointMapOption,
+  timeAxis,
+  timeTooltip,
+  valueAxis,
+  zoomControls,
+} from '../lib/chart'
+
+const meta = ref(null)
+const overview = ref(null)
+const snapshot = ref(null)
+const trend = ref(null)
+const error = ref('')
+
+const snapshotDate = ref('2025-12-30')
+const hour = ref(12)
 const playing = ref(false)
-const beijing = computed(() => snapshot.value?.cities.find(c => c.city_id === 'beijing'))
-const ranking = computed(() => [...(snapshot.value?.cities || [])].sort((a, b) => (b.pm25 ?? -1) - (a.pm25 ?? -1)))
-const yearLabel = computed(() => overview.value?.year === 'all' ? '2015—2025 年' : `${overview.value?.year || props.year} 年`)
-async function loadSnapshot() {
-  if (!snapshotDate.value) return
-  const request = ++snapshotRequest
-  try { const data = await api('snapshot', { time: `${snapshotDate.value}T${String(hour.value).padStart(2, '0')}:00` }); if (request === snapshotRequest) snapshot.value = data } catch (e) { error.value = e.message }
+const period = ref('all')
+const activeCities = ref(['beijing', 'tianjin', 'langfang'])
+
+let playTimer = 0
+let overviewToken = 0
+let snapshotToken = 0
+let trendToken = 0
+
+// "全部年份"时，按年展开的视图使用最近一年
+const concreteYear = computed(() => (historyYear.value === 'all' ? '2025' : historyYear.value))
+
+const yearLabel = computed(() => {
+  return historyYear.value === 'all' ? '2015—2025 年' : `${historyYear.value} 年`
+})
+
+const beijing = computed(() => snapshot.value?.cities.find(item => item.city_id === 'beijing'))
+
+const ranking = computed(() => {
+  const rows = [...(snapshot.value?.cities || [])]
+  return rows.sort((a, b) => (b.pm25 ?? -1) - (a.pm25 ?? -1))
+})
+
+const rankingMax = computed(() => Math.max(100, ...ranking.value.map(item => item.pm25 ?? 0)))
+
+// 排序条的长度；刻度至少到 100，避免浓度都很低时最短的城市也显得很长
+function barWidth(value) {
+  if (value === null || value === undefined) {
+    return '0%'
+  }
+  return `${Math.max(2, (value / rankingMax.value) * 100)}%`
 }
-async function loadTrend() {
-  const request = ++trendRequest
-  if (!activeCities.value.length) return
-  const year = props.year === 'all' ? '2025' : props.year
+
+const rising = computed(() => (overview.value?.yoy_percent ?? 0) > 0)
+
+const strongest = computed(() => {
+  const rows = overview.value?.analysis.city_correlations || []
+  const others = rows.filter(row => row.city === 'beijing' && row.other !== 'beijing')
+  return others.sort((a, b) => b.correlation - a.correlation)[0] || null
+})
+
+// ---------- 数据加载 ----------
+
+async function loadOverview() {
+  const token = ++overviewToken
   try {
-    const data = await api('trend', { cities: activeCities.value.join(','), start: period.value === 'all' ? '2015-01-01' : `${year}-01-01`, end: period.value === 'all' ? '2025-12-31' : `${year}-12-31` })
-    if (request === trendRequest) trend.value = data
-  } catch (e) { error.value = e.message }
+    const result = await api('overview', { year: historyYear.value })
+    if (token === overviewToken) {
+      overview.value = result
+      error.value = ''
+    }
+  } catch (reason) {
+    if (token === overviewToken) {
+      error.value = reason.message
+    }
+  }
 }
-async function loadYear() {
-  const request = ++yearRequest
-  try { const data = await api('overview', { year: props.year }); if (request === yearRequest) { overview.value = data; error.value = '' } }
-  catch (e) { if (request === yearRequest) error.value = e.message }
+
+async function loadSnapshot() {
+  if (!snapshotDate.value) {
+    return
+  }
+  const token = ++snapshotToken
+  const time = `${snapshotDate.value}T${String(hour.value).padStart(2, '0')}:00`
+  try {
+    const result = await api('snapshot', { time })
+    if (token === snapshotToken) {
+      snapshot.value = result
+    }
+  } catch (reason) {
+    error.value = reason.message
+  }
 }
-onMounted(async () => { await Promise.all([loadYear(), loadSnapshot(), loadTrend()]); busy.value = false })
-watch(() => props.year, () => { loadYear(); if (props.year !== 'all') snapshotDate.value = `${props.year}-12-30`; if (period.value !== 'all') loadTrend() })
-watch([snapshotDate, hour], loadSnapshot)
-watch([period, activeCities], loadTrend, { deep: true })
-function toggleCity(id) { if (activeCities.value.includes(id)) { if (activeCities.value.length > 1) activeCities.value = activeCities.value.filter(c => c !== id) } else activeCities.value = [...activeCities.value, id] }
-function togglePlay() { playing.value = !playing.value; clearInterval(playTimer); if (playing.value) playTimer = setInterval(() => { hour.value = (hour.value + 1) % 24 }, 1500) }
-onBeforeUnmount(() => clearInterval(playTimer))
-const mapOption = computed(() => {
-  const points = (snapshot.value?.cities || []).map(c => ({ name: cityNames[c.city_id], city_id: c.city_id, value: [props.meta.cities.find(x => x.id === c.city_id).longitude, props.meta.cities.find(x => x.id === c.city_id).latitude, c.pm25] }))
-  if (!echarts.getMap('bth-region')) return { ...baseChart, xAxis: { type: 'value', min: 113, max: 120, name: '经度' }, yAxis: { type: 'value', min: 36, max: 43, name: '纬度' }, series: [{ type: 'scatter', data: points.map(p => ({ ...p, value: p.value.slice(0, 2) })), symbolSize: 16, label: { show: true, formatter: '{b}', position: 'top' } }] }
-  return {
-    tooltip: { trigger: 'item', formatter: p => p.seriesType === 'scatter' ? `${p.name}<br/>PM₂.₅ <b>${fmt(p.value[2])}</b> μg/m³` : p.name },
-    geo: { map: 'bth-region', roam: false, layoutCenter: ['47%', '49%'], layoutSize: '97%', silent: true, itemStyle: { areaColor: '#f0f3eb', borderColor: '#d8dfd2', borderWidth: 1 }, regions: [{ name: '北京市', itemStyle: { areaColor: '#dce9dd' } }, { name: '天津市', itemStyle: { areaColor: '#e8ebda' } }], emphasis: { disabled: true } },
-    visualMap: { show: false, dimension: 2, min: 0, max: 120, inRange: { color: ['#4a987a', '#afbc76', '#d7ad64', '#c97952', '#a3534c'] } },
-    series: [{ type: 'scatter', coordinateSystem: 'geo', data: points, symbolSize: v => v[2] === null ? 9 : 12 + Math.min(v[2], 150) / 8, itemStyle: { borderColor: '#fff', borderWidth: 2, opacity: .94, shadowBlur: 9, shadowColor: '#244f3020' }, label: { show: true, position: 'right', formatter: p => `${p.name}  ${fmt(p.value[2], 0)}`, color: '#3d5141', fontSize: 11, backgroundColor: '#ffffffbc', padding: [3, 5], borderRadius: 3 }, emphasis: { scale: 1.3 } }],
+
+async function loadTrend() {
+  if (!activeCities.value.length) {
+    return
+  }
+  const token = ++trendToken
+  const whole = period.value === 'all'
+  try {
+    const result = await api('trend', {
+      cities: activeCities.value.join(','),
+      start: whole ? '2015-01-01' : `${concreteYear.value}-01-01`,
+      end: whole ? '2025-12-31' : `${concreteYear.value}-12-31`,
+    })
+    if (token === trendToken) {
+      trend.value = result
+    }
+  } catch (reason) {
+    error.value = reason.message
+  }
+}
+
+onMounted(async () => {
+  try {
+    meta.value = await loadHistoryMeta()
+  } catch (reason) {
+    error.value = reason.message
+  }
+  snapshotDate.value = `${concreteYear.value}-12-30`
+  await Promise.all([loadOverview(), loadSnapshot(), loadTrend()])
+})
+
+watch(historyYear, () => {
+  loadOverview()
+  snapshotDate.value = `${concreteYear.value}-12-30`
+  if (period.value !== 'all') {
+    loadTrend()
   }
 })
-const trendOption = computed(() => lineOption(trend.value?.series || [], { zoom: true }))
-const strongest = computed(() => (overview.value?.analysis.city_correlations || []).filter(r => r.city === 'beijing' && r.other !== 'beijing').sort((a, b) => b.correlation - a.correlation)[0])
+
+watch([snapshotDate, hour], loadSnapshot)
+watch([period, activeCities], loadTrend, { deep: true })
+
+function toggleCity(id) {
+  if (activeCities.value.includes(id)) {
+    // 至少保留一个城市，避免空图
+    if (activeCities.value.length > 1) {
+      activeCities.value = activeCities.value.filter(item => item !== id)
+    }
+  } else {
+    activeCities.value = [...activeCities.value, id]
+  }
+}
+
+function togglePlay() {
+  playing.value = !playing.value
+  clearInterval(playTimer)
+  if (playing.value) {
+    playTimer = setInterval(() => {
+      hour.value = (hour.value + 1) % 24
+    }, 1500)
+  }
+}
+
+onBeforeUnmount(() => clearInterval(playTimer))
+
+// ---------- 图表 ----------
+
+const mapOption = computed(() => {
+  const cities = meta.value?.cities || []
+  const points = (snapshot.value?.cities || []).map(item => {
+    const place = cities.find(cityItem => cityItem.id === item.city_id)
+    return {
+      id: item.city_id,
+      name: cityNames[item.city_id],
+      lon: place?.longitude,
+      lat: place?.latitude,
+      value: item.pm25,
+    }
+  }).filter(point => point.lon !== undefined)
+  return pointMapOption({
+    points,
+    center: [116.6, 39.75],
+    zoom: 1.7,
+    highlight: ['北京市'],
+    labelAll: true,
+    // 点的大小也随浓度变化，便于投影时远处看清
+    sizeOf: point => 14 + Math.min(point.value ?? 0, 150) / 6,
+  })
+})
+
+const trendOption = computed(() => {
+  const series = trend.value?.series || []
+  const monthly = trend.value?.resolution === 'month'
+  const base = baseOption()
+  // 上方的城市按钮带色块，已经起到图例作用，这里不再画 ECharts 图例
+  return {
+    ...base,
+    grid: { ...base.grid, top: 34, bottom: 62 },
+    tooltip: { ...base.tooltip, formatter: timeTooltip({ precision: monthly ? 'month' : 'day' }) },
+    xAxis: timeAxis(),
+    yAxis: valueAxis(monthly ? '月均 μg/m³' : '日均 μg/m³'),
+    dataZoom: zoomControls(0),
+    series: series.map(item => lineSeries({
+      name: item.name,
+      data: item.points.map(point => [axisTime(point.time), point.value]),
+      color: cityColors[item.city_id],
+      width: item.city_id === 'beijing' ? 2.5 : 1.5,
+      z: item.city_id === 'beijing' ? 5 : 2,
+    })),
+  }
+})
 </script>
+
 <template>
-  <div v-if="error" class="error-box" role="alert">{{ error }}</div>
-  <div v-if="busy" class="page-loader"><span class="spinner"></span> 正在读取区域观测…</div>
-  <template v-else>
-    <section class="kpi-grid">
-      <article class="kpi-card featured"><div class="kpi-label"><span>北京 PM₂.₅ 平均浓度</span><Activity :size="16" /></div><div class="kpi-number">{{ fmt(overview?.beijing_mean) }}<small>μg/m³</small></div><div class="kpi-bottom"><span>{{ yearLabel }}</span><span v-if="overview?.yoy_percent !== null" class="change" :class="{ negative: overview?.yoy_percent > 0 }"><component :is="overview?.yoy_percent <= 0 ? ArrowDownRight : ArrowUpRight" :size="13" />{{ fmt(Math.abs(overview?.yoy_percent)) }}% 同比</span></div></article>
-      <article class="kpi-card"><div class="kpi-label"><span>北京小时观测覆盖率</span><Database :size="16" /></div><div class="kpi-number">{{ fmt(overview?.coverage * 100) }}<small>%</small></div><div class="mini-progress"><i :style="{ width: `${overview?.coverage * 100}%` }"></i></div><div class="kpi-bottom">缺测保留为空值</div></article>
-      <article class="kpi-card"><div class="kpi-label"><span>区域观测城市</span><MapPin :size="16" /></div><div class="kpi-number">06<small>座城市</small></div><div class="kpi-bottom">北京及周边五城 · 小时数据</div></article>
-      <article class="kpi-card"><div class="kpi-label"><span>短时预测窗口</span><Clock3 :size="16" /></div><div class="kpi-number">1–6<small>小时</small></div><a href="#forecast" class="kpi-action">进入历史预测回放 <ArrowRight :size="14" /></a></article>
-    </section>
-    <div class="map-ranking-grid">
-      <section class="panel map-panel"><div class="panel-heading"><div><div class="section-kicker">SPATIAL OBSERVATION</div><h2>此刻，区域空气如何？</h2></div><span class="subtle-tag">六城观测</span></div><div class="map-controls"><input type="date" v-model="snapshotDate" min="2015-01-01" max="2025-12-31" aria-label="地图观测日期"><span class="time-stamp">{{ String(hour).padStart(2, '0') }}:00</span><button class="icon-button" :aria-label="playing ? '暂停小时播放' : '播放小时变化'" @click="togglePlay"><component :is="playing ? Pause : Play" :size="14" /></button><input type="range" v-model.number="hour" min="0" max="23" aria-label="地图观测小时"></div><Chart :option="mapOption" height="325px" label="京津冀六城 PM2.5 浓度分布地图" /><div class="map-legend"><span>PM₂.₅ 小时浓度</span><i></i><span>0</span><span>120+</span><small>μg/m³</small><a href="https://geo.datav.aliyun.com/" target="_blank" rel="noreferrer">边界：DataV</a></div></section>
-      <section class="panel ranking-panel"><div class="panel-heading"><div><div class="section-kicker">CITY COMPARISON</div><h2>城市浓度对比</h2></div><span class="unit-label">μg/m³</span></div><div class="ranking-time">{{ snapshot?.time.slice(0, 16) }} · 北京时间</div><div class="ranking-list"><div v-for="(city, index) in ranking" :key="city.city_id" class="rank-row"><span class="rank-index">{{ String(index + 1).padStart(2, '0') }}</span><span class="rank-city">{{ cityNames[city.city_id] }}</span><div class="rank-track"><i :style="{ width: city.pm25 === null ? '0%' : `${Math.max(3, city.pm25 / Math.max(100, ranking[0]?.pm25 || 100) * 100)}%`, background: city.city_id === 'beijing' ? '#176e59' : '#b9c9ad' }"></i></div><strong>{{ fmt(city.pm25, 0) }}</strong></div></div><div class="weather-strip"><div><Thermometer :size="15" /><strong>{{ fmt(beijing?.temperature_2m) }}°</strong><span>气温</span></div><div><Droplets :size="15" /><strong>{{ fmt(beijing?.relative_humidity_2m, 0) }}%</strong><span>湿度</span></div><div><Wind :size="15" /><strong>{{ fmt(beijing?.wind_speed_10m) }}</strong><span>风速 m/s</span></div></div><div class="panel-note">北京气象 · ERA5 再分析资料</div></section>
-    </div>
-    <section class="panel trend-panel"><div class="panel-heading"><div><div class="section-kicker">TEMPORAL TREND</div><h2>{{ period === 'all' ? '十一年的变化，沿时间展开' : `${yearLabel}的浓度变化` }}</h2></div><div class="segmented"><button :class="{ active: period === 'all' }" @click="period = 'all'">十一年月均</button><button :class="{ active: period === 'year' }" @click="period = 'year'">所选年日均</button></div></div><div class="chart-legend"><button v-for="(name, id, index) in cityNames" :key="id" :class="{ muted: !activeCities.includes(id) }" @click="toggleCity(id)"><i :style="{ background: colors[index] }"></i>{{ name }}</button><span class="legend-caption">{{ trend?.start }} — {{ trend?.end }}</span></div><Chart :option="trendOption" height="285px" label="各城市 PM2.5 浓度历史趋势" /><div class="panel-note">均值按有效观测小时加权；曲线保留缺测，可拖动底部时间条查看局部。</div></section>
-    <section class="insight-grid"><div><span class="insight-number">01</span><div><h3>区域联动，值得关注</h3><p>北京与{{ cityNames[strongest?.other] || '周边城市' }}的小时浓度相关系数为 <strong>{{ fmt(strongest?.correlation, 2) }}</strong>。<small>2015—2025 年，统计关联不代表因果。</small></p></div></div><div><span class="insight-number">02</span><div><h3>从观测走向预测</h3><p>使用历史污染与气象信息，预测未来六小时。<a href="#models">查看独立测试表现 <ArrowUpRight :size="12" /></a></p></div></div></section>
-  </template>
+  <div class="stack">
+    <YearBar :years="meta?.years || []" exportable />
+
+    <Notice v-if="error" kind="error">{{ error }}</Notice>
+    <Notice v-if="!overview && !error" kind="loading">正在读取区域观测…</Notice>
+
+    <template v-if="overview">
+      <div class="stat-row">
+        <StatCard
+          :label="`北京 PM₂.₅ 平均浓度 · ${yearLabel}`"
+          :value="fmt(overview.beijing_mean)"
+          unit="μg/m³"
+          :icon="Activity"
+          featured
+        >
+          <span v-if="overview.yoy_percent !== null" class="change" :class="{ up: rising }">
+            <component :is="rising ? ArrowUpRight : ArrowDownRight" :size="13" />
+            比上一年{{ rising ? '上升' : '下降' }} {{ fmt(Math.abs(overview.yoy_percent)) }}%
+          </span>
+          <span v-else>按有效观测小时计算</span>
+        </StatCard>
+        <StatCard
+          label="北京最高小时浓度"
+          :value="fmt(overview.beijing_max, 0)"
+          unit="μg/m³"
+          :icon="TrendingUp"
+          :hint="`${yearLabel}内的城市均值小时最大值`"
+        />
+        <StatCard
+          label="北京小时观测覆盖率"
+          :value="fmt(overview.coverage * 100)"
+          unit="%"
+          :icon="Database"
+        >
+          <div class="meter"><i :style="{ width: `${overview.coverage * 100}%` }"></i></div>
+          <span class="meter-caption">缺测小时保留为空，不做插值</span>
+        </StatCard>
+        <StatCard
+          label="与北京联动最强的城市"
+          :value="strongest ? cityNames[strongest.other] : null"
+          word
+          :hint="strongest ? `小时浓度相关系数 r = ${fmt(strongest.correlation, 2)}（2015—2025）` : ''"
+        />
+      </div>
+
+      <div class="grid-wide-left">
+        <PanelCard kicker="空间分布" title="某一时刻，六座城市的空气如何">
+          <div class="map-controls">
+            <input
+              v-model="snapshotDate"
+              type="date"
+              min="2015-01-01"
+              max="2025-12-31"
+              aria-label="观测日期"
+            />
+            <button
+              class="button small"
+              type="button"
+              :aria-label="playing ? '暂停逐小时播放' : '逐小时播放'"
+              @click="togglePlay"
+            >
+              <component :is="playing ? Pause : Play" :size="14" />{{ playing ? '暂停' : '播放' }}
+            </button>
+            <input
+              v-model.number="hour"
+              class="hour-slider"
+              type="range"
+              min="0"
+              max="23"
+              aria-label="观测小时"
+            />
+            <strong class="hour-label">{{ String(hour).padStart(2, '0') }}:00</strong>
+          </div>
+          <Chart :option="mapOption" height="360px" label="六城 PM2.5 浓度分布地图" />
+          <PmLegend />
+          <template #note>
+            点的大小和颜色都表示城市小时均值浓度。边界数据来自
+            <a href="https://geo.datav.aliyun.com/" target="_blank" rel="noreferrer">DataV</a>。
+          </template>
+        </PanelCard>
+
+        <PanelCard kicker="城市对比" :title="`${snapshot?.time.slice(0, 16) || ''} 浓度排序`">
+          <ol class="ranking">
+            <li v-for="(item, index) in ranking" :key="item.city_id">
+              <span class="rank">{{ index + 1 }}</span>
+              <span class="rank-city">{{ cityNames[item.city_id] }}</span>
+              <span class="rank-track">
+                <i
+                  :class="{ beijing: item.city_id === 'beijing' }"
+                  :style="{ width: barWidth(item.pm25) }"
+                ></i>
+              </span>
+              <strong class="num">{{ fmt(item.pm25, 0) }}</strong>
+            </li>
+          </ol>
+          <div class="weather-strip">
+            <div>
+              <Thermometer :size="16" />
+              <strong>{{ fmt(beijing?.temperature_2m) }} °C</strong>
+              <span>北京气温</span>
+            </div>
+            <div>
+              <Droplets :size="16" />
+              <strong>{{ fmt(beijing?.relative_humidity_2m, 0) }}%</strong>
+              <span>相对湿度</span>
+            </div>
+            <div>
+              <Wind :size="16" />
+              <strong>{{ fmt(beijing?.wind_speed_10m) }} m/s</strong>
+              <span>风速</span>
+            </div>
+          </div>
+          <template #note>单位 μg/m³。北京气象为 ERA5 再分析资料。</template>
+        </PanelCard>
+      </div>
+
+      <PanelCard
+        kicker="时间变化"
+        :title="period === 'all' ? '十一年的变化：月均浓度' : `${concreteYear} 年的变化：日均浓度`"
+      >
+        <template #actions>
+          <Segmented
+            v-model="period"
+            label="时间范围"
+            :options="[{ value: 'all', label: '十一年月均' }, { value: 'year', label: '所选年日均' }]"
+          />
+        </template>
+        <div class="pills city-pills" role="group" aria-label="选择城市">
+          <button
+            v-for="id in cityIds"
+            :key="id"
+            type="button"
+            :class="{ active: activeCities.includes(id) }"
+            :aria-pressed="activeCities.includes(id)"
+            @click="toggleCity(id)"
+          >
+            <i class="swatch" :style="{ background: cityColors[id] }"></i>{{ cityNames[id] }}
+          </button>
+        </div>
+        <Chart :option="trendOption" height="320px" label="各城市 PM2.5 浓度变化" />
+        <template #note>均值按有效观测小时计算；曲线中的空缺是缺测，可拖动底部时间条查看局部。</template>
+      </PanelCard>
+
+      <div class="grid-2">
+        <div class="insight">
+          <span class="insight-index">01</span>
+          <div>
+            <h3>区域联动，值得关注</h3>
+            <p>
+              北京与{{ cityNames[strongest?.other] || '周边城市' }}的小时浓度相关系数为
+              <strong>{{ fmt(strongest?.correlation, 2) }}</strong>，说明污染常常在区域内同步起落。
+              这是统计关联，不代表因果。<a href="#analysis">查看城市间相关矩阵 →</a>
+            </p>
+          </div>
+        </div>
+        <div class="insight">
+          <span class="insight-index">02</span>
+          <div>
+            <h3>从观测走向预测</h3>
+            <p>
+              用起点之前的污染、气象和周边城市信息预测未来六小时，并和"保持当前值不变"的基线比较。
+              <a href="#models">查看独立测试表现 →</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
 </template>
+
+<style scoped>
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--good);
+  font-weight: 600;
+}
+
+.change.up {
+  color: var(--danger);
+}
+
+.meter-caption {
+  display: block;
+  margin-top: 6px;
+}
+
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.map-controls input[type="date"] {
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.hour-slider {
+  flex: 1 1 160px;
+  accent-color: var(--brand);
+}
+
+.hour-label {
+  min-width: 48px;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking {
+  display: grid;
+  gap: 12px;
+  margin: 4px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.ranking li {
+  display: grid;
+  grid-template-columns: 22px 54px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.rank {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.rank-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.rank-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #a9b8ad;
+}
+
+.rank-track i.beijing {
+  background: var(--brand);
+}
+
+.ranking strong {
+  font-size: 16px;
+}
+
+.weather-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.weather-strip div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.weather-strip strong {
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.city-pills {
+  margin-bottom: 8px;
+}
+
+.insight {
+  display: flex;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.insight-index {
+  font-size: 22px;
+  font-weight: 650;
+  color: var(--brand);
+  line-height: 1.2;
+}
+
+.insight h3 {
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+.insight p {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+</style>

@@ -1,0 +1,178 @@
+/*
+ * 基础样式：设计令牌、元素重置和排版。
+ * 颜色只在这里定义一次，组件和页面都通过变量引用，便于统一调整。
+ * 图表系列色在 lib/chart.js 中定义，与这里的界面色分开管理。
+ */
+
+:root {
+  --font-sans: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC",
+    system-ui, sans-serif;
+
+  /* 页面与卡片底色 */
+  --bg: #f3f5f2;
+  --surface: #ffffff;
+  --surface-sunken: #f7f8f6;
+  --surface-hover: #f1f4f1;
+
+  /* 线条 */
+  --border: #e1e6e1;
+  --border-strong: #c9d1ca;
+
+  /* 文字：主文字、次要说明、弱提示 */
+  --ink: #15211c;
+  --ink-2: #46534d;
+  --ink-3: #737e78;
+
+  /* 品牌色：按钮、选中态和链接 */
+  --brand: #0a6e4f;
+  --brand-strong: #075a40;
+  --brand-soft: #e4f1eb;
+  --brand-line: #b9dccc;
+
+  /* 状态色：总是与图标或文字一起出现，不单独靠颜色表达含义 */
+  --good: #0a7d3a;
+  --good-soft: #e6f4ea;
+  --warn: #9a6200;
+  --warn-soft: #fdf3df;
+  --danger: #b93434;
+  --danger-soft: #fbeceb;
+  --info: #285fa8;
+  --info-soft: #eaf1fb;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --shadow: 0 1px 2px rgba(21, 33, 28, 0.04), 0 2px 8px rgba(21, 33, 28, 0.04);
+  --sidebar-width: 236px;
+
+  color-scheme: light;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+code {
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 0.92em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  word-break: break-all;
+}
+
+/* 表格里的数字需要上下对齐，所以使用等宽数字 */
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--ink-3);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.nowrap code {
+  word-break: normal;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

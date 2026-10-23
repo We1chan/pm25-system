@@ -1,44 +1,358 @@
 <script setup>
+/*
+ * 时空分析页（第一代，2015—2025 城市小时均值）。
+ * 数据：/api/pattern（月份 × 小时平均与四季平均）、/api/weather（气象与浓度散点及相关系数）、
+ *       /api/trend（所选城市浓度曲线）、/api/overview（城市间相关矩阵）。
+ * 散点图为了绘图速度按时间等距抽样，相关系数用全部有效小时计算。相关不代表因果。
+ */
 import { computed, onMounted, ref, watch } from 'vue'
 import Chart from '../components/Chart.vue'
-import { api, fmt, cityNames, colors, baseChart, lineOption } from '../lib/api'
-const props = defineProps({ meta: Object, year: String })
-const city = ref('beijing'), variable = ref('relative_humidity_2m'), pattern = ref(null), weather = ref(null), trend = ref(null), analysis = ref(null), error = ref(''), busy = ref(true)
-let request = 0
-async function load() {
-  const id = ++request
-  busy.value = true; error.value = ''
-  try {
-    const y = props.year
-    const [p, w, t, o] = await Promise.all([api('pattern', { city: city.value, year: y }), api('weather', { city: city.value, year: y, variable: variable.value }), api('trend', { cities: city.value, start: y === 'all' ? '2015-01-01' : `${y}-01-01`, end: y === 'all' ? '2025-12-31' : `${y}-12-31` }), api('overview', { year: y })])
-    if (id === request) { pattern.value = p; weather.value = w; trend.value = t; analysis.value = o.analysis }
-  } catch (e) { if (id === request) error.value = e.message } finally { if (id === request) busy.value = false }
+import Notice from '../components/Notice.vue'
+import PanelCard from '../components/PanelCard.vue'
+import YearBar from '../components/YearBar.vue'
+import { api } from '../lib/api'
+import { fmt, fmtInt } from '../lib/format'
+import { cityIds, cityNames } from '../lib/labels'
+import { historyYear, loadHistoryMeta } from '../lib/state'
+import {
+  axisTime,
+  barSeries,
+  baseOption,
+  categoryAxis,
+  categoryTooltip,
+  cityColors,
+  greenRamp,
+  ink,
+  lineSeries,
+  timeAxis,
+  timeTooltip,
+  valueAxis,
+  zoomControls,
+} from '../lib/chart'
+
+const weatherOptions = {
+  relative_humidity_2m: { name: '相对湿度', unit: '%' },
+  wind_speed_10m: { name: '风速', unit: 'm/s' },
+  temperature_2m: { name: '气温', unit: '°C' },
 }
-onMounted(load); watch([city, variable, () => props.year], load)
-const trendOption = computed(() => lineOption(trend.value?.series || [], { zoom: true }))
-const heatOption = computed(() => ({
-  ...baseChart, tooltip: { position: 'top', formatter: p => `${p.value[1] + 1} 月 · ${p.value[0]}:00<br/>PM₂.₅ ${fmt(p.value[2])} μg/m³` },
-  grid: { top: 10, bottom: 46, left: 42, right: 12 },
-  xAxis: { type: 'category', data: Array.from({ length: 24 }, (_, i) => i), axisLabel: { interval: 3, color: '#89948b' }, axisLine: { show: false }, axisTick: { show: false }, name: '时' },
-  yAxis: { type: 'category', data: Array.from({ length: 12 }, (_, i) => `${i + 1}月`), axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#89948b' } },
-  visualMap: { min: 0, max: Math.max(60, ...((pattern.value?.cells || []).map(r => r.value || 0))), calculable: false, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 11, itemHeight: 150, text: ['高', '低'], textStyle: { color: '#8b968e', fontSize: 10 }, inRange: { color: ['#edf2dd', '#b9cd99', '#6c9e74', '#2d7157'] } },
-  series: [{ type: 'heatmap', data: (pattern.value?.cells || []).filter(r => r.value !== null).map(r => [r.hour, r.month - 1, +r.value.toFixed(2)]), itemStyle: { borderColor: '#fff', borderWidth: 2, borderRadius: 2 }, emphasis: { itemStyle: { borderColor: '#4a7257', borderWidth: 2 } } }],
-}))
-const seasonOption = computed(() => ({ ...baseChart, grid: { top: 25, bottom: 30, left: 50, right: 18 }, xAxis: { ...baseChart.xAxis, type: 'category', data: ['春季', '夏季', '秋季', '冬季'] }, series: [{ type: 'bar', barWidth: '35%', data: ['春季', '夏季', '秋季', '冬季'].map((s, i) => ({ value: pattern.value?.seasons.find(r => r.season === s)?.value, itemStyle: { color: ['#b4c399', '#6f9b83', '#d4b176', '#83a4aa'][i], borderRadius: [5, 5, 0, 0] } })), label: { show: true, position: 'top', formatter: p => fmt(p.value), color: '#65756e' } }] }))
-const weatherUnits = { temperature_2m: '°C', relative_humidity_2m: '%', wind_speed_10m: 'm/s' }
-const scatterOption = computed(() => ({ ...baseChart, tooltip: { trigger: 'item', formatter: p => `${p.data[2]}<br/>${weather.value?.name}: ${fmt(p.data[0])} ${weatherUnits[variable.value]}<br/>PM₂.₅: ${fmt(p.data[1])} μg/m³` }, xAxis: { ...baseChart.xAxis, type: 'value', name: weatherUnits[variable.value], nameTextStyle: { color: '#89948b' }, splitLine: { show: false } }, yAxis: { ...baseChart.yAxis }, series: [{ type: 'scatter', symbolSize: 4, itemStyle: { color: '#26795e', opacity: .24 }, data: (weather.value?.points || []).map(r => [r.x, r.y, r.ts]) }] }))
+
+const meta = ref(null)
+const city = ref('beijing')
+const variable = ref('relative_humidity_2m')
+const pattern = ref(null)
+const weather = ref(null)
+const trend = ref(null)
+const analysis = ref(null)
+const error = ref('')
+const busy = ref(true)
+
+let request = 0
+
+const yearLabel = computed(() => {
+  return historyYear.value === 'all' ? '2015—2025 年' : `${historyYear.value} 年`
+})
+
+async function load() {
+  const token = ++request
+  busy.value = true
+  error.value = ''
+  const year = historyYear.value
+  const whole = year === 'all'
+  try {
+    const [patternResult, weatherResult, trendResult, overviewResult] = await Promise.all([
+      api('pattern', { city: city.value, year }),
+      api('weather', { city: city.value, year, variable: variable.value }),
+      api('trend', {
+        cities: city.value,
+        start: whole ? '2015-01-01' : `${year}-01-01`,
+        end: whole ? '2025-12-31' : `${year}-12-31`,
+      }),
+      api('overview', { year }),
+    ])
+    if (token === request) {
+      pattern.value = patternResult
+      weather.value = weatherResult
+      trend.value = trendResult
+      analysis.value = overviewResult.analysis
+    }
+  } catch (reason) {
+    if (token === request) {
+      error.value = reason.message
+    }
+  } finally {
+    if (token === request) {
+      busy.value = false
+    }
+  }
+}
+
+onMounted(async () => {
+  loadHistoryMeta().then(result => {
+    meta.value = result
+  }).catch(reason => {
+    error.value = reason.message
+  })
+  await load()
+})
+
+watch([city, variable, historyYear], load)
+
+// ---------- 图表 ----------
+
+const trendOption = computed(() => {
+  const series = trend.value?.series || []
+  const monthly = trend.value?.resolution === 'month'
+  const base = baseOption()
+  return {
+    ...base,
+    grid: { ...base.grid, top: 34, bottom: 62 },
+    tooltip: { ...base.tooltip, formatter: timeTooltip({ precision: monthly ? 'month' : 'day' }) },
+    xAxis: timeAxis(),
+    yAxis: valueAxis(monthly ? '月均 μg/m³' : '日均 μg/m³'),
+    dataZoom: zoomControls(0),
+    series: series.map(item => lineSeries({
+      name: item.name,
+      data: item.points.map(point => [axisTime(point.time), point.value]),
+      color: cityColors[item.city_id],
+      area: true,
+    })),
+  }
+})
+
+const heatOption = computed(() => {
+  const cells = (pattern.value?.cells || []).filter(cell => cell.value !== null)
+  const max = Math.max(60, ...cells.map(cell => cell.value))
+  return {
+    textStyle: baseOption().textStyle,
+    tooltip: {
+      confine: true,
+      formatter: item => {
+        const [hour, month, value] = item.value
+        return `${month + 1} 月 · ${hour}:00<br/>平均 PM₂.₅ <b>${fmt(value)}</b> μg/m³`
+      },
+    },
+    grid: { top: 8, left: 44, right: 12, bottom: 64 },
+    xAxis: categoryAxis(Array.from({ length: 24 }, (_, index) => index), {
+      name: '时',
+      axisLine: { show: false },
+      axisLabel: { color: ink.muted, fontSize: 11, interval: 2 },
+    }),
+    yAxis: categoryAxis(Array.from({ length: 12 }, (_, index) => `${index + 1} 月`), {
+      axisLine: { show: false },
+    }),
+    visualMap: {
+      min: 0,
+      max: Math.ceil(max),
+      orient: 'horizontal',
+      left: 'center',
+      bottom: 0,
+      itemWidth: 12,
+      itemHeight: 180,
+      text: ['高', '低'],
+      textStyle: { color: ink.muted, fontSize: 11 },
+      inRange: { color: greenRamp },
+    },
+    series: [{
+      type: 'heatmap',
+      data: cells.map(cell => [cell.hour, cell.month - 1, Number(cell.value.toFixed(1))]),
+      itemStyle: { borderColor: '#fff', borderWidth: 2, borderRadius: 3 },
+      emphasis: { itemStyle: { borderColor: ink.primary, borderWidth: 1 } },
+    }],
+  }
+})
+
+const seasonOrder = ['春季', '夏季', '秋季', '冬季']
+
+const seasonOption = computed(() => {
+  const values = seasonOrder.map(name => {
+    return pattern.value?.seasons.find(item => item.season === name)?.value ?? null
+  })
+  const base = baseOption()
+  return {
+    ...base,
+    grid: { ...base.grid, top: 34 },
+    tooltip: { ...base.tooltip, formatter: categoryTooltip() },
+    xAxis: categoryAxis(seasonOrder, { axisLabel: { color: ink.secondary, fontSize: 13 } }),
+    yAxis: valueAxis(),
+    series: [barSeries({
+      name: '平均 PM₂.₅',
+      data: values,
+      color: cityColors[city.value],
+      width: 48,
+      labels: true,
+      digits: 1,
+    })],
+  }
+})
+
+const scatterOption = computed(() => {
+  const info = weatherOptions[variable.value]
+  const base = baseOption()
+  return {
+    ...base,
+    grid: { ...base.grid, top: 34, bottom: 40 },
+    tooltip: {
+      ...base.tooltip,
+      trigger: 'item',
+      formatter: item => {
+        const [x, y, time] = item.data
+        const weatherText = `${info.name} ${fmt(x)} ${info.unit}`
+        return `${time.slice(0, 16)}<br/>${weatherText}<br/>PM₂.₅ ${fmt(y)} μg/m³`
+      },
+    },
+    xAxis: valueAxis(`${info.name} ${info.unit}`, {
+      nameLocation: 'middle',
+      nameGap: 26,
+      nameTextStyle: { color: ink.muted, fontSize: 11 },
+      scale: true,
+      splitLine: { show: false },
+      axisLine: { show: true, lineStyle: { color: ink.axis } },
+    }),
+    yAxis: valueAxis(),
+    series: [{
+      type: 'scatter',
+      symbolSize: 5,
+      itemStyle: { color: cityColors[city.value], opacity: 0.28 },
+      data: (weather.value?.points || []).map(point => [point.x, point.y, point.ts]),
+    }],
+  }
+})
+
 const matrixOption = computed(() => {
-  const ids = Object.keys(cityNames), entries = []
-  for (const row of analysis.value?.city_correlations || []) { entries.push([ids.indexOf(row.city), ids.indexOf(row.other), +row.correlation.toFixed(3)]); if (row.city !== row.other) entries.push([ids.indexOf(row.other), ids.indexOf(row.city), +row.correlation.toFixed(3)]) }
-  return { ...baseChart, tooltip: { formatter: p => `${cityNames[ids[p.value[0]]]} × ${cityNames[ids[p.value[1]]]}<br/>Pearson r = ${fmt(p.value[2], 3)}` }, grid: { top: 4, left: 55, right: 20, bottom: 36 }, xAxis: { type: 'category', data: Object.values(cityNames), axisLine: { show: false }, axisTick: { show: false }, axisLabel: { fontSize: 10 } }, yAxis: { type: 'category', data: Object.values(cityNames), axisLine: { show: false }, axisTick: { show: false }, axisLabel: { fontSize: 10 } }, visualMap: { show: false, min: 0, max: 1, inRange: { color: ['#f2f3e7', '#b9c9a2', '#2c765c'] } }, series: [{ type: 'heatmap', data: entries, label: { show: true, formatter: p => fmt(p.value[2], 2), fontSize: 11, color: '#fff' }, itemStyle: { borderWidth: 3, borderColor: '#fff', borderRadius: 3 } }] }
+  const names = cityIds.map(id => cityNames[id])
+  const cells = []
+  for (const row of analysis.value?.city_correlations || []) {
+    const a = cityIds.indexOf(row.city)
+    const b = cityIds.indexOf(row.other)
+    const value = Number(row.correlation.toFixed(3))
+    // 深色格子上用白字，浅色格子上用深色字，保证文字可读
+    const label = { color: value >= 0.75 ? '#fff' : ink.primary }
+    cells.push({ value: [a, b, value], label })
+    if (a !== b) {
+      cells.push({ value: [b, a, value], label })
+    }
+  }
+  return {
+    textStyle: baseOption().textStyle,
+    tooltip: {
+      confine: true,
+      formatter: item => {
+        const [a, b, value] = item.value
+        return `${names[a]} × ${names[b]}<br/>Pearson r = <b>${fmt(value, 3)}</b>`
+      },
+    },
+    grid: { top: 8, left: 56, right: 12, bottom: 30 },
+    xAxis: categoryAxis(names, { axisLine: { show: false }, axisLabel: { color: ink.secondary } }),
+    // 纵轴倒序，使北京位于左上角，与横轴顺序对应
+    yAxis: categoryAxis(names, {
+      inverse: true,
+      axisLine: { show: false },
+      axisLabel: { color: ink.secondary },
+    }),
+    visualMap: { show: false, min: 0.3, max: 1, inRange: { color: greenRamp } },
+    series: [{
+      type: 'heatmap',
+      data: cells,
+      label: { show: true, fontSize: 12, formatter: item => fmt(item.value[2], 2) },
+      itemStyle: { borderColor: '#fff', borderWidth: 3, borderRadius: 4 },
+    }],
+  }
 })
 </script>
+
 <template>
-  <div class="view-toolbar"><div class="select-pills"><button v-for="(name, id) in cityNames" :key="id" :class="{ active: city === id }" @click="city = id">{{ name }}</button></div><span class="quiet">{{ year === 'all' ? '2015—2025 年' : `${year} 年` }} · 有效小时观测</span></div>
-  <div v-if="error" class="error-box" role="alert">{{ error }}</div><div v-if="busy" class="page-loader"><span class="spinner"></span> 正在计算分析视图…</div>
-  <template v-else>
-    <section class="panel"><div class="panel-heading"><div><div class="section-kicker">TIME SERIES</div><h2>{{ cityNames[city] }}的浓度变化</h2></div><span class="subtle-tag">{{ trend?.resolution === 'month' ? '月均浓度' : '日均浓度' }}</span></div><Chart :option="trendOption" height="260px" label="所选城市 PM2.5 时间变化曲线" /></section>
-    <div class="two-column-grid"><section class="panel"><div class="panel-heading"><div><div class="section-kicker">MONTH × HOUR</div><h2>污染的时间纹理</h2></div><span class="unit-label">PM₂.₅ · μg/m³</span></div><Chart :option="heatOption" height="300px" label="月份与小时的 PM2.5 浓度热力图" /><div class="panel-note">每个格子代表该月、该小时全部有效观测的平均浓度。</div></section><section class="panel"><div class="panel-heading"><div><div class="section-kicker">SEASONALITY</div><h2>四季之间的差异</h2></div><span class="unit-label">μg/m³</span></div><Chart :option="seasonOption" height="300px" label="春夏秋冬 PM2.5 平均浓度对比" /><div class="panel-note">按日历月份分季，冬季为 12 月、1 月、2 月。</div></section></div>
-    <div class="two-column-grid"><section class="panel"><div class="panel-heading"><div><div class="section-kicker">METEOROLOGY</div><h2>气象与污染的关联</h2></div><select v-model="variable" class="compact-select" aria-label="气象分析变量"><option value="relative_humidity_2m">相对湿度</option><option value="wind_speed_10m">风速</option><option value="temperature_2m">气温</option></select></div><div class="correlation-note">Pearson r <strong>{{ fmt(weather?.correlation, 3) }}</strong><span>{{ fmt(weather?.n, 0) }} 个有效小时 · 图中按时间等距抽样</span></div><Chart :option="scatterOption" height="275px" label="气象变量与 PM2.5 浓度散点图" /><div class="panel-note">统计关联不代表因果关系；气象采用历史再分析资料。</div></section><section class="panel"><div class="panel-heading"><div><div class="section-kicker">REGIONAL LINKAGE</div><h2>城市间的共同变化</h2></div><span class="subtle-tag">2015—2025 全时段</span></div><Chart :option="matrixOption" height="306px" label="六个城市 PM2.5 小时浓度相关矩阵" /><div class="panel-note">对每对城市使用同时有观测值的小时计算 Pearson 相关系数。</div></section></div>
-  </template>
+  <div class="stack">
+    <YearBar :years="meta?.years || []">
+      <div class="pills" role="group" aria-label="选择城市">
+        <button
+          v-for="id in cityIds"
+          :key="id"
+          type="button"
+          :class="{ active: city === id }"
+          :aria-pressed="city === id"
+          @click="city = id"
+        >
+          <i class="swatch" :style="{ background: cityColors[id] }"></i>{{ cityNames[id] }}
+        </button>
+      </div>
+    </YearBar>
+
+    <Notice v-if="error" kind="error">{{ error }}</Notice>
+    <Notice v-if="busy && !pattern" kind="loading">正在计算分析视图…</Notice>
+
+    <template v-if="pattern">
+      <PanelCard
+        kicker="时间序列"
+        :title="`${cityNames[city]} · ${yearLabel}的浓度变化`"
+      >
+        <template #actions>
+          <span class="tag">{{ trend?.resolution === 'month' ? '月均' : '日均' }}</span>
+        </template>
+        <Chart :option="trendOption" height="280px" label="所选城市 PM2.5 浓度变化" />
+      </PanelCard>
+
+      <div class="grid-wide-left">
+        <PanelCard
+          kicker="月份 × 小时"
+          title="污染的时间纹理：一年中的哪个月、一天中的哪个钟点更高"
+          note="每格为该月该小时全部有效观测的平均浓度（μg/m³），颜色越深浓度越高。"
+        >
+          <Chart :option="heatOption" height="360px" label="月份与小时的 PM2.5 平均浓度热力图" />
+        </PanelCard>
+        <PanelCard
+          kicker="季节"
+          title="四季平均浓度"
+          note="按日历月份分季：春 3—5 月，夏 6—8 月，秋 9—11 月，冬 12—2 月。"
+        >
+          <Chart :option="seasonOption" height="360px" label="四季 PM2.5 平均浓度" />
+        </PanelCard>
+      </div>
+
+      <div class="grid-2">
+        <PanelCard kicker="气象关联" :title="`${weatherOptions[variable].name}与 PM₂.₅ 的关系`">
+          <template #actions>
+            <select v-model="variable" class="select" aria-label="选择气象变量">
+              <option v-for="(info, key) in weatherOptions" :key="key" :value="key">
+                {{ info.name }}
+              </option>
+            </select>
+          </template>
+          <div class="correlation">
+            <span>Pearson 相关系数</span>
+            <strong>{{ fmt(weather?.correlation, 3) }}</strong>
+            <span>基于 {{ fmtInt(weather?.n) }} 个有效小时；图中按时间等距抽样显示</span>
+          </div>
+          <Chart :option="scatterOption" height="300px" label="气象变量与 PM2.5 散点图" />
+          <template #note>相关不代表因果；气象为 ERA5 历史再分析资料。</template>
+        </PanelCard>
+        <PanelCard
+          kicker="区域联动"
+          title="城市之间的共同变化"
+          note="对每对城市，用两地同时有观测的小时计算 Pearson 相关系数；数值越接近 1 越同步。"
+        >
+          <template #actions>
+            <span class="tag">2015—2025 全时段</span>
+          </template>
+          <Chart :option="matrixOption" height="340px" label="六城 PM2.5 小时浓度相关矩阵" />
+        </PanelCard>
+      </div>
+    </template>
+  </div>
 </template>
+
+<style scoped>
+.correlation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.correlation strong {
+  font-size: 22px;
+  color: var(--ink);
+}
+</style>

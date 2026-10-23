@@ -75,11 +75,16 @@ The API serves `latest.json` only while it is fresh (`server/live.py` `freshness
 
 **Model versioning.** Checkpoints are also stored as `models/versions/<sha256>.pt`. Published forecasts keep the interval and checkpoint they were issued with, and are never rewritten when the model changes. Errors are never mixed across checkpoints.
 
-**Frontend.**
-- `frontend/src/App.vue` holds the `pages` array, which does hash routing; `#live` is the default page.
-- Each page is one file in `views/`.
-- `lib/api.js` `api(path, params)` fetches `/api/<path>` and throws the server's `detail` message.
-- Charts go through `components/Chart.vue` (ECharts).
+**Frontend.** Vue 3 + ECharts, no router or state library. `docs/api.md` is the contract it is built against.
+- `frontend/src/App.vue` holds the `groups` and `pages` arrays and does hash routing; `#live` is the default page and unknown hashes fall back to it. The sidebar groups pages by generation: 实时系统 (`#live` `#online`), 站点实验 (`#stations`), 城市研究 (`#overview` `#analysis` `#forecast` `#models` `#quality`), 平台与架构 (`#system`, which reads `/api/system`).
+- Each page is one file in `views/` and loads its own data; page-only styles are `<style scoped>` in that file.
+- `lib/api.js`: `api(path, params)` / `postApi` fetch `/api/<path>` and throw the server's Chinese `detail` message; `apiHref` builds CSV download links. Empty params are dropped.
+- `lib/format.js`: number formatting (`fmt`, `fmtInt`, `fmtPercent`, `fmtBytes`) and Beijing-time display (`bjDateTime`, `bjFull`, `bjTime`) for both `+08:00` ISO strings and naive historical strings, independent of the browser's time zone. Missing values render as `—` / 暂无数据, never 0.
+- `lib/chart.js`: the shared chart theme. Colors follow the entity, never the rank: TCN green, RF blue, GBT orange, persistence gray dashed, observations dark ink; city colors are fixed per city; the categorical order was checked for color-blind separation. Time axes use `axisTime()` + `useUTC` so labels show Beijing time. `pointMapOption()` draws station/city maps on the `bth-region` GeoJSON and falls back to a lon/lat scatter if it is missing.
+- `lib/labels.js` holds every Chinese display name (cities, models, weather variables, feature names); `lib/state.js` holds the city-page year shared across pages and a cached `/api/meta`.
+- `components/`: `Chart.vue` (ECharts container), `PanelCard`, `StatCard`, `Notice` (error/warn/info/loading), `Segmented`, `YearBar` (year select + Beijing CSV export), `PmLegend`.
+- Global styles are `styles/base.css` (design tokens), `layout.css` (shell and grids) and `components.css`. Grid columns use `minmax(0, 1fr)` so wide tables cannot push the page sideways.
+- Data figures (sizes, counts, metrics, versions) come from the API, never typed into the UI; a version missing from the reports shows 报告未记录. Code follows the Python conventions: one statement per line, at most 100 characters, Chinese module comments.
 
 ## Invariants the code and tests enforce
 

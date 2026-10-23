@@ -1,79 +1,992 @@
 <script setup>
-import {computed,onMounted,onBeforeUnmount,ref,watch} from 'vue'
-import {Activity,RefreshCw,Download,Clock3,Wind,Info,ArrowUpRight} from '@lucide/vue'
+/*
+ * 实时预测页（第三代）。
+ * 数据：/api/live/meta 每 5 秒轮询一次，拿到刷新进度、站点状态和本轮发布信息；
+ *       轮次变化或切换站点时再读 /api/live/forecast；点击按钮调用 POST /api/live/refresh。
+ * 规则：只展示"目标时刻都还在未来"的预测；过期或正在准备时明确提示，不展示旧结果冒充当前。
+ */
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import {
+  Activity,
+  ArrowRight,
+  ArrowUpRight,
+  Clock3,
+  Download,
+  Info,
+  MapPin,
+  RefreshCw,
+  Thermometer,
+} from '@lucide/vue'
 import Chart from '../components/Chart.vue'
-import {api,fmt,baseChart} from '../lib/api'
-const props=defineProps({meta:Object})
-const live=ref(null),forecast=ref(null),selected=ref('mean'),error=ref(''),notice=ref(''),requesting=ref(false),clock=ref(Date.now()),weather=ref('wind_speed_10m'),reference=ref(75)
-const phases={initializing:'初始化实时连接',collecting:'采集最新实测和天气资料',spark:'Spark 清洗与 72 小时特征融合',inference:'运行 TCN 并发布未来六小时预测',complete:'更新完成',failed:'本轮更新未完成'}
-const wx={wind_speed_10m:['风速','m/s'],temperature_2m:['气温','°C'],relative_humidity_2m:['相对湿度','%'],surface_pressure:['气压','hPa'],precipitation:['降水','mm'],wind_direction_10m:['风向','°']}
-const dateFormat=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'})
-const stamp=t=>t?dateFormat.format(new Date(t)):'—'
-const short=t=>t?new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(t)):'—'
-const fresh=computed(()=>live.value?.usable&&forecast.value?.points.every(p=>new Date(p.target).getTime()>clock.value))
-const age=computed(()=>live.value?.origin?(clock.value-new Date(live.value.origin))/60000:null)
-const risk=computed(()=>{const limit=Number(reference.value);if(!forecast.value||!Number.isFinite(limit))return '';const med=forecast.value.points.filter(p=>p.prediction>=limit);const upper=forecast.value.points.filter(p=>p.upper!=null&&p.upper>=limit);return med.length?`有 ${med.length} 个目标的预测中位数达到参考线 ${limit} μg/m³。`:upper.length?`有 ${upper.length} 个目标的区间上沿超过参考线 ${limit} μg/m³，需结合后续更新观察。`:'本轮中位预测与区间上沿均未达到所设参考线。'})
-const currentWeather=computed(()=>forecast.value?.history.at(-1))
-const phase=computed(()=>live.value?.refreshing&&live.value?.refresh.phase==='complete'?'正在启动数据采集':phases[live.value?.refresh.phase]||'正在更新')
-const refreshing=computed(()=>requesting.value||live.value?.refreshing)
-let pollTimer,clockTimer,token=0,lastCycle=''
-async function loadForecast(){
-  const id=++token
-  if(!live.value?.usable){forecast.value=null;return}
-  try{const f=await api('live/forecast',{station_id:selected.value});if(id===token){forecast.value=f;error.value=''}}catch(e){if(id===token){forecast.value=null;error.value=e.message}}
-}
-async function poll(){
-  try{
-    const m=await api('live/meta');live.value=m
-    if(selected.value!=='mean'&&!m.stations.some(s=>s.station_id===selected.value&&s.available))selected.value='mean'
-    if(m.cycle_id!==lastCycle&&notice.value==='已开始更新实时数据与六小时预测')notice.value='最新实测与预测已更新'
-    if(m.cycle_id!==lastCycle||!forecast.value){lastCycle=m.cycle_id;await loadForecast()}
-  }catch(e){error.value=e.message}
-}
-async function refresh(){
-  requesting.value=true;notice.value=''
-  try{const r=await fetch('/api/live/refresh',{method:'POST'});const body=await r.json();if(!r.ok)throw new Error(body.detail||'更新未能启动');notice.value=body.message;await poll()}catch(e){error.value=e.message}finally{requesting.value=false}
-}
-watch(selected,loadForecast)
-onMounted(async()=>{await poll();pollTimer=setInterval(poll,5000);clockTimer=setInterval(()=>clock.value=Date.now(),1000)})
-onBeforeUnmount(()=>{clearInterval(pollTimer);clearInterval(clockTimer)})
-const forecastOption=computed(()=>{
-  const f=forecast.value;if(!f)return {...baseChart}
-  const initial=[f.origin,f.current]
-  const bands=f.points.every(p=>p.lower!=null)?[{name:'区间下沿',type:'line',stack:'band',symbol:'none',silent:true,tooltip:{show:false},lineStyle:{opacity:0},data:[[f.origin,f.current],...f.points.map(p=>[p.target,p.lower])]},{name:'80%名义区间',type:'line',stack:'band',symbol:'none',silent:true,tooltip:{show:false},lineStyle:{opacity:0},areaStyle:{color:'#176e5926'},data:[[f.origin,0],...f.points.map(p=>[p.target,p.upper-p.lower])]}]:[]
-  return {...baseChart,tooltip:{...baseChart.tooltip,valueFormatter:v=>fmt(Array.isArray(v)?v[1]:v,1)+' μg/m³'},grid:{...baseChart.grid,bottom:58},xAxis:{...baseChart.xAxis,type:'time',axisLabel:{formatter:v=>stamp(v),hideOverlap:true,color:'#82917f'}},
-    dataZoom:[{type:'inside',start:60,end:100},{type:'slider',start:60,end:100,height:13,bottom:0,borderColor:'transparent'}],
-    series:[...bands,{name:'历史实测',type:'line',showSymbol:false,data:f.history.map(p=>[p.ts,p.pm25]),lineStyle:{color:'#7d9b8b',width:1.8},itemStyle:{color:'#7d9b8b'}},
-      {name:'当前预测',type:'line',data:[initial,...f.points.map(p=>({value:[p.target,p.prediction],itemStyle:{color:p.method==='recursive_extension'?'#c58e4b':'#176e59'}}))],symbolSize:6,lineStyle:{color:'#176e59',width:2.7},itemStyle:{color:'#176e59'},markLine:{silent:true,symbol:'none',lineStyle:{color:'#ba9b6e',type:'dashed'},label:{formatter:'自设参考线'},data:[{yAxis:Number(reference.value)||75}]}},
-      {name:'持续基线',type:'line',showSymbol:false,data:[initial,...f.points.map(p=>[p.target,p.baseline])],lineStyle:{color:'#b4baaa',width:1.5,type:'dashed'},itemStyle:{color:'#b4baaa'}}]}
+import Notice from '../components/Notice.vue'
+import PanelCard from '../components/PanelCard.vue'
+import PmLegend from '../components/PmLegend.vue'
+import StatCard from '../components/StatCard.vue'
+import { api, apiHref, postApi } from '../lib/api'
+import { bjDateTime, bjTime, fmt, fmtInt, minutesSince } from '../lib/format'
+import { refreshPhaseText, refreshSteps, weatherVariables } from '../lib/labels'
+import {
+  BAND_NAME,
+  axisTime,
+  bandSeries,
+  barSeries,
+  baseOption,
+  legend,
+  lineSeries,
+  palette,
+  pmColor,
+  pointMapOption,
+  referenceLine,
+  roleColors,
+  timeAxis,
+  timeTooltip,
+  valueAxis,
+  zoomControls,
+} from '../lib/chart'
+
+const live = ref(null)
+const forecast = ref(null)
+const selected = ref('mean')
+// 三类错误分开保存，各自在下一次成功时清除，避免一次网络抖动的提示一直留在页面上
+const pollError = ref('')
+const forecastError = ref('')
+const refreshError = ref('')
+const notice = ref('')
+const requesting = ref(false)
+const clock = ref(Date.now())
+const weatherVar = ref('wind_speed_10m')
+const reference = ref(75)
+
+let pollTimer = 0
+let clockTimer = 0
+let forecastToken = 0
+let lastCycle = ''
+let cycleBeforeRefresh = ''
+
+// ---------- 状态推导 ----------
+
+// 预测可用：后端标记可用，且六个目标时刻都还没到（已经过去的目标不能叫"预测"）
+const fresh = computed(() => {
+  if (!live.value?.usable || !forecast.value) {
+    return false
+  }
+  return forecast.value.points.every(point => new Date(point.target).getTime() > clock.value)
 })
-const weatherOption=computed(()=>({...baseChart,xAxis:{...baseChart.xAxis,type:'time',axisLabel:{formatter:v=>stamp(v)}},yAxis:{...baseChart.yAxis,name:wx[weather.value][1]},series:[{type:weather.value==='precipitation'?'bar':'line',showSymbol:false,data:forecast.value?.history.map(p=>[p.ts,p[weather.value]])||[],lineStyle:{width:2,color:'#71937b'},itemStyle:{color:'#71937b'}}]}))
-const mapOption=computed(()=>({tooltip:{formatter:p=>`${p.data.name}<br/>PM₂.₅ ${fmt(p.value[2])} μg/m³`},geo:{map:'bth-region',roam:true,center:[116.4074,39.9042],zoom:3.2,layoutCenter:['47%','49%'],layoutSize:'95%',scaleLimit:{min:.8,max:12},itemStyle:{areaColor:'#eff3e9',borderColor:'#d2dccd'},emphasis:{disabled:true}},visualMap:{show:false,dimension:2,min:0,max:150,inRange:{color:['#4a987a','#bcc179','#d8ac60','#bc6551']}},series:[{type:'scatter',coordinateSystem:'geo',data:(live.value?.stations||[]).filter(s=>s.current!=null&&s.latitude!=null&&s.longitude!=null).map(s=>({name:`${s.station_id} ${s.name}`,station_id:s.station_id,value:[s.longitude,s.latitude,s.current],symbolSize:s.station_id===selected.value?15:10,itemStyle:{borderColor:s.station_id===selected.value?'#244d3e':'#fff',borderWidth:1.5}})),label:{show:true,position:'right',formatter:p=>p.data.station_id,color:'#617258',fontSize:10},labelLayout:{hideOverlap:true}}]}))
-function mapSelect(p){if(live.value.stations.some(s=>s.station_id===p.data?.station_id&&s.available))selected.value=p.data.station_id}
-const exportHref=computed(()=>'/api/live/export?'+new URLSearchParams({station_id:selected.value}))
+
+const dataAge = computed(() => minutesSince(live.value?.origin, clock.value))
+
+const refreshing = computed(() => requesting.value || Boolean(live.value?.refreshing))
+
+// 当前处于刷新流水线的第几步；刚触发但进度文件还没更新时算第 0 步
+const stepIndex = computed(() => {
+  const phase = live.value?.refresh?.phase
+  if (!refreshing.value) {
+    return refreshSteps.length
+  }
+  if (phase === 'complete' || phase === 'initializing' || !phase) {
+    return 0
+  }
+  return Math.max(0, refreshSteps.findIndex(step => step.id === phase))
+})
+
+const phaseText = computed(() => {
+  const phase = live.value?.refresh?.phase
+  if (live.value?.refreshing && phase === 'complete') {
+    return '正在启动数据采集'
+  }
+  return refreshPhaseText[phase] || '正在更新'
+})
+
+const headline = computed(() => {
+  if (!live.value?.ready) {
+    return '正在准备实时输入'
+  }
+  if (fresh.value) {
+    return '最新实测已接入，当前预测有效'
+  }
+  return '当前没有有效预测'
+})
+
+const selectedName = computed(() => forecast.value?.name || '北京覆盖站点均值')
+
+const startWeather = computed(() => forecast.value?.history.at(-1) || null)
+
+const lastPoint = computed(() => forecast.value?.points.at(-1) || null)
+
+const hasInterval = computed(() => {
+  const points = forecast.value?.points || []
+  return points.length > 0 && points.every(point => point.lower !== null && point.upper !== null)
+})
+
+const weatherHint = computed(() => {
+  const wind = fmt(startWeather.value?.wind_speed_10m)
+  const humidity = fmt(startWeather.value?.relative_humidity_2m, 0)
+  return `风速 ${wind} m/s · 湿度 ${humidity}%`
+})
+
+function stationOptionText(station) {
+  const suffix = station.available ? '' : ' · 暂不可预测'
+  return `${station.name}（${station.station_id}）${suffix}`
+}
+
+// 用户自设的关注参考线：只做提示，不是官方预警
+const riskText = computed(() => {
+  const limit = Number(reference.value)
+  if (!forecast.value || !Number.isFinite(limit)) {
+    return ''
+  }
+  const median = forecast.value.points.filter(point => point.prediction >= limit)
+  const upper = forecast.value.points.filter(point => point.upper !== null && point.upper >= limit)
+  if (median.length) {
+    return `有 ${median.length} 个整点的预测中位数达到 ${limit} μg/m³。`
+  }
+  if (upper.length) {
+    return `有 ${upper.length} 个整点的区间上沿超过 ${limit} μg/m³，需留意后续更新。`
+  }
+  return `本轮预测和区间上沿都低于 ${limit} μg/m³。`
+})
+
+const stationRows = computed(() => {
+  const rows = [...(live.value?.stations || [])]
+  return rows.sort((a, b) => (b.current ?? -1) - (a.current ?? -1))
+})
+
+const exportHref = computed(() => apiHref('live/export', { station_id: selected.value }))
+
+// ---------- 数据加载 ----------
+
+async function loadForecast() {
+  const token = ++forecastToken
+  if (!live.value?.usable) {
+    // 不可用的原因已由状态条和提示说明，这里不再重复报错
+    forecast.value = null
+    forecastError.value = ''
+    return
+  }
+  try {
+    const result = await api('live/forecast', { station_id: selected.value })
+    if (token === forecastToken) {
+      forecast.value = result
+      forecastError.value = ''
+    }
+  } catch (reason) {
+    if (token === forecastToken) {
+      forecast.value = null
+      forecastError.value = reason.message
+    }
+  }
+}
+
+async function poll() {
+  try {
+    const meta = await api('live/meta')
+    live.value = meta
+    pollError.value = ''
+    // 选中的站点本轮不可预测时退回均值，避免停留在一个没有结果的站点
+    const stillAvailable = meta.stations.some(station => {
+      return station.station_id === selected.value && station.available
+    })
+    if (selected.value !== 'mean' && !stillAvailable) {
+      selected.value = 'mean'
+    }
+    if (cycleBeforeRefresh && meta.cycle_id !== cycleBeforeRefresh && !meta.refreshing) {
+      notice.value = '最新实测与预测已更新'
+      cycleBeforeRefresh = ''
+    }
+    if (meta.cycle_id !== lastCycle || !forecast.value) {
+      lastCycle = meta.cycle_id
+      await loadForecast()
+    }
+  } catch (reason) {
+    pollError.value = reason.message
+  }
+}
+
+async function refresh() {
+  requesting.value = true
+  notice.value = ''
+  refreshError.value = ''
+  try {
+    const result = await postApi('live/refresh')
+    notice.value = result.message
+    cycleBeforeRefresh = live.value?.cycle_id || ''
+    await poll()
+  } catch (reason) {
+    refreshError.value = reason.message
+  } finally {
+    requesting.value = false
+  }
+}
+
+function selectStation(stationId) {
+  const station = live.value?.stations.find(item => item.station_id === stationId)
+  if (station?.available) {
+    selected.value = stationId
+  }
+}
+
+function onMapSelect(event) {
+  if (event.data?.id) {
+    selectStation(event.data.id)
+  }
+}
+
+watch(selected, loadForecast)
+
+onMounted(async () => {
+  await poll()
+  pollTimer = setInterval(poll, 5000)
+  clockTimer = setInterval(() => {
+    clock.value = Date.now()
+  }, 1000)
+})
+
+onBeforeUnmount(() => {
+  clearInterval(pollTimer)
+  clearInterval(clockTimer)
+})
+
+// ---------- 图表 ----------
+
+const forecastOption = computed(() => {
+  const result = forecast.value
+  if (!result) {
+    return null
+  }
+  const origin = axisTime(result.origin)
+  const start = [origin, result.current]
+  const history = result.history.map(point => [axisTime(point.ts), point.pm25])
+  const predictions = [
+    { value: start },
+    ...result.points.map(point => ({
+      value: [axisTime(point.target), point.prediction],
+      lower: point.lower,
+      upper: point.upper,
+      // 递推延伸的点用橙色标出，表示误差可能更大
+      itemStyle: point.method === 'recursive_extension' ? { color: palette.orange } : undefined,
+    })),
+  ]
+  const baseline = [start, ...result.points.map(point => [axisTime(point.target), point.baseline])]
+  const names = ['历史实测', '当前预测', '持续性基线']
+  let band = []
+  if (hasInterval.value) {
+    const lower = [start, ...result.points.map(point => [axisTime(point.target), point.lower])]
+    const upper = [start, ...result.points.map(point => [axisTime(point.target), point.upper])]
+    band = bandSeries(lower, upper)
+    names.push(BAND_NAME)
+  }
+  const base = baseOption()
+  const limit = Number(reference.value)
+  return {
+    ...base,
+    legend: legend(names),
+    grid: { ...base.grid, bottom: 62 },
+    tooltip: { ...base.tooltip, formatter: timeTooltip() },
+    xAxis: timeAxis(),
+    yAxis: valueAxis(),
+    dataZoom: zoomControls(50),
+    series: [
+      ...band,
+      lineSeries({ name: '历史实测', data: history, color: roleColors.observed, z: 3 }),
+      lineSeries({
+        name: '当前预测',
+        data: predictions,
+        color: palette.green,
+        width: 2.5,
+        points: true,
+        z: 4,
+        markLine: Number.isFinite(limit) && limit > 0 ? referenceLine(limit, '关注参考线') : undefined,
+      }),
+      lineSeries({ name: '持续性基线', data: baseline, color: roleColors.baseline, dashed: true }),
+    ],
+  }
+})
+
+const weatherOption = computed(() => {
+  const result = forecast.value
+  if (!result) {
+    return null
+  }
+  const key = weatherVar.value
+  const variable = weatherVariables[key]
+  const past = result.history.map(point => [axisTime(point.ts), point[key]])
+  const next = (result.weather_next || []).map(point => [axisTime(point.ts), point[key]])
+  const base = baseOption()
+  const isRain = key === 'precipitation'
+  // 过去与未来是同一个量的不同来源：同色，未来用虚线（降水用浅色柱）
+  const makeSeries = (name, data, isFuture) => {
+    if (isRain) {
+      const color = isFuture ? '#9ec5f4' : palette.blue
+      return barSeries({ name, data, color, width: 6 })
+    }
+    return lineSeries({ name, data, color: palette.blue, dashed: isFuture })
+  }
+  return {
+    ...base,
+    legend: legend(['过去 72 小时（模型输入）', '未来预报']),
+    tooltip: { ...base.tooltip, formatter: timeTooltip({ unit: variable.unit }) },
+    xAxis: timeAxis(),
+    yAxis: valueAxis(variable.unit, { scale: !isRain }),
+    series: [
+      makeSeries('过去 72 小时（模型输入）', past, false),
+      makeSeries('未来预报', next, true),
+    ],
+  }
+})
+
+const mapOption = computed(() => {
+  const points = (live.value?.stations || [])
+    .filter(station => station.latitude !== null && station.longitude !== null)
+    .map(station => ({
+      id: station.station_id,
+      name: `${station.name}（${station.station_id}）`,
+      lon: station.longitude,
+      lat: station.latitude,
+      value: station.current,
+    }))
+  return pointMapOption({
+    points,
+    selectedId: selected.value,
+    center: [116.38, 40.15],
+    zoom: 3.6,
+    highlight: ['北京市'],
+  })
+})
 </script>
+
 <template>
-  <div v-if="error" class="error-box" role="alert">{{ error }}</div>
-  <div v-if="!live" class="page-loader"><span class="spinner"></span>正在连接实时预测服务…</div>
-  <template v-else>
-    <section class="live-status panel"><div><span class="live-dot" :class="{muted:!live.usable}"></span><strong>{{ live.usable?'最新实测已接入':'正在准备当前预测' }}</strong><span class="live-clock"><Clock3 :size="13" />北京时间 {{ stamp(clock) }}</span><p>服务运行时每 10 分钟更新，并在整点后重新生成未来窗口。</p></div><button class="button primary" :disabled="refreshing" @click="refresh"><RefreshCw :size="15" :class="{'live-spinning':refreshing}" />{{ refreshing?'正在更新':'更新实测与预测' }}</button></section>
-    <div v-if="notice" class="info-box" role="status">{{ notice }}</div>
-    <div v-if="live.refreshing" class="info-box" role="status"><span class="spinner"></span>{{ phase }}。可继续查看尚未过期的上一轮结果。</div>
-    <div v-if="live.refresh.phase==='failed'" class="error-box" role="alert">{{ live.refresh.error }}。{{ live.usable?'当前显示上一轮尚未过期的结果。':'数据恢复后将重新生成预测。' }}</div>
-    <div v-if="live.source_errors?.length" class="info-box">部分原始资料本轮未获取，当前结果使用已成功取得的资料；请结合实测时刻和站点覆盖数查看。</div>
-    <section v-if="!live.ready" class="panel"><h2>正在建立最近 72 小时的实时输入</h2><p class="station-copy">{{ phase }}。首次需要补充最近几日站点记录，随后由 Spark 构建小时网格并运行已训练模型。</p><p class="station-copy">空气质量：中国环境监测总站 + quotsoft 近几日归档；气象：Open-Meteo 业务天气模型。</p></section>
-    <template v-else>
-      <section class="kpi-grid"><article class="kpi-card featured"><div class="kpi-label">北京覆盖站点实测均值<Activity :size="15" /></div><div class="kpi-number">{{ fmt(live.current) }}<small>μg/m³</small></div><div class="kpi-bottom">观测时刻 {{ stamp(live.origin) }}</div></article><article class="kpi-card"><div class="kpi-label">最新实测距现在<Clock3 :size="15" /></div><div class="kpi-number">{{ fmt(age,0) }}<small>分钟</small></div><div class="kpi-bottom">按数据时间计算，发布存在延迟</div></article><article class="kpi-card"><div class="kpi-label">当前可预测北京站点</div><div class="kpi-number">{{ live.forecast_stations }}<small>/ {{ live.beijing_stations }} 个已训练站点</small></div><div class="kpi-bottom">起点实测 + 至少 48 个历史有效小时</div></article><article class="kpi-card"><div class="kpi-label">模型使用的起点天气<Wind :size="15" /></div><div class="kpi-number">{{ fmt(currentWeather?.temperature_2m) }}<small>°C</small></div><div class="kpi-bottom">风 {{ fmt(currentWeather?.wind_speed_10m) }} m/s · 湿度 {{ fmt(currentWeather?.relative_humidity_2m,0) }}%</div></article></section>
-      <section class="panel live-selector"><label class="form-field">预测范围<select v-model="selected" aria-label="实时预测站点"><option value="mean">北京覆盖站点均值（{{ live.forecast_stations }} 站）</option><option v-for="s in live.stations" :key="s.station_id" :value="s.station_id" :disabled="!s.available">{{ s.station_id }} · {{ s.name }}{{ s.available?'':' · 暂不可预测' }}</option></select></label><div class="live-origin"><span>最新实测 {{ stamp(live.origin) }}</span><span>预测发布 {{ stamp(live.issued_at) }}</span><span v-if="live.next_refresh">下次更新约 {{ short(live.next_refresh) }}</span></div><a v-if="fresh" class="button secondary small" :href="exportHref"><Download :size="14" />导出当前预测</a></section>
-      <div v-if="!fresh" class="info-box" role="status">上一轮预测已过期或资料正在准备，正在等待新的当前预测。实测超过三小时将停止发布。</div>
-      <template v-if="fresh">
-        <section class="panel"><div class="panel-heading"><div><div class="section-kicker">LIVE SIX-HOUR FORECAST</div><h2>{{ forecast.name }}：未来六个整点</h2></div><span class="subtle-tag">{{ live.future_weather?'TCN · 72h历史 + 未来天气':'TCN · 最近72小时' }}</span></div><div class="chart-legend"><span><i style="background:#7d9b8b"></i>历史实测</span><span><i style="background:#176e59"></i>当前预测</span><span><i style="background:#b4baaa"></i>持续基线</span><span v-if="live.extension_hours"><i style="background:#c58e4b"></i>递推延伸</span><span v-if="live.nominal_coverage"><i style="background:#176e5933"></i>80%名义区间</span></div><Chart :option="forecastOption" height="330px" label="当前北京未来六个整点PM2.5预测" /><div class="table-scroll"><table><thead><tr><th>目标时刻 · 北京时间</th><th>未来整点</th><th class="numeric">预测 PM₂.₅</th><th>80%名义区间</th><th class="numeric">持续基线</th><th>距实测起点</th><th>生成方式</th></tr></thead><tbody><tr v-for="p in forecast.points" :key="p.target"><td>{{ stamp(p.target) }}</td><td>第 {{ p.horizon }} 个</td><td class="numeric strong-value">{{ fmt(p.prediction) }}</td><td>{{ p.lower==null?'—':fmt(p.lower)+'—'+fmt(p.upper) }}</td><td class="numeric">{{ fmt(p.baseline) }}</td><td>+{{ p.lead_from_observation }} h</td><td><span class="live-method" :class="{extended:p.method==='recursive_extension'}">{{ p.method==='recursive_extension'?'递推延伸':'模型直出' }}</span></td></tr></tbody></table></div><div class="panel-note">目标时刻均在发布时间之后。{{ live.extension_hours?`实测存在延迟，最后 ${live.extension_hours} 个目标通过递推覆盖，误差可能更大。`:'本轮六个目标均由模型直接输出。' }}尚未发生的真实浓度保持未知。{{ live.interval_note }}<span v-if="live.nominal_coverage"> 历史测试显示，高浓度和浓度突变时区间覆盖不足，真实值仍可能超出范围。<a href="#online">查看分组检验</a></span></div><div v-if="live.nominal_coverage" class="live-risk"><label>关注参考线<input v-model.number="reference" type="number" min="1" max="1000" aria-label="PM2.5关注参考线" />μg/m³</label><p>{{ risk }}</p><small>用户自设分析参考线，非官方污染预警。</small></div></section>
-        <div class="two-column-grid"><section class="panel"><div class="panel-heading"><div><div class="section-kicker">LATEST OBSERVATIONS</div><h2>最新站点实测</h2></div><span class="subtle-tag">点击可预测站点切换</span></div><Chart :option="mapOption" height="300px" label="北京最新实测站点PM2.5地图" @select="mapSelect" /><div class="panel-note">{{ stamp(live.origin) }} · 只显示该时刻有效实测。</div></section><section class="panel"><div class="panel-heading"><div><div class="section-kicker">PAST 72 HOURS</div><h2>模型使用的近期气象</h2></div><select v-model="weather" aria-label="实时历史气象变量" class="compact-select"><option v-for="(v,k) in wx" :value="k">{{ v[0] }}</option></select></div><Chart :option="weatherOption" height="300px" label="实时预测输入的过去72小时气象" /><div class="panel-note">同城共享的天气模型格点资料。{{ live.future_weather?'本模型训练与线上均使用GFS固定提前24小时预报。':'旧模型历史实验使用ERA5。' }}</div></section></div>
-        <section class="panel"><div class="panel-heading"><div><div class="section-kicker">PUBLISHED WEATHER OUTLOOK</div><h2>同期天气展望</h2></div><span class="subtle-tag">Open-Meteo · 天气预报</span></div><div class="table-scroll"><table><thead><tr><th>时刻</th><th class="numeric">气温 °C</th><th class="numeric">湿度 %</th><th class="numeric">风速 m/s</th><th class="numeric">降水 mm</th></tr></thead><tbody><tr v-for="p in forecast.weather_next" :key="p.ts"><td>{{ stamp(p.ts) }}</td><td class="numeric">{{ fmt(p.temperature_2m) }}</td><td class="numeric">{{ fmt(p.relative_humidity_2m,0) }}</td><td class="numeric">{{ fmt(p.wind_speed_10m) }}</td><td class="numeric">{{ fmt(p.precipitation) }}</td></tr></tbody></table></div><div class="panel-note">{{ live.future_weather?'本表天气直接进入主模型；使用GFS固定提前24小时的预报，和训练口径一致。':'直接TCN读取过去72小时；未来天气用于展示及延迟递推。' }}未来污染物实测保持未知。</div></section>
+  <div class="stack">
+    <Notice v-if="pollError" kind="error">{{ pollError }}</Notice>
+    <Notice v-if="refreshError" kind="error">{{ refreshError }}</Notice>
+    <Notice v-if="forecastError" kind="error">{{ forecastError }}</Notice>
+    <Notice v-if="!live && !pollError" kind="loading">正在连接实时预测服务…</Notice>
+
+    <template v-if="live">
+      <!-- 状态条：当前是否有有效预测、刷新进度和手动刷新按钮 -->
+      <section class="panel status-bar">
+        <div class="status-main">
+          <div class="status-title">
+            <span class="dot" :class="{ live: fresh, off: !fresh }"></span>
+            <strong>{{ headline }}</strong>
+          </div>
+          <div class="status-times">
+            <span>实测起点 <b>{{ bjDateTime(live.origin) }}</b></span>
+            <ArrowRight :size="13" aria-hidden="true" />
+            <span>预测发布 <b>{{ bjDateTime(live.issued_at) }}</b></span>
+            <template v-if="live.next_refresh">
+              <ArrowRight :size="13" aria-hidden="true" />
+              <span>下次自动更新约 <b>{{ bjTime(live.next_refresh) }}</b></span>
+            </template>
+          </div>
+        </div>
+
+        <ol v-if="refreshing" class="steps" aria-label="实时更新进度">
+          <li
+            v-for="(step, index) in refreshSteps"
+            :key="step.id"
+            :class="{ done: index < stepIndex, current: index === stepIndex }"
+          >
+            <span class="step-mark">{{ index < stepIndex ? '✓' : index + 1 }}</span>
+            {{ step.name }}
+          </li>
+        </ol>
+        <p v-else class="status-cycle">
+          轮次 <code>{{ live.cycle_id }}</code>
+        </p>
+
+        <button class="button primary" type="button" :disabled="refreshing" @click="refresh">
+          <RefreshCw :size="15" :class="{ spinning: refreshing }" aria-hidden="true" />
+          {{ refreshing ? '正在更新' : '立即更新实测与预测' }}
+        </button>
+      </section>
+
+      <Notice v-if="notice" kind="good">{{ notice }}</Notice>
+      <Notice v-if="live.refreshing" kind="loading">
+        {{ phaseText }}。{{ fresh ? '更新期间可以继续查看尚未过期的上一轮结果。' : '' }}
+      </Notice>
+      <Notice v-if="live.refresh?.phase === 'failed'" kind="error">
+        {{ live.refresh.error }}。
+        {{ live.usable ? '当前显示上一轮尚未过期的结果。' : '数据恢复后将重新生成预测。' }}
+      </Notice>
+      <Notice v-if="live.source_errors?.length" kind="warn">
+        本轮有部分原始资料未能获取，预测只使用已成功取得的资料；请结合实测时刻和可预测站点数判断。
+      </Notice>
+
+      <PanelCard v-if="!live.ready" title="正在建立最近 72 小时的实时输入">
+        <p class="panel-text">
+          {{ phaseText }}。首次运行需要补齐最近几天的站点记录，然后由 Spark 构建小时网格，再运行已训练模型。
+        </p>
+      </PanelCard>
+
+      <template v-else>
+        <div class="stat-row">
+          <StatCard
+            label="北京覆盖站点实测均值"
+            :value="fmt(live.current)"
+            unit="μg/m³"
+            :icon="Activity"
+            :featured="fresh"
+            :hint="`实测时刻 ${bjDateTime(live.origin)}`"
+          />
+          <StatCard
+            label="最新实测距现在"
+            :value="fmtInt(dataAge)"
+            unit="分钟"
+            :icon="Clock3"
+            hint="官方发布有延迟；超过 3 小时停止发布预测"
+          />
+          <StatCard
+            label="本轮可预测站点"
+            :value="fmtInt(live.forecast_stations)"
+            :unit="`/ ${live.beijing_stations} 个北京站点`"
+            :icon="MapPin"
+            hint="起点有实测且过去 72 小时至少 48 小时有效"
+          />
+          <StatCard
+            label="起点天气（模型输入）"
+            :value="fmt(startWeather?.temperature_2m)"
+            unit="°C"
+            :icon="Thermometer"
+            :hint="weatherHint"
+          />
+        </div>
+
+        <Notice v-if="!fresh" kind="warn">
+          上一轮预测已经过期或资料正在准备，正在等待新的当前预测。实测超过三小时没有更新时系统会停止发布。
+        </Notice>
+
+        <PanelCard
+          v-if="fresh"
+          kicker="未来六个整点 · 每个整点直接输出"
+          :title="`${selectedName}：PM₂.₅ 预测`"
+        >
+          <template #actions>
+            <select v-model="selected" class="select" aria-label="选择预测站点">
+              <option value="mean">北京覆盖站点均值（{{ live.forecast_stations }} 站）</option>
+              <option
+                v-for="station in live.stations"
+                :key="station.station_id"
+                :value="station.station_id"
+                :disabled="!station.available"
+              >
+                {{ stationOptionText(station) }}
+              </option>
+            </select>
+            <a class="button small" :href="exportHref"><Download :size="14" />导出 CSV</a>
+          </template>
+
+          <ol class="strip">
+            <li class="strip-now">
+              <span class="strip-time">{{ bjTime(forecast.origin) }} 实测</span>
+              <strong>{{ fmt(forecast.current) }}</strong>
+              <span class="strip-sub">起点</span>
+            </li>
+            <li v-for="point in forecast.points" :key="point.target">
+              <i class="strip-level" :style="{ background: pmColor(point.prediction) }"></i>
+              <span class="strip-time">{{ bjTime(point.target) }} · +{{ point.horizon }} h</span>
+              <strong>{{ fmt(point.prediction) }}</strong>
+              <span class="strip-sub">
+                {{ point.lower === null ? '无区间' : `${fmt(point.lower)}–${fmt(point.upper)}` }}
+              </span>
+              <span v-if="point.method === 'recursive_extension'" class="tag warn">递推延伸</span>
+            </li>
+          </ol>
+
+          <Chart :option="forecastOption" height="340px" label="北京未来六个整点 PM2.5 预测与历史实测" />
+
+          <div class="forecast-foot">
+            <label class="reference">
+              关注参考线
+              <input
+                v-model.number="reference"
+                type="number"
+                min="1"
+                max="1000"
+                aria-label="关注参考线"
+              />
+              μg/m³
+            </label>
+            <p>{{ riskText }} <span class="muted">（自设参考线，不是官方污染预警）</span></p>
+          </div>
+
+          <details class="more">
+            <summary>查看逐小时明细</summary>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>目标时刻</th>
+                    <th>发布后第几个整点</th>
+                    <th class="num">预测 PM₂.₅</th>
+                    <th class="num">80% 区间</th>
+                    <th class="num">持续性基线</th>
+                    <th>距实测起点</th>
+                    <th>生成方式</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="point in forecast.points" :key="point.target">
+                    <td>{{ bjDateTime(point.target) }}</td>
+                    <td>第 {{ point.horizon }} 个</td>
+                    <td class="num strong">{{ fmt(point.prediction) }}</td>
+                    <td class="num">
+                      {{ point.lower === null ? '—' : `${fmt(point.lower)}–${fmt(point.upper)}` }}
+                    </td>
+                    <td class="num">{{ fmt(point.baseline) }}</td>
+                    <td>+{{ point.lead_from_observation }} h</td>
+                    <td>{{ point.method === 'recursive_extension' ? '递推延伸' : '模型直出' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <template #note>
+            六个目标时刻都在发布时间之后，真实浓度此时未知。
+            {{ live.extension_hours
+              ? `实测存在延迟，最后 ${live.extension_hours} 个整点通过递推覆盖，误差可能更大。`
+              : '本轮六个整点均由模型直接输出。' }}
+            {{ live.interval_note }}
+            6 小时后预计 {{ fmt(lastPoint?.prediction) }} μg/m³。
+            历史测试显示，高浓度和浓度突变时区间覆盖不足。<a href="#online">查看在线核验 →</a>
+          </template>
+        </PanelCard>
+
+        <div v-if="fresh" class="grid-2">
+          <PanelCard
+            kicker="最新实测 · 点击站点切换预测"
+            title="北京各站点当前浓度"
+            :note="`${bjDateTime(live.origin)} 的实测；灰色点表示该时刻无实测。`"
+          >
+            <Chart
+              :option="mapOption"
+              height="330px"
+              label="北京各站点最新 PM2.5 地图"
+              @select="onMapSelect"
+            />
+            <PmLegend />
+          </PanelCard>
+
+          <PanelCard kicker="站点状态" title="哪些站点本轮可以预测">
+            <div class="table-wrap tall">
+              <table>
+                <thead>
+                  <tr>
+                    <th>站点</th>
+                    <th class="num">当前 PM₂.₅</th>
+                    <th class="num">72h 有效小时</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="station in stationRows"
+                    :key="station.station_id"
+                    :class="{
+                      selected: station.station_id === selected,
+                      clickable: station.available,
+                    }"
+                    @click="selectStation(station.station_id)"
+                  >
+                    <td>{{ station.name }} <span class="muted">{{ station.station_id }}</span></td>
+                    <td class="num strong">{{ fmt(station.current) }}</td>
+                    <td class="num">{{ fmtInt(station.valid_history_hours) }}</td>
+                    <td>
+                      <span v-if="station.available" class="tag good">可预测</span>
+                      <span v-else class="tag">{{ station.reason || '暂不可预测' }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </PanelCard>
+        </div>
+
+        <div v-if="fresh" class="grid-wide-left">
+          <PanelCard kicker="天气输入" title="模型读取的天气：过去 72 小时 + 未来预报">
+            <template #actions>
+              <select v-model="weatherVar" class="select" aria-label="选择气象变量">
+                <option v-for="(variable, key) in weatherVariables" :key="key" :value="key">
+                  {{ variable.name }}
+                </option>
+              </select>
+            </template>
+            <Chart :option="weatherOption" height="280px" label="模型使用的过去与未来天气" />
+            <template #note>
+              城市代表点的天气模型格点资料，同城站点共享，不是空气站的气象实测。
+              {{ live.future_weather
+                ? '训练和线上都使用 GFS 提前 24 小时发布的预报，口径一致。'
+                : '旧模型的历史实验使用 ERA5。' }}
+            </template>
+          </PanelCard>
+
+          <PanelCard kicker="天气预报" title="未来六个整点的天气">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>时刻</th>
+                    <th class="num">气温 °C</th>
+                    <th class="num">湿度 %</th>
+                    <th class="num">风速 m/s</th>
+                    <th class="num">降水 mm</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="point in forecast.weather_next" :key="point.ts">
+                    <td>{{ bjTime(point.ts) }}</td>
+                    <td class="num">{{ fmt(point.temperature_2m) }}</td>
+                    <td class="num">{{ fmt(point.relative_humidity_2m, 0) }}</td>
+                    <td class="num">{{ fmt(point.wind_speed_10m) }}</td>
+                    <td class="num">{{ fmt(point.precipitation) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <template #note>未来的污染物浓度在发布时未知，模型只读取未来的天气预报。</template>
+          </PanelCard>
+        </div>
+
+        <PanelCard kicker="上线后的真实检验" title="等实测到达，再计算误差">
+          <template #actions>
+            <span class="tag">已匹配 {{ fmtInt(live.online_evaluation?.matched) }} 条</span>
+            <span class="tag">等待实测 {{ fmtInt(live.online_evaluation?.pending) }} 条</span>
+          </template>
+          <p v-if="!live.online_evaluation?.matched" class="panel-text">
+            本轮预测已经存档。目标时刻过去、实测到达后才会计算在线误差；目前还没有可以报告的在线误差。
+          </p>
+          <div v-else class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>发布后第几个整点</th>
+                  <th class="num">已匹配</th>
+                  <th class="num">等待实测</th>
+                  <th class="num">TCN MAE</th>
+                  <th class="num">TCN RMSE</th>
+                  <th class="num">基线 RMSE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in live.online_evaluation.by_horizon" :key="row.horizon">
+                  <td>第 {{ row.horizon }} 个</td>
+                  <td class="num">{{ fmtInt(row.n) }}</td>
+                  <td class="num">{{ fmtInt(row.pending) }}</td>
+                  <td class="num">{{ fmt(row.mae, 2) }}</td>
+                  <td class="num strong">{{ fmt(row.rmse, 2) }}</td>
+                  <td class="num">{{ fmt(row.baseline_rmse, 2) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <template #note>
+            {{ live.online_evaluation?.note }}
+            <a href="#online">查看逐日、分站点、分浓度的完整核验 →</a>
+          </template>
+        </PanelCard>
+
+        <PanelCard kicker="数据从哪里来" title="这一轮预测经过的流水线">
+          <ol class="pipeline">
+            <li>
+              <span class="pipe-step">1 · 采集</span>
+              <strong>{{ live.air_sources.map(source => source.name).join(' + ') }}</strong>
+              <span>{{ live.weather_source.name }}</span>
+              <small>采集于 {{ bjDateTime(live.source_fetched_at) }}</small>
+            </li>
+            <li>
+              <span class="pipe-step">2 · HDFS</span>
+              <strong>原始文件与清单入库</strong>
+              <span><code>live_v1/cycles/{{ live.cycle_id }}</code></span>
+            </li>
+            <li>
+              <span class="pipe-step">3 · Spark</span>
+              <strong>Spark {{ live.spark_version }} 清洗与融合</strong>
+              <span>补齐小时网格、合并天气，构建 {{ live.history_hours }} 小时窗口</span>
+            </li>
+            <li>
+              <span class="pipe-step">4 · GPU 推理</span>
+              <strong>{{ live.model_name }}</strong>
+              <span>{{ live.inference_device }}</span>
+              <small>{{ live.engine }}</small>
+            </li>
+            <li>
+              <span class="pipe-step">5 · 发布与核验</span>
+              <strong>发布 {{ live.forecast_stations }} 个站点 + 均值</strong>
+              <span>写入在线核验库，等待实测到达</span>
+            </li>
+          </ol>
+          <template #note>
+            页面会运行已训练模型推理，但更新数据不会重新训练模型。来源：
+            <a
+              v-for="source in live.air_sources"
+              :key="source.url"
+              :href="source.url"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {{ source.name }}<ArrowUpRight :size="12" />
+            </a>
+            ·
+            <a :href="live.weather_source.url" target="_blank" rel="noreferrer">
+              天气接口说明<ArrowUpRight :size="12" />
+            </a>
+          </template>
+        </PanelCard>
+
+        <div class="method-note">
+          <Info :size="16" aria-hidden="true" />
+          <p>{{ live.method_note }} {{ live.accuracy_note }}</p>
+        </div>
       </template>
-      <section class="panel"><div class="panel-heading"><div><div class="section-kicker">PROSPECTIVE VERIFICATION</div><h2>等待实测，积累在线误差</h2></div><span class="subtle-tag">已匹配 {{ fmt(live.online_evaluation?.matched,0) }} 条</span></div><p v-if="!live.online_evaluation?.matched" class="station-copy">已保存本次预测。后续实测到达后，系统才计算在线 MAE 和 RMSE；当前没有可报告的在线误差。</p><div v-else class="table-scroll"><table><thead><tr><th>未来小时</th><th class="numeric">已匹配站点预测</th><th class="numeric">TCN MAE</th><th class="numeric">TCN RMSE</th><th class="numeric">基线 RMSE</th></tr></thead><tbody><tr v-for="r in live.online_evaluation.by_horizon" :key="r.horizon"><td>{{ r.horizon }}</td><td class="numeric">{{ fmt(r.n,0) }}</td><td class="numeric">{{ fmt(r.mae,2) }}</td><td class="numeric">{{ fmt(r.rmse,2) }}</td><td class="numeric">{{ fmt(r.baseline_rmse,2) }}</td></tr></tbody></table></div><div class="panel-note">核验对象为站点预测；重复更新按站点、目标时刻和提前小时保留最新发布版本。<a href="#online">查看逐日、站点、浓度分组与区间覆盖 →</a></div></section>
-      <section class="panel live-provenance"><div><div class="section-kicker">OBSERVATIONS → SPARK → CURRENT PREDICTION</div><h2>这次预测从哪里来</h2><p>空气实测与近几日记录进入 HDFS，由 Spark {{ live.spark_version }} 清洗、补齐小时网格并融合气象；{{ live.future_weather?'已训练TCN同时读取过去72小时与未来9小时天气，直接生成九个时长及分位区间。':'已训练TCN读取完整72小时序列。' }}</p><p>本次推理设备：{{ live.inference_device }} · {{ live.engine }}。本页会运行模型推理，更新数据不会重新训练。</p><div class="live-source-links"><a v-for="s in live.air_sources" :href="s.url" target="_blank" rel="noreferrer">{{ s.name }}<ArrowUpRight :size="12" /></a><a :href="live.weather_source.url" target="_blank" rel="noreferrer">气象接口说明<ArrowUpRight :size="12" /></a></div></div></section>
-      <div class="method-note"><Info :size="16" /><p>{{ live.method_note }} {{ live.accuracy_note }}</p></div>
     </template>
-  </template>
+  </div>
 </template>
+
+<style scoped>
+.status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 28px;
+}
+
+.status-main {
+  flex: 1 1 320px;
+}
+
+.status-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.status-times {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.status-times b {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-cycle {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.step-mark {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+}
+
+.steps li.done {
+  color: var(--good);
+}
+
+.steps li.done .step-mark {
+  border-color: var(--good);
+  background: var(--good-soft);
+}
+
+.steps li.current {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.steps li.current .step-mark {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* 未来六个整点的横向卡片：第一张是起点实测 */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.strip li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 12px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.strip li.strip-now {
+  background: var(--surface);
+  border-style: dashed;
+}
+
+.strip-level {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+}
+
+.strip-time {
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.strip strong {
+  font-size: 24px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.strip-sub {
+  font-size: 12px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.strip .tag {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.forecast-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.reference {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.reference input {
+  width: 76px;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+/* 本轮流水线：五个阶段从左到右 */
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.pipeline li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink-2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pipeline li:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.pipe-step {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--brand);
+}
+
+.pipeline strong {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.pipeline small {
+  color: var(--ink-3);
+}
+
+@media (max-width: 1180px) {
+  .strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .pipeline {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pipeline li:not(:last-child)::after {
+    content: "↓";
+    top: auto;
+    right: auto;
+    bottom: -16px;
+    left: 20px;
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+</style>

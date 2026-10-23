@@ -1,60 +1,258 @@
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
-import { Wind, LayoutDashboard, ChartNoAxesCombined, ScanLine, FlaskConical, Database, ArrowUpRight, Download, ChevronDown, Leaf } from '@lucide/vue'
+/*
+ * 应用外壳：左侧按"三代系统 + 平台"分组的导航、顶栏和页面标题区。
+ * 路由用地址栏的 # 部分（如 #live），不引入路由库；默认页面是实时预测。
+ * pages 数组是页面目录：新增页面只需在 views/ 写组件并在这里登记。
+ */
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import {
+  BadgeCheck,
+  ChartNoAxesCombined,
+  Clock3,
+  Cpu,
+  Database,
+  FileText,
+  FlaskConical,
+  History,
+  Map,
+  Radio,
+  Server,
+  Wind,
+} from '@lucide/vue'
 import { api } from './lib/api'
+import { bjFull } from './lib/format'
+import LiveView from './views/LiveView.vue'
+import OnlineView from './views/OnlineView.vue'
+import StationView from './views/StationView.vue'
 import OverviewView from './views/OverviewView.vue'
 import AnalysisView from './views/AnalysisView.vue'
 import ForecastView from './views/ForecastView.vue'
 import ModelsView from './views/ModelsView.vue'
 import QualityView from './views/QualityView.vue'
-import StationView from './views/StationView.vue'
-import LiveView from './views/LiveView.vue'
-import OnlineView from './views/OnlineView.vue'
-const pages = [
-  { id: 'live', name: '实时预测', english: 'LIVE FORECAST', icon: Wind, view: LiveView, title: '现在的北京，接下来的六小时', description: '接入最新空气实测与业务天气资料，生成未来预测，并等待后续实测核验。' },
-  { id: 'online', name: '在线核验', english: 'ONLINE VERIFICATION', icon: FlaskConical, view: OnlineView, title: '让每一轮预测，接受实测检验', description: '连续积累真实在线误差，比较站点与时长，检查区间覆盖与浓度突变。' },
-  { id: 'stations', name: '站点与 GPU', english: 'STATION LAB', icon: ScanLine, view: StationView, title: '从城市均值，走向每个监测站', description: '保留站点差异，加入 72 小时气象历史，比较 Spark 与 CUDA 模型。' },
-  { id: 'overview', name: '区域概览', english: 'OVERVIEW', icon: LayoutDashboard, view: OverviewView, title: '区域空气质量概览', description: '从十一年小时观测中，理解北京与周边城市的污染变化。' },
-  { id: 'analysis', name: '时空分析', english: 'EXPLORATION', icon: ChartNoAxesCombined, view: AnalysisView, title: '探索时间、空间与气象', description: '对比城市差异，观察季节规律，寻找污染与气象的关联。' },
-  { id: 'forecast', name: '短时预测', english: 'FORECAST', icon: ScanLine, view: ForecastView, title: '看见接下来的六小时', description: '选择历史观测时点，回放模型预测，并与后续真实浓度对比。' },
-  { id: 'models', name: '模型评估', english: 'MODELS', icon: FlaskConical, view: ModelsView, title: '让预测经得起比较', description: '独立测试、持续性基线与特征消融，呈现模型实际表现。' },
-  { id: 'quality', name: '数据质量', english: 'DATA QUALITY', icon: Database, view: QualityView, title: '每一次分析，都有据可查', description: '查看观测覆盖、缺失日期与数据来源，保留真实数据的边界。' },
+import SystemView from './views/SystemView.vue'
+
+const groups = [
+  { id: 'live', name: '实时系统', note: '第三代' },
+  { id: 'station', name: '站点实验', note: '第二代' },
+  { id: 'city', name: '城市研究', note: '第一代' },
+  { id: 'platform', name: '平台与架构', note: '大数据组件' },
 ]
-const pageId = ref(location.hash.slice(1) || 'live'), year = ref('2025'), meta = ref(null), error = ref('')
-const current = computed(() => pages.find(p => p.id === pageId.value) || pages[0])
-function reloadPage() { window.location.reload() }
-function route() { pageId.value = location.hash.slice(1) || 'live'; document.title = `${current.value.name} · 北京空气观察`; window.scrollTo({ top: 0 }) }
-let timer
-onMounted(async () => {
+
+const pages = [
+  {
+    id: 'live',
+    group: 'live',
+    name: '实时预测',
+    icon: Radio,
+    view: LiveView,
+    title: '现在的北京，接下来六个整点',
+    description: '接入官方最新实测和 GFS 天气预报，经 HDFS 与 Spark 处理后，'
+      + '由 GPU 上的 TCN 模型给出未来六个整点的 PM₂.₅ 预测和 80% 区间。',
+    scope: ['当前实测', '北京监测站点', 'TCN 分位数模型', '约每 10 分钟更新'],
+  },
+  {
+    id: 'online',
+    group: 'live',
+    name: '在线核验',
+    icon: BadgeCheck,
+    view: OnlineView,
+    title: '让每一轮预测接受随后实测的检验',
+    description: '预测发布时答案未知；目标时刻过去、真实观测到达后才计算误差。'
+      + '这里与历史测试成绩分开统计。',
+    scope: ['真实发布记录', '按模型版本分开', '与持续性基线对比'],
+  },
+  {
+    id: 'stations',
+    group: 'station',
+    name: '站点与 GPU',
+    icon: Cpu,
+    view: StationView,
+    title: '从城市均值走向每个监测站',
+    description: '保留每个监测站点各自的差异，加入过去 72 小时天气，'
+      + '在同一批样本上比较 Spark 随机森林与 CUDA 时序卷积网络。',
+    scope: ['2022—2025 历史', '2022—23 训练 · 2024 验证 · 2025 测试', 'Spark + CUDA'],
+  },
+  {
+    id: 'overview',
+    group: 'city',
+    name: '区域概览',
+    icon: Map,
+    view: OverviewView,
+    title: '北京与周边五城的空气质量概览',
+    description: '基于 2015—2025 年城市小时均值，查看长期变化、某一时刻的区域分布和城市对比。',
+    scope: ['2015—2025 历史', '六城城市均值', 'ERA5 再分析气象'],
+  },
+  {
+    id: 'analysis',
+    group: 'city',
+    name: '时空分析',
+    icon: ChartNoAxesCombined,
+    view: AnalysisView,
+    title: '时间、季节与气象中的污染规律',
+    description: '月份 × 小时热力图、四季对比、气象相关和城市间联动。统计关联不代表因果。',
+    scope: ['2015—2025 历史', '有效小时观测', 'Pearson 相关'],
+  },
+  {
+    id: 'forecast',
+    group: 'city',
+    name: '预测回放',
+    icon: History,
+    view: ForecastView,
+    title: '选择历史时刻，回放六小时预测',
+    description: '只用起点及之前的信息做预测，再与后来真实发生的浓度对照。'
+      + '这是历史回放，不代表现在的预报。',
+    scope: ['2024 验证 · 2025 测试', 'Spark ML 批量预测', '北京城市均值'],
+  },
+  {
+    id: 'models',
+    group: 'city',
+    name: '模型评估',
+    icon: FlaskConical,
+    view: ModelsView,
+    title: '与基线比较，让预测经得起检验',
+    description: '按时间划分训练、验证和测试；推荐模型只由 2024 年验证集决定，2025 年测试集只负责最后评价。',
+    scope: ['2015—23 训练 · 2024 验证 · 2025 测试', 'Spark ML 随机森林 · 梯度提升树'],
+  },
+  {
+    id: 'quality',
+    group: 'city',
+    name: '数据质量',
+    icon: Database,
+    view: QualityView,
+    title: '每一个数字都有据可查',
+    description: '观测覆盖率、缺失日期、数据来源和清洗核验结果。缺失保留为空，不当作零浓度。',
+    scope: ['逐年逐城覆盖', '来源与 SHA-256 清单', 'Spark 清洗核验'],
+  },
+  {
+    id: 'system',
+    group: 'platform',
+    name: '大数据平台',
+    icon: Server,
+    view: SystemView,
+    title: 'HDFS 与 Spark 实际做了什么',
+    description: '数据从下载到网页的完整流水线、HDFS 各目录的真实规模、组件版本和各阶段产物。'
+      + '数字来自离线盘点与已保存的报告。',
+    scope: ['HDFS 盘点快照', 'Spark 3.5.8 local[4]', 'PyTorch CUDA'],
+  },
+]
+
+const pageId = ref('live')
+const health = ref(null)
+const healthError = ref(false)
+const now = ref(Date.now())
+
+const current = computed(() => pages.find(page => page.id === pageId.value) || pages[0])
+const currentGroup = computed(() => groups.find(group => group.id === current.value.group))
+
+function pagesOf(groupId) {
+  return pages.filter(page => page.group === groupId)
+}
+
+function route() {
+  const hash = location.hash.slice(1)
+  pageId.value = pages.some(page => page.id === hash) ? hash : 'live'
+  document.title = `${current.value.name} · 北京空气观察`
+  window.scrollTo({ top: 0 })
+}
+
+async function checkHealth() {
+  try {
+    health.value = await api('health')
+    healthError.value = false
+  } catch {
+    healthError.value = true
+  }
+}
+
+let clockTimer = 0
+let healthTimer = 0
+
+onMounted(() => {
   route()
   window.addEventListener('hashchange', route)
-  try { meta.value = await api('meta') } catch (e) { error.value = e.message }
-  timer = setInterval(async () => { if (meta.value && !meta.value.models_ready) meta.value = await api('meta').catch(() => meta.value) }, 15000)
+  checkHealth()
+  healthTimer = setInterval(checkHealth, 30000)
+  clockTimer = setInterval(() => {
+    now.value = Date.now()
+  }, 1000)
 })
-onBeforeUnmount(() => { window.removeEventListener('hashchange', route); clearInterval(timer) })
-const exportYear = computed(() => year.value === 'all' ? '2025' : year.value)
-const exportHref = computed(() => `/api/export?city=beijing&start=${exportYear.value}-01-01&end=${exportYear.value}-12-31`)
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', route)
+  clearInterval(healthTimer)
+  clearInterval(clockTimer)
+})
 </script>
+
 <template>
-  <div class="workspace">
+  <div class="app">
     <aside class="sidebar">
-      <a href="#overview" class="brand"><span class="brand-symbol"><Wind :size="25" :stroke-width="1.7" /></span><span>北京空气观察<small>BEIJING AIR OBSERVATORY</small></span></a>
-      <div class="side-section-label">研究工作台 <span>WORKSPACE</span></div>
-      <nav aria-label="主要导航"><a v-for="page in pages" :key="page.id" :href="`#${page.id}`" class="nav-item" :class="{ active: current.id === page.id }" :aria-current="current.id === page.id ? 'page' : undefined"><component :is="page.icon" :size="18" :stroke-width="1.7" /><span>{{ page.name }}</span><span v-if="page.id === 'forecast'" class="nav-badge">1–6 h</span></a></nav>
-      <div class="side-study"><div class="study-icon"><Leaf :size="17" /></div><h3>一份关于空气的长期观察</h3><p>北京 · 天津 · 廊坊<br>保定 · 唐山 · 张家口</p><div class="study-foot"><span>{{ ['live','online'].includes(current.id) ? '最新实测' : current.id === 'stations' ? '2022—2025' : '2015—2025' }}</span><span>{{ ['live','online'].includes(current.id) ? '6 小时预测' : current.id === 'stations' ? '4 年站点' : '11 年城市' }}</span></div></div>
-      <div class="side-footer"><span class="status-dot"></span> {{ ['live','online'].includes(current.id) ? '实时数据预测环境' : '历史数据研究环境' }}<small>{{ ['live','online'].includes(current.id) ? 'SPARK · TCN · HDFS' : 'SPARK ML · HDFS' }}</small></div>
+      <a href="#live" class="brand">
+        <span class="brand-mark"><Wind :size="22" :stroke-width="1.8" /></span>
+        <span class="brand-name">北京空气观察<small>PM₂.₅ 分析与短时预测</small></span>
+      </a>
+
+      <nav class="nav-groups" aria-label="主要导航">
+        <div v-for="group in groups" :key="group.id" class="nav-group">
+          <div class="nav-group-label">
+            <span>{{ group.name }}</span>
+            <small>{{ group.note }}</small>
+          </div>
+          <a
+            v-for="page in pagesOf(group.id)"
+            :key="page.id"
+            :href="`#${page.id}`"
+            class="nav-item"
+            :class="{ active: current.id === page.id }"
+            :aria-current="current.id === page.id ? 'page' : undefined"
+          >
+            <component :is="page.icon" :size="17" :stroke-width="1.8" aria-hidden="true" />
+            <span>{{ page.name }}</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="service-state">
+          <span class="dot" :class="{ bad: healthError, off: !health && !healthError }"></span>
+          {{ healthError ? '后端服务无响应' : health ? '后端服务运行中' : '正在连接服务' }}
+        </div>
+        <p v-if="health && !healthError">
+          历史数据 {{ health.data_ready ? '就绪' : '缺失' }} · 模型 {{ health.models_ready ? '就绪' : '缺失' }}
+        </p>
+      </div>
     </aside>
-    <main class="main-shell">
-      <header class="topbar"><div class="breadcrumb">研究工作台 <span>/</span> <strong>{{ current.name }}</strong></div><div class="topbar-right"><span class="history-badge"><span class="status-dot"></span> {{ ['live','online'].includes(current.id) ? '实时接入与预测' : '小时历史数据' }}</span><a href="#quality" class="topbar-link">数据说明 <ArrowUpRight :size="13" /></a></div></header>
-      <div class="page-wrap">
-        <section class="page-heading"><div><div class="eyebrow">BEIJING AIR OBSERVATORY <span>/ {{ current.english }}</span></div><h1>{{ current.title }}</h1><p>{{ current.description }}</p></div><div class="heading-actions"><label v-if="['overview','analysis','quality'].includes(current.id)" class="select-wrap"><span class="sr-only">分析年份</span><select v-model="year" aria-label="分析年份"><option value="all">全部年份</option><option v-for="y in meta?.years.slice().reverse()" :value="String(y)">{{ y }} 年</option></select><ChevronDown :size="14" /></label><a v-if="!['stations','live','online'].includes(current.id)" :href="exportHref" class="button secondary small" :title="`导出${year === 'all' ? 2025 : year}年北京小时数据`"><Download :size="15" /> 导出北京 {{ exportYear }}</a></div></section>
-        <div v-if="error" class="error-box" role="alert">{{ error }} <button @click="reloadPage">重新加载</button></div>
-        <component v-if="meta" :is="current.view" :meta="meta" :year="year" />
-        <div v-else-if="!error" class="page-loader"><span class="spinner"></span> 正在连接观测数据…</div>
-        <footer class="page-footer"><span>北京市 PM₂.₅ 时空分析与短时预测系统</span><span>北京时间 UTC+8 <i>·</i> {{ ['live','online'].includes(current.id) ? '实测更新与当前预测' : '历史回放与独立评估' }}</span></footer>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumb">
+          <span>{{ currentGroup.name }}</span>
+          <span aria-hidden="true">/</span>
+          <strong>{{ current.name }}</strong>
+        </div>
+        <div class="topbar-right">
+          <span class="clock"><Clock3 :size="14" aria-hidden="true" />北京时间 {{ bjFull(now) }}</span>
+          <a href="/docs" target="_blank" rel="noreferrer"><FileText :size="14" />接口文档</a>
+        </div>
+      </header>
+
+      <div class="page">
+        <header class="page-head">
+          <div class="page-eyebrow">{{ currentGroup.note }} · {{ currentGroup.name }}</div>
+          <h1>{{ current.title }}</h1>
+          <p>{{ current.description }}</p>
+          <div class="scope-chips">
+            <span v-for="item in current.scope" :key="item">{{ item }}</span>
+          </div>
+        </header>
+
+        <component :is="current.view" :key="current.id" />
+
+        <footer class="page-foot">
+          <span>北京市 PM₂.₅ 时空分析与短时预测系统</span>
+          <span>所有时间均为北京时间（UTC+8）</span>
+        </footer>
       </div>
     </main>
   </div>
 </template>
-
-

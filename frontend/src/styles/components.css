@@ -1,0 +1,519 @@
+/*
+ * 通用组件样式：面板、指标卡、按钮、表单、表格、提示框、标签和进度条。
+ * 各页面独有的排版写在对应 .vue 文件的 scoped 样式里。
+ */
+
+/* ---------- 面板 ---------- */
+
+.panel {
+  min-width: 0;
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 14px;
+}
+
+.panel-kicker {
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.panel-head h2 {
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.panel-actions .select {
+  max-width: 100%;
+}
+
+.panel-note {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.panel-note a {
+  white-space: nowrap;
+}
+
+.panel-text {
+  color: var(--ink-2);
+}
+
+.panel-text + .panel-text {
+  margin-top: 8px;
+}
+
+/* ---------- 指标卡 ---------- */
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.stat.featured {
+  background: var(--brand-soft);
+  border-color: var(--brand-line);
+}
+
+.stat-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.stat-label svg {
+  flex: none;
+  color: var(--ink-3);
+}
+
+.stat-value {
+  margin-top: 6px;
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.stat-value small {
+  margin-left: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.stat-value.word {
+  font-size: 22px;
+}
+
+.stat-hint {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* ---------- 按钮 ---------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.button:hover:not(:disabled) {
+  text-decoration: none;
+  background: var(--surface-hover);
+}
+
+.button.primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.button.primary:hover:not(:disabled) {
+  background: var(--brand-strong);
+}
+
+.button.small {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.button.ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--brand);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* ---------- 表单 ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.field input,
+.field select,
+.select {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.select {
+  width: auto;
+  min-height: 30px;
+  padding: 0 8px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.toolbar .field {
+  flex: 1 1 160px;
+}
+
+.toolbar .button {
+  flex: none;
+}
+
+/* 分段切换：用于两三个互斥选项 */
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+}
+
+.segmented button {
+  min-height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.segmented button.active {
+  background: var(--surface);
+  color: var(--brand-strong);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(21, 33, 28, 0.12);
+}
+
+/* 可多选的胶囊按钮 */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pills button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.pills button.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.pills button.off {
+  opacity: 0.55;
+}
+
+.swatch {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* ---------- 表格 ---------- */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table-wrap.tall {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-2);
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover td {
+  background: var(--surface-hover);
+}
+
+td.strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+tr.selected td {
+  background: var(--brand-soft);
+}
+
+tr.clickable {
+  cursor: pointer;
+}
+
+/* ---------- 提示框 ---------- */
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  border: 1px solid transparent;
+}
+
+.notice svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.notice.info {
+  color: var(--info);
+  background: var(--info-soft);
+  border-color: #cfe0f5;
+}
+
+.notice.warn {
+  color: var(--warn);
+  background: var(--warn-soft);
+  border-color: #f2dcac;
+}
+
+.notice.error {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: #f0c9c6;
+}
+
+.notice.good {
+  color: var(--good);
+  background: var(--good-soft);
+  border-color: #c4e5cd;
+}
+
+.notice.loading {
+  color: var(--ink-2);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.notice p + p {
+  margin-top: 4px;
+}
+
+.spinner {
+  display: inline-block;
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ---------- 标签与状态点 ---------- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--ink-2);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+}
+
+.tag.brand {
+  color: var(--brand-strong);
+  background: var(--brand-soft);
+  border-color: var(--brand-line);
+}
+
+.tag.good {
+  color: var(--good);
+  background: var(--good-soft);
+  border-color: #c4e5cd;
+}
+
+.tag.warn {
+  color: var(--warn);
+  background: var(--warn-soft);
+  border-color: #f2dcac;
+}
+
+.tag.danger {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: #f0c9c6;
+}
+
+.dot {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--good);
+}
+
+.dot.live {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.dot.off {
+  background: var(--ink-3);
+}
+
+.dot.bad {
+  background: var(--danger);
+}
+
+/* ---------- 进度条 ---------- */
+
+.meter {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  overflow: hidden;
+}
+
+.meter i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+/* ---------- 方法说明 ---------- */
+
+.method-note {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  border: 1px dashed var(--border-strong);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.method-note svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--ink-3);
+}
+
+details.more {
+  margin-top: 12px;
+}
+
+details.more summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+details.more[open] summary {
+  margin-bottom: 10px;
+}
