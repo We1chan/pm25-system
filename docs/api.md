@@ -1871,6 +1871,19 @@ start/end 为 ISO 日期，默认 end=当前北京时间日期、start=end减13�
 | `by_regime[].interval_n` | integer | 有实测且发布时保存了上下限的样本数 |
 | `by_regime[].coverage` | null/number | 已有实测且保存区间的样本中，实测落入区间的比例，0—1 |
 | `by_regime[].mean_width` | null/number | 区间上限减下限的平均值，μg/m³ |
+| `uncertainty` | object | 在线评价的不确定性与重污染评价，基线为发布时的持续性值 |
+| `uncertainty.by_horizon[]` | object | 每个提前小时按目标自然日整块 bootstrap 的 RMSE 对比 |
+| `uncertainty.by_horizon[].horizon` | integer | 提前小时 |
+| `uncertainty.by_horizon[].n` / `n_days` | integer | 有实测的样本数 / 覆盖的目标自然日数 |
+| `uncertainty.by_horizon[].model` / `baseline` | number | 模型与基线的 RMSE，μg/m³ |
+| `uncertainty.by_horizon[].gain` | number | 1减模型RMSE/基线RMSE，无量纲 |
+| `uncertainty.by_horizon[].gain_ci95` | array | 提升幅度 95% 区间，[下限, 上限] |
+| `uncertainty.by_horizon[].p_gain_le_0` | number | 重采样中提升不大于 0 的比例 |
+| `uncertainty.by_horizon[].significant` | boolean | 区间下限是否大于 0 |
+| `uncertainty.by_horizon[].reliable` | boolean | 覆盖天数是否不少于 7；否则只能作进度参考 |
+| `uncertainty.pollution_levels[]` | object | 按真值六档（优到严重）的 MAE 与相对基线增益；样本为 0 的档位指标为 null |
+| `uncertainty.alerts[]` | object | 阈值 75 和 150 的高值预警，含 model 与 baseline 两组 |
+| `uncertainty.alerts[].model.recall` / `precision` / `f1` / `false_alarm_rate` | null/number | 召回率、精确率、F1、误报率；分母为 0 时为 null |
 | `failures` | array | 按绝对误差排序的最差在线样本，最多20条 |
 | `failures[]` | object | 按绝对误差排序的最差在线样本，最多20条 |
 | `failures[].cycle_id` | string | 数据采集与预测轮次标识 |
