@@ -1511,6 +1511,8 @@ station_id 必须存在；time 为2024-01-01T00:00至2025-12-31T17:00的北京�
 | `timezone` | string | 时间所属时区 |
 | `current` | number | 预测起点的 PM2.5，μg/m³ |
 | `inference_device` | string | 本次推理实际执行设备 |
+| `checkpoint_sha256` | string/null | 本轮实际加载的模型权重 SHA-256 |
+| `hdfs` | string/null | 本轮原始数据与预测产物的 HDFS 归档路径 |
 | `model_name` | string | 模型显示名 |
 | `engine` | string | 实际推理框架及版本 |
 | `forecast_stations` | integer | 本轮满足输入要求、可预测的北京站点数 |

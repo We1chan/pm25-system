@@ -182,6 +182,8 @@ def meta():
         "current",
         "inference_device",
         "model_name",
+        "checkpoint_sha256",
+        "hdfs",
         "engine",
         "forecast_stations",
         "beijing_stations",

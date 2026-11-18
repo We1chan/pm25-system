@@ -406,7 +406,7 @@ export function hasRegionMap() {
 }
 
 /*
- * 站点/城市点位地图。points: [{ id, name, lon, lat, value }]。
+ * 站点/城市点位地图。points: [{ id, name, lon, lat, value, color? }]。
  * 点的颜色按 PM2.5 浓度分档；只给选中的点加文字标签，避免市区站点标签互相遮挡。
  * 地图边界文件读取失败时，退化为经纬度散点图，功能不受影响。
  */
@@ -428,7 +428,8 @@ export function pointMapOption(options) {
       value: [point.lon, point.lat, point.value],
       symbolSize: selected ? sizeOf(point) + 6 : sizeOf(point),
       itemStyle: {
-        color: pmColor(point.value),
+        color: point.color ?? pmColor(point.value),
+        opacity: point.color ? 1 : undefined,
         borderColor: selected ? ink.primary : '#ffffff',
         borderWidth: 2,
       },

@@ -46,9 +46,8 @@ const pages = [
     icon: Radio,
     view: LiveView,
     title: '现在的北京，接下来六个整点',
-    description: '接入官方最新实测和 GFS 天气预报，经 HDFS 与 Spark 处理后，'
-      + '由 GPU 上的 TCN 模型给出未来六个整点的 PM₂.₅ 预测和 80% 区间。',
-    scope: ['当前实测', '北京监测站点', 'TCN 分位数模型', '约每 10 分钟更新'],
+    description: '查看北京监测站点的最新实测、PM₂.₅ 预测与预计范围。',
+    scope: [],
   },
   {
     id: 'online',
@@ -238,10 +237,10 @@ onBeforeUnmount(() => {
 
       <div class="page">
         <header class="page-head">
-          <div class="page-eyebrow">{{ currentGroup.note }} · {{ currentGroup.name }}</div>
+          <div v-if="current.id !== 'live'" class="page-eyebrow">{{ currentGroup.note }} · {{ currentGroup.name }}</div>
           <h1>{{ current.title }}</h1>
           <p>{{ current.description }}</p>
-          <div class="scope-chips">
+          <div v-if="current.scope.length" class="scope-chips">
             <span v-for="item in current.scope" :key="item">{{ item }}</span>
           </div>
         </header>
