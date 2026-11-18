@@ -14,6 +14,9 @@ data/stations/smoke_hourly/
 data/stations/*.zip
 data/stations/zip_tail.bin
 models/*.pt
+!/models/station_tcn72.pt
+!/models/forecast_tcn9.pt
+!/models/forecast_history_control.pt
 data/live/
 
 data/forecast_weather/

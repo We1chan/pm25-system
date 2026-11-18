@@ -232,7 +232,10 @@ bash scripts/run_spark.sh station-verify
 | `data/forecast_weather/` | 训练用固定提前量 GFS 原始响应和清单 |
 | `data/app/` | 城市观测、城市预测、站点查询 SQLite，Git 忽略 |
 | `models/registry.json`、`models/station_registry.json` | 已训练模型登记、参数与推荐规则 |
-| `models/*.pt`、`models/versions/` | TCN 权重及按哈希冻结的发布版本，Git 忽略 |
+| `models/station_tcn72.pt` | 站点 TCN 权重，实时预测回退时使用 |
+| `models/forecast_tcn9.pt` | 未来天气 TCN 权重，用于实时预测 |
+| `models/forecast_history_control.pt` | 历史天气对照模型权重 |
+| `models/versions/` | 在线核验按哈希冻结的权重副本，Git 忽略 |
 | `reports/` | 规模、质量、模型指标、GPU 证据和核验输出 |
 | `data/live/cycles/` | 每轮原始响应、来源清单、特征摘要与预测 |
 | `data/live/latest.json`、`data/live/online.sqlite` | 当前快照与真实在线核验记录 |
