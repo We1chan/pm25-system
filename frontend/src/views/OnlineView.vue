@@ -98,6 +98,19 @@ const stationNames = computed(() => {
   return names
 })
 
+const uncertainty = computed(() => result.value?.uncertainty || null)
+
+const unreliableDays = computed(() =>
+  (uncertainty.value?.by_horizon || []).some((row) => !row.reliable),
+)
+
+function bootstrapVerdict(row) {
+  if (!row.reliable) {
+    return '天数不足，仅供参考'
+  }
+  return row.significant ? '显著优于基线' : '区间含 0，不显著'
+}
+
 function stationLabel(stationId) {
   const name = stationNames.value[stationId]
   return name ? `${name}（${stationId}）` : stationId
@@ -473,6 +486,113 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
         </PanelCard>
       </div>
 
+      <PanelCard
+        v-if="uncertainty"
+        kicker="不确定性与重污染"
+        title="提升有多可靠，重污染和高值预警表现如何"
+        note="按目标自然日整块重采样 2000 次得到 95% 区间；基线为发布时的持续性预测。"
+      >
+        <Notice v-if="!uncertainty.by_horizon.length" kind="info">
+          等待目标时刻的实测到达后才能计算。
+        </Notice>
+        <template v-else>
+          <Notice v-if="unreliableDays" kind="warn">
+            覆盖的目标日不足 7 天，区间很宽，只能作为积累进度的参考，不能据此判断模型好坏。
+          </Notice>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>提前</th>
+                  <th class="num">样本 / 天数</th>
+                  <th class="num">模型 RMSE</th>
+                  <th class="num">基线 RMSE</th>
+                  <th class="num">相对基线提升</th>
+                  <th class="num">95% 区间</th>
+                  <th>结论</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in uncertainty.by_horizon" :key="row.horizon">
+                  <td>第 {{ row.horizon }} 个</td>
+                  <td class="num">{{ fmtInt(row.n) }} / {{ fmtInt(row.n_days) }}</td>
+                  <td class="num strong">{{ fmt(row.model, 2) }}</td>
+                  <td class="num">{{ fmt(row.baseline, 2) }}</td>
+                  <td class="num">{{ fmtPercent(row.gain) }}</td>
+                  <td class="num">
+                    {{ fmtPercent(row.gain_ci95[0]) }} ~ {{ fmtPercent(row.gain_ci95[1]) }}
+                  </td>
+                  <td>{{ bootstrapVerdict(row) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+        <div v-if="uncertainty.by_horizon.length" class="grid-2 inner-grid">
+          <div>
+            <h4 class="sub-title">按真实污染档位</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>档位</th>
+                    <th class="num">样本</th>
+                    <th class="num">模型 MAE</th>
+                    <th class="num">基线 MAE</th>
+                    <th class="num">相对基线</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="row in uncertainty.pollution_levels" :key="row.level">
+                    <td>{{ row.level }}</td>
+                    <td class="num">{{ fmtInt(row.n) }}</td>
+                    <td class="num">{{ fmt(row.mae, 2) }}</td>
+                    <td class="num">{{ fmt(row.baseline_mae, 2) }}</td>
+                    <td class="num">{{ fmtPercent(row.gain) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="panel-text small">样本很少的档位（例如严重污染）不具统计意义。</p>
+          </div>
+          <div>
+            <h4 class="sub-title">高值预警（模型对比持续性基线）</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>阈值</th>
+                    <th>预测来源</th>
+                    <th class="num">召回率</th>
+                    <th class="num">精确率</th>
+                    <th class="num">误报率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-for="item in uncertainty.alerts" :key="item.threshold">
+                    <tr>
+                      <td rowspan="2">≥ {{ fmt(item.threshold, 0) }}</td>
+                      <td>模型</td>
+                      <td class="num strong">{{ fmtPercent(item.model.recall) }}</td>
+                      <td class="num">{{ fmtPercent(item.model.precision) }}</td>
+                      <td class="num">{{ fmtPercent(item.model.false_alarm_rate) }}</td>
+                    </tr>
+                    <tr>
+                      <td>持续性基线</td>
+                      <td class="num">{{ fmtPercent(item.baseline.recall) }}</td>
+                      <td class="num">{{ fmtPercent(item.baseline.precision) }}</td>
+                      <td class="num">{{ fmtPercent(item.baseline.false_alarm_rate) }}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <p class="panel-text small">召回率是实际高值被提前报出的比例；没有事件时显示 —。</p>
+          </div>
+        </div>
+      </PanelCard>
+
       <PanelCard kicker="失败案例" title="误差最大的真实预测（最多 20 条）">
         <p v-if="!result.failures.length" class="panel-text">等待当前模型的目标实测到达。</p>
         <div v-else class="table-wrap">
@@ -620,6 +740,22 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
 </template>
 
 <style scoped>
+.inner-grid {
+  margin-top: 18px;
+}
+
+.sub-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.panel-text.small {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
 .toolbar .field.wide {
   flex-basis: 300px;
 }
