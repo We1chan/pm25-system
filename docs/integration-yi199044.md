@@ -41,9 +41,28 @@ $PY scripts/train_forecast_model.py --tag heavy_nb --heavy-weight --neighbors
 和 `regimes.pm_ge150`。只有带 `--tag` 的检查点在同一测试队列上优于现用模型，才考虑复制为
 `models/forecast_tcn9.pt`。复制前先停止服务，并跑 `predict_forecast_live.py --verify-only`。
 
+## v2 站点随机森林加权
+
+`spark_station_train.py` 新增 `--heavy-weight`（权重同上）和必填的 `--tag`。权重按真实目标浓度
+`label_h{h}` 计算，不按残差标签，通过 Spark `weightCol` 传入。注册表、HDFS 模型目录和预测输出
+都带 `--tag` 后缀，不覆盖正式结果：
+
+```bash
+bash scripts/run_spark.sh station-train --heavy-weight --tag heavy
+```
+
+该改动只做了语法检查，没有在 Spark 中运行，Windows 环境没有 pyspark。
+
+## 数据层面的评估
+
+- v3 的未来天气模型依赖 GFS 提前 24 小时的归档预报，最早只到 2024 年初
+  （`reports/forecast_training_data.json` 的 `start` 为 2024-01-01），所以原型 2013—2023 年的
+  站点历史**无法**喂给 v3，不能用真实预报天气训练。
+- 这些历史只能用于不含未来天气的模型（v2 站点 RF/TCN 的 2022 年之前，或 v1 城市模型），
+  收益需要单独验证，还要处理站点编码和网络纪元差异，以及 HDFS 入库。
+- 因此本分支不搬运原始数据，避免做出 v3 用不上的 GB 级拷贝。
+
 ## 尚未完成
 
-- 以上三个训练变体**没有训练**，本分支只提交代码和合成数据测试，不声称任何精度提升。
-- 数据层面未移植：原型的 2013—2026 年 35 站历史（约 390 万站点小时）与本系统的站点编码和
-  网络纪元不同，需要单独做对齐和 HDFS 入库，数据量大，见分支说明。
-- v2 站点 Spark RF 的 `weightCol` 加权尚未接入。
+- 以上训练变体**没有训练**，本分支只提交代码和合成数据测试，不声称任何精度提升。
+- 原型长历史数据未入库，原因见上一节。
