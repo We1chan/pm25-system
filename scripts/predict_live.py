@@ -297,7 +297,7 @@ def main():
         )
         return
     atomic(folder / "forecast.json", snapshot)
-    record(snapshot, actual_observations, sites, start)
+    record(snapshot)
     atomic(ROOT / "data/live/latest.json", snapshot)
     print(
         "Published six FUTURE Beijing forecasts:",

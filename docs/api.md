@@ -1483,6 +1483,8 @@ station_id 必须存在；time 为2024-01-01T00:00至2025-12-31T17:00的北京�
 
 ## GET /api/live/meta
 
+可选 `cycle_id` 查询已发布的指定轮次。此时 `archived=true`，`usable` 仍表示该快照此刻能否作为实时预测展示。缺少该轮归档返回 404。
+
 无参数。始终可查询状态；ready仅表示有快照，是否能展示当前预测要同时检查 usable。
 
 读取或写入：data/live/latest.json、reports/live_progress.json、data/live/online.sqlite。
@@ -1594,6 +1596,8 @@ station_id 必须存在；time 为2024-01-01T00:00至2025-12-31T17:00的北京�
 ```
 
 ## GET /api/live/forecast
+
+可选 `cycle_id` 固定查询轮次，响应始终包含 `cycle_id`。传入轮次时允许读取过期的发布快照作为归档，省略时仍要求当前预测有效。
 
 station_id 为 mean 或已接入的北京站点编号。仅返回仍有效的当前预测：实测年龄≤180分钟，且全部六个目标时刻仍在未来。城市均值来自本轮可预测站点等权平均。单站响应包含站点元数据，均值响应包含 nominal_coverage / interval_note。
 
@@ -1744,6 +1748,8 @@ station_id 为 mean 或已接入的北京站点编号。仅返回仍有效的当
 
 ## GET /api/live/export
 
+接受与 `/api/live/forecast` 相同的 `station_id` 和 `cycle_id`，CSV 含「发布轮次」列，可复核曲线与导出是否来自同一次发布。
+
 station_id 与 /api/live/forecast 相同，时效检查完全相同。
 
 读取或写入：data/live/latest.json。
@@ -1778,6 +1784,12 @@ mean,2026-10-23T00:08:48.045975+08:00,2026-10-22T23:00:00+08:00,2026-10-23T02:00
 ```
 
 ## GET /api/live/evaluation
+
+- 可选 `cycle_id` 固定核验轮次。按目标日期、站点、提前量等现有条件继续筛选。
+- 可选 `compare_checkpoint` 指定对照权重的 SHA-256。`comparison.primary` 与 `comparison.comparison` 仅对双方共有的同站点、同实测起点、同目标、同提前量及同一实测值计算指标。
+- `recent_case` 返回筛选范围内最近收到实测的记录，或一条待核验记录。`timeline` 按 `scheduled`、`waiting`、`verified`、`missing` 分组，各组提供总数、偏移量和最多 24 条记录。通过 `timeline_status` 选择要翻页的组，`timeline_offset` 指定偏移量。目标时刻过去 24 小时无实测标为缺失，后续收到实测仍可核验。
+- `observation_refresh` 提供独立的实测补录阶段、补录数量、失败来源和下一次调度时间。该任务在没有新预测发布时仍运行，最多回查最近 7 天的待核验实测。
+- `by_station_horizon` 返回已有实测的站点和提前量组合，附该组最大绝对误差的轮次与目标时刻，供热力图跳转。
 
 start/end 为 ISO 日期，默认 end=当前北京时间日期、start=end减13天；校验0≤(end-start).days≤90。station_id 可省略，指定时须为北京站点；horizon 可省略或1—6；checkpoint 可省略或64位小写十六进制哈希。省略版本时优先采用最新发布快照的版本。日期过滤作用于 target，不是 issued_at。
 
@@ -1966,7 +1978,13 @@ start/end 为 ISO 日期，默认 end=当前北京时间日期、start=end减13�
 }
 ```
 
+## GET /api/live/evaluation/detail
+
+必须传入 `cycle_id` 与 `station_id`。返回该发布轮次的站点 `records`（含各目标核验状态）以及原始发布的 `forecast` 上下文（历史实测、预测区间、天气及发布时间）。缺少原始文件时 `forecast` 为 null，仍可查看核验记录。轮次下没有该站记录时返回 404。
+
 ## GET /api/live/evaluation/export
+
+接受可选 `cycle_id`，CSV 含 `cycle_id` 列。
 
 参数、默认值、去重口径与 /api/live/evaluation 一致。导出保留未到达实测的空单元格。
 

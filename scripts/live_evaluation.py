@@ -7,6 +7,7 @@ from pathlib import Path
 from live_common import ROOT, safe_float, now
 
 DB = ROOT / "data/live/online.sqlite"
+MISSING_AFTER = timedelta(hours=24)
 
 
 def initialize(db):
@@ -34,11 +35,27 @@ def initialize(db):
     db.execute(
         "CREATE INDEX IF NOT EXISTS live_model_target ON forecasts(checkpoint_sha256,target)"
     )
+    db.execute("CREATE INDEX IF NOT EXISTS live_unmatched_target ON forecasts(target) WHERE actual IS NULL")
     db.commit()
 
 
-def record(snapshot, observed, sites, start, path=DB):
-    """冻结发布时的预测，并只用已经到达的真实观测补填标签。"""
+def backfill_actuals(db, observations, received, cycle_id):
+    """只补齐预测发布后到达的真实观测，保留第一次匹配的标签和来源。"""
+    before = db.total_changes
+    db.executemany(
+        "UPDATE forecasts SET actual=?,actual_received_at=?,actual_cycle_id=? WHERE"
+        " station_id=? AND target=? AND issued_at<? AND actual IS NULL",
+        (
+            (value, received.isoformat(), cycle_id, station_id, target.isoformat(), target.isoformat())
+            for (station_id, target), value in observations.items()
+            if value is not None and target <= received
+        ),
+    )
+    return db.total_changes - before
+
+
+def record(snapshot, observed=None, sites=None, start=None, path=DB):
+    """冻结发布时的预测，兼容调用方随快照传入观测的既有接口。"""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(path, timeout=10)
@@ -72,29 +89,16 @@ def record(snapshot, observed, sites, start, path=DB):
             "?,?,?,?)",
             rows,
         )
-        received = datetime.fromisoformat(snapshot["issued_at"])
-        updates = []
-        for i, s in enumerate(sites):
-            if s["city_id"] != "beijing":
-                continue
-            for t, value in enumerate(observed[i]):
-                actual = safe_float(value)
-                target = start + timedelta(hours=t)
-                if actual is None or target > received:
-                    continue
-                updates.append((
-                    actual,
-                    snapshot["issued_at"],
-                    snapshot["cycle_id"],
-                    s["station_id"],
-                    target.isoformat(),
-                    target.isoformat(),
-                ))
-        db.executemany(
-            "UPDATE forecasts SET actual=?,actual_received_at=?,actual_cycle_id=? WHERE"
-            " station_id=? AND target=? AND issued_at<? AND actual IS NULL",
-            updates,
-        )
+        if observed is not None:
+            observations = {
+                (site["station_id"], start + timedelta(hours=t)): safe_float(value)
+                for site, series in zip(sites, observed)
+                if site["city_id"] == "beijing"
+                for t, value in enumerate(series)
+            }
+            backfill_actuals(
+                db, observations, datetime.fromisoformat(snapshot["issued_at"]), snapshot["cycle_id"]
+            )
         db.commit()
     finally:
         db.close()
@@ -144,7 +148,7 @@ def metrics(checkpoint=None, path=DB):
         db.close()
 
 
-def evaluation_rows(checkpoint=None, start=None, end=None, station_id=None, horizon=None, path=DB):
+def evaluation_rows(checkpoint=None, start=None, end=None, station_id=None, horizon=None, path=DB, *, cycle_id=None):
     """按模型与目标日期筛选记录，去重后供页面和导出共用。"""
     if not Path(path).exists():
         return [], []
@@ -156,14 +160,19 @@ def evaluation_rows(checkpoint=None, start=None, end=None, station_id=None, hori
             for r in db.execute(
                 "SELECT checkpoint_sha256,max(model_name) model_name,min(issued_at)"
                 " first_issue,max(issued_at) last_issue,count(*) stored FROM forecasts GROUP BY"
-                " checkpoint_sha256 ORDER BY last_issue DESC"
+                " checkpoint_sha256 ORDER BY last_issue DESC,checkpoint_sha256"
             )
         ]
         if not models:
             return [], []
-        checkpoint = checkpoint or models[0]["checkpoint_sha256"]
-        clauses = ["checkpoint_sha256=?"]
-        args = [checkpoint]
+        clauses = []
+        args = []
+        if checkpoint or not cycle_id:
+            clauses.append("checkpoint_sha256=?")
+            args.append(checkpoint or models[0]["checkpoint_sha256"])
+        if cycle_id:
+            clauses.append("cycle_id=?")
+            args.append(cycle_id)
         if start:
             clauses.append("substr(target,1,10)>=?")
             args.append(start)
@@ -230,10 +239,41 @@ def score_rows(rows):
     }
 
 
-def evaluation(checkpoint=None, start=None, end=None, station_id=None, horizon=None, path=DB):
+def verification_status(row, current):
+    """超过 24 小时仍没有匹配实测的记录标记为缺失，后续仍可补录。"""
+    if row["actual"] is not None:
+        return "verified"
+    target = datetime.fromisoformat(row["target"])
+    if target > current:
+        return "scheduled"
+    return "missing" if current >= target + MISSING_AFTER else "waiting"
+
+
+def cycle_rows(cycle_id, station_id=None, path=DB):
+    """读取一轮真实发布记录，可按站点定位原始预测。"""
+    path = Path(path)
+    if not path.is_file():
+        return []
+    db = sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)
+    db.row_factory = sqlite3.Row
+    try:
+        sql = "SELECT * FROM forecasts WHERE cycle_id=?"
+        if station_id is None:
+            return [dict(row) for row in db.execute(sql + " LIMIT 1", (cycle_id,))]
+        return [dict(row) for row in db.execute(
+            sql + " AND station_id=? ORDER BY target", (cycle_id, station_id)
+        )]
+    finally:
+        db.close()
+
+
+def evaluation(checkpoint=None, start=None, end=None, station_id=None, horizon=None, path=DB,
+               *, cycle_id=None, compare_checkpoint=None, timeline_status=None, timeline_offset=0):
     """返回误差分组、失败样本和真实在线积累时长。"""
-    rows, models = evaluation_rows(checkpoint, start, end, station_id, horizon, path)
-    checkpoint = checkpoint or (models[0]["checkpoint_sha256"] if models else None)
+    rows, models = evaluation_rows(checkpoint, start, end, station_id, horizon, path, cycle_id=cycle_id)
+    checkpoint = checkpoint or (
+        rows[0]["checkpoint_sha256"] if rows else (models[0]["checkpoint_sha256"] if models and not cycle_id else None)
+    )
 
     def groups(key):
         """按指定键聚合已经筛选的记录，保证各视图统计口径一致。"""
@@ -254,6 +294,55 @@ def evaluation(checkpoint=None, start=None, end=None, station_id=None, horizon=N
             **score_rows([r for r in rows if r["actual"] is not None and predicate(r)]),
         })
     matched = [r for r in rows if r["actual"] is not None]
+    station_hours = {}
+    for row in matched:
+        station_hours.setdefault((row["station_id"], row["horizon"]), []).append(row)
+    station_horizon = []
+    for (station_id, lead), records in sorted(station_hours.items()):
+        example = max(records, key=lambda row: abs(row["prediction"] - row["actual"]))
+        station_horizon.append({
+            **score_rows(records), "station_id": station_id, "horizon": lead,
+            "cycle_id": example["cycle_id"], "target": example["target"],
+        })
+    current = now()
+    timeline = {key: [] for key in ("scheduled", "waiting", "verified", "missing")}
+    for row in rows:
+        timeline[verification_status(row, current)].append(row)
+    timeline_page = {}
+    for key, records in timeline.items():
+        offset = min(timeline_offset, ((len(records) - 1) // 24) * 24) if records and key == timeline_status else 0
+        ordered = records if key in ("scheduled", "waiting") else records[::-1]
+        timeline_page[key] = {
+            "count": len(records), "offset": offset, "records": ordered[offset:offset + 24],
+        }
+    newest_issue = max(rows, key=lambda r: r["issued_at"], default=None)
+    recent = max(
+        matched, key=lambda r: (r["actual_received_at"] or "", r["target"], r["issued_at"]),
+        default=newest_issue,
+    )
+    model_comparison = None
+    if compare_checkpoint and checkpoint and compare_checkpoint != checkpoint:
+        other, _ = evaluation_rows(compare_checkpoint, start, end, station_id, horizon, path)
+
+        def cohort_key(row):
+            return row["station_id"], row["target"], row["origin"], row["horizon"], row["actual"]
+
+        peers = {}
+        for row in other:
+            if row["actual"] is not None:
+                key = cohort_key(row)
+                if key not in peers or row["issued_at"] > peers[key]["issued_at"]:
+                    peers[key] = row
+        paired = {}
+        for row in matched:
+            key = cohort_key(row)
+            if key in peers and (key not in paired or row["issued_at"] > paired[key]["issued_at"]):
+                paired[key] = row
+        model_comparison = {
+            "checkpoint_sha256": compare_checkpoint,
+            "primary": score_rows(list(paired.values())),
+            "comparison": score_rows([peers[key] for key in paired]),
+        }
     worst = sorted(matched, key=lambda r: abs(r["prediction"] - r["actual"]), reverse=True)[:20]
     actual_hours = {r["origin"] for r in rows}
     first = min((r["issued_at"] for r in rows), default=None)
@@ -278,13 +367,17 @@ def evaluation(checkpoint=None, start=None, end=None, station_id=None, horizon=N
     return {
         "checkpoint_sha256": checkpoint,
         "models": models,
-        "filters": {"start": start, "end": end, "station_id": station_id, "horizon": horizon},
+        "filters": {"start": start, "end": end, "station_id": station_id, "horizon": horizon, "cycle_id": cycle_id},
         "summary": score_rows(rows),
         "by_horizon": groups(lambda r: r["horizon"]),
         "by_day": groups(lambda r: r["target"][:10]),
         "by_station": groups(lambda r: r["station_id"]),
+        "by_station_horizon": station_horizon,
         "by_regime": by_regime,
         "failures": [{**r, "absolute_error": abs(r["prediction"] - r["actual"])} for r in worst],
+        "recent_case": {**recent, "status": verification_status(recent, current)} if recent else None,
+        "timeline": timeline_page,
+        "comparison": model_comparison,
         "collection": {
             "first_issue": first,
             "last_issue": last,

@@ -21,6 +21,7 @@ import PmLegend from '../components/PmLegend.vue'
 import { api, apiHref, postApi } from '../lib/api'
 import { bjDateTime, bjTime, fmt, fmtInt, fmtPercent, isNumber } from '../lib/format'
 import { refreshPhaseText, refreshSteps, weatherVariables } from '../lib/labels'
+import { verificationHref } from '../lib/liveLinks'
 import {
   BAND_NAME,
   axisTime,
@@ -70,6 +71,7 @@ let active = true
 // 预测可用：后端标记可用，且六个目标时刻都还没到（已经过去的目标不能叫"预测"）
 function usableForecast(result, stationId) {
   return live.value?.usable && result?.station_id === stationId && canForecast(stationId)
+    && result.cycle_id === live.value.cycle_id
     && result.points?.length > 0
     && result.points.every(point => new Date(point.target).getTime() > clock.value)
 }
@@ -153,8 +155,12 @@ const searchResults = computed(() => {
   )
 })
 
-const exportHref = computed(() => apiHref('live/export', { station_id: selected.value }))
-const comparisonExportHref = computed(() => apiHref('live/export', { station_id: comparison.value }))
+const exportHref = computed(() => apiHref('live/export', {
+  station_id: forecast.value?.station_id, cycle_id: forecast.value?.cycle_id,
+}))
+const comparisonExportHref = computed(() => apiHref('live/export', {
+  station_id: comparisonForecast.value?.station_id, cycle_id: comparisonForecast.value?.cycle_id,
+}))
 const forecastHours = computed(() => (forecast.value?.points || []).map((point, index, points) => {
   const previous = index === 0 ? forecast.value.current : points[index - 1].prediction
   const change = isNumber(point.prediction) && isNumber(previous)
@@ -186,7 +192,7 @@ async function loadForecast(stationId, target, error, token) {
     return
   }
   try {
-    const result = await api('live/forecast', { station_id: stationId })
+    const result = await api('live/forecast', { station_id: stationId, cycle_id: live.value.cycle_id })
     if (token === forecastToken) {
       target.value = result
     }
@@ -537,6 +543,10 @@ const mapOption = computed(() => {
           <PanelCard :title="`${selectedName} · 实测与预测`">
             <template #actions>
               <a v-if="fresh" class="button small" :href="exportHref"><Download :size="14" />导出 CSV</a>
+              <a v-if="fresh && selected !== 'mean'" class="button small"
+                :href="verificationHref(forecast.cycle_id, selected)">
+                查看本轮核验
+              </a>
             </template>
             <label v-if="stations.length" class="comparison-picker">
               并排比较
@@ -563,6 +573,9 @@ const mapOption = computed(() => {
                 <template v-if="comparisonFresh">
                   <Chart :option="comparisonOption" height="320px" :label="`${comparisonForecast.name}对比曲线`" />
                   <a class="button small" :href="comparisonExportHref"><Download :size="14" />导出对比站 CSV</a>
+                  <a class="button small" :href="verificationHref(comparisonForecast.cycle_id, comparison)">
+                    查看对比站核验
+                  </a>
                 </template>
                 <Notice v-else-if="comparisonError" kind="error">{{ comparisonError }}</Notice>
                 <p v-else-if="!canForecast(comparison)" class="panel-text">对比站点本轮暂不可预测。</p>

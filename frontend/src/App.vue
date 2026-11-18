@@ -148,7 +148,7 @@ function pagesOf(groupId) {
 }
 
 function route() {
-  const hash = location.hash.slice(1)
+  const hash = location.hash.slice(1).split('?')[0]
   pageId.value = pages.some(page => page.id === hash) ? hash : 'live'
   document.title = `${current.value.name} · 北京空气观察`
   window.scrollTo({ top: 0 })

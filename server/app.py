@@ -35,12 +35,14 @@ WEATHER = {
 @asynccontextmanager
 async def lifespan(app):
     """随服务启动和关闭管理实时工作线程。"""
-    from server.live import worker
+    from server.live import observation_worker, worker
 
     worker.start()
     try:
+        observation_worker.start()
         yield
     finally:
+        observation_worker.stop()
         worker.stop()
 
 

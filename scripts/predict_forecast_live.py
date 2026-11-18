@@ -345,7 +345,7 @@ def main():
         print("Verified reloaded median, lower and upper forecasts and all raw hashes", flush=True)
         return
     atomic(folder / "forecast.json", snapshot)
-    record(snapshot, x[:, :, 0].copy(), sites, start)
+    record(snapshot)
     atomic(ROOT / "data/live/latest.json", snapshot)
     print(
         "Published real weather-aware direct forecasts and calibrated intervals",

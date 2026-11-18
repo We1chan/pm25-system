@@ -2,6 +2,7 @@
 读取最新轮次 JSON 与在线 SQLite，输出带时效检查的接口响应和 CSV。"""
 
 import csv, io, json, logging, os, signal, subprocess, sys, threading, time
+from typing import Annotated, Literal
 from datetime import date, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
@@ -10,15 +11,17 @@ from fastapi.responses import StreamingResponse
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from live_common import TZ, now, progress
-from live_evaluation import metrics, evaluation, evaluation_rows, initialize, DB
+from live_common import TZ, atomic, now, progress
+from live_evaluation import metrics, evaluation, evaluation_rows, initialize, DB, cycle_rows, verification_status
 
 router = APIRouter(prefix="/api/live")
 LOG = logging.getLogger("pm25.live")
+CycleId = Annotated[str, Query(pattern=r"^[a-zA-Z0-9_-]{1,80}$")]
+OBSERVATION_STATUS = ROOT / "data/live/observation_progress.json"
 
 
 class LiveWorker:
-    def __init__(self):
+    def __init__(self, *, observations_only=False):
         """初始化既定结构和状态，不在构造时执行训练或采集。"""
         self.stop_event = threading.Event()
         self.wake = threading.Event()
@@ -28,6 +31,9 @@ class LiveWorker:
         self.running = False
         self.last_start = 0.0
         self.next_run = None
+        self.observations_only = observations_only
+        self.name = "live_observations" if observations_only else "live_cycle"
+        self.script = "collect_live_observations" if observations_only else "live_cycle"
 
     def start(self):
         """启动唯一后台刷新线程，并兼容已有在线核验表。"""
@@ -35,14 +41,14 @@ class LiveWorker:
             return
         if self.thread and self.thread.is_alive():
             return
-        if DB.exists():
+        if DB.exists() and not self.observations_only:
             import sqlite3
 
             with sqlite3.connect(DB, timeout=15) as db:
                 initialize(db)
         self.stop_event.clear()
         self.wake.clear()
-        self.thread = threading.Thread(target=self.loop, name="pm25-live-refresh", daemon=True)
+        self.thread = threading.Thread(target=self.loop, name=self.name, daemon=True)
         self.thread.start()
 
     def request(self):
@@ -66,26 +72,33 @@ class LiveWorker:
                 self.last_start = time.monotonic()
             try:
                 (ROOT / "logs").mkdir(exist_ok=True)
-                with (ROOT / "logs/live_cycle.log").open("a", encoding="utf-8") as log:
+                with (ROOT / f"logs/{self.name}.log").open("a", encoding="utf-8") as log:
                     self.process = subprocess.Popen(
-                        [sys.executable, "-u", "scripts/live_cycle.py"],
+                        [sys.executable, "-u", f"scripts/{self.script}.py"],
                         cwd=ROOT,
                         stdout=log,
                         stderr=subprocess.STDOUT,
                         start_new_session=(os.name != "nt"),
                     )
-                    code = self.process.wait()
+                    code = self.process.wait(timeout=300 if self.observations_only else None)
                     if code:
-                        LOG.warning(
-                            "Live refresh failed with exit %s; see logs/live_cycle.log", code
-                        )
+                        LOG.warning("%s failed with exit %s; see logs/%s.log", self.name, code, self.name)
             except Exception as e:
-                LOG.exception("Unable to start live refresh")
-                progress(
-                    "failed",
-                    error="实时更新未完成，请检查网络或 Hadoop 服务后重试",
-                    technical_error=str(e)[:300],
-                )
+                LOG.exception("%s failed", self.name)
+                if self.observations_only:
+                    if self.process and self.process.poll() is None:
+                        self.process.kill()
+                        self.process.wait()
+                    atomic(OBSERVATION_STATUS, {
+                        "phase": "failed", "updated_at": now().isoformat(),
+                        "error": "实测补录未完成，请查看采集日志",
+                    })
+                else:
+                    progress(
+                        "failed",
+                        error="实时更新未完成，请检查网络或 Hadoop 服务后重试",
+                        technical_error=str(e)[:300],
+                    )
             finally:
                 with self.lock:
                     self.process = None
@@ -117,6 +130,7 @@ class LiveWorker:
 
 
 worker = LiveWorker()
+observation_worker = LiveWorker(observations_only=True)
 
 
 @lru_cache(maxsize=2)
@@ -157,16 +171,28 @@ def require_current():
     return data
 
 
-@router.get("/meta")
-def meta():
-    """返回数据范围、模型和页面初始化需要的元信息。"""
+def archived(cycle_id):
+    """只提供已登记发布的轮次，避免暴露推理过程中未完成的快照。"""
     data = latest()
+    if data and data.get("cycle_id") == cycle_id:
+        return data
+    path = ROOT / "data/live/cycles" / cycle_id / "forecast.json"
+    if not path.is_file() or not cycle_rows(cycle_id, path=DB):
+        raise HTTPException(404, "该发布轮次的预测归档不可用")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+@router.get("/meta")
+def meta(cycle_id: CycleId | None = None):
+    """返回数据范围、模型和页面初始化需要的元信息。"""
+    data = archived(cycle_id) if cycle_id else latest()
     p = ROOT / "reports/live_progress.json"
     status = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"phase": "initializing"}
     status.pop("technical_error", None)
     common = {
         "ready": data is not None,
         "current_time": now().isoformat(),
+        "archived": cycle_id is not None,
         "refresh": status,
         "refreshing": worker.running,
         "next_refresh": worker.next_run,
@@ -226,19 +252,27 @@ def meta():
 
 
 @router.get("/forecast")
-def forecast(station_id: str = "mean"):
+def forecast(station_id: str = "mean", cycle_id: CycleId | None = None):
     """校验选择项后返回六小时预测及对应历史。"""
-    data = require_current()
+    data = archived(cycle_id) if cycle_id else require_current()
+    return forecast_for_station(data, station_id)
+
+
+def forecast_for_station(data, station_id):
+    publication = {
+        "cycle_id": data.get("cycle_id"),
+        "issued_at": data["issued_at"],
+        "origin": data["origin"],
+        "weather_next": data["weather_next"],
+    }
     if station_id == "mean":
         return {
+            **publication,
             "station_id": "mean",
             "name": "北京覆盖站点均值",
-            "issued_at": data["issued_at"],
-            "origin": data["origin"],
             "current": data["current"],
             "points": data["points"],
             "history": data["history"],
-            "weather_next": data["weather_next"],
             "nominal_coverage": data.get("nominal_coverage"),
             "interval_note": data.get("interval_note"),
         }
@@ -249,9 +283,7 @@ def forecast(station_id: str = "mean"):
         raise HTTPException(409, station["reason"])
     return {
         **station,
-        "issued_at": data["issued_at"],
-        "origin": data["origin"],
-        "weather_next": data["weather_next"],
+        **publication,
     }
 
 
@@ -262,14 +294,15 @@ def refresh():
 
 
 @router.get("/export")
-def export(station_id: str = "mean"):
+def export(station_id: str = "mean", cycle_id: CycleId | None = None):
     """按当前查询口径导出带中文编码标识的 CSV。"""
-    f = forecast(station_id)
+    f = forecast(station_id, cycle_id)
     output = io.StringIO()
     output.write("\ufeff")
     writer = csv.writer(output)
     writer.writerow([
         "站点",
+        "发布轮次",
         "发布时间",
         "最新实测起点",
         "目标时刻",
@@ -284,6 +317,7 @@ def export(station_id: str = "mean"):
     for p in f["points"]:
         writer.writerow([
             station_id,
+            f["cycle_id"],
             f["issued_at"],
             f["origin"],
             p["target"],
@@ -324,12 +358,45 @@ def live_evaluation(
     station_id: str | None = None,
     horizon: int | None = Query(None, ge=1, le=6),
     checkpoint: str | None = Query(None, pattern=r"^[a-f0-9]{64}$"),
+    cycle_id: CycleId | None = None,
+    compare_checkpoint: str | None = Query(None, pattern=r"^[a-f0-9]{64}$"),
+    timeline_status: Literal["scheduled", "waiting", "verified", "missing"] | None = None,
+    timeline_offset: int = Query(0, ge=0),
 ):
     """读取选定模型版本的在线核验结果。"""
     start, end = evaluation_filters(start, end, station_id)
     data = latest()
-    checkpoint = checkpoint or (data["checkpoint_sha256"] if data else None)
-    return evaluation(checkpoint, start, end, station_id, horizon)
+    checkpoint = checkpoint or (data["checkpoint_sha256"] if data and not cycle_id else None)
+    result = evaluation(
+        checkpoint, start, end, station_id, horizon,
+        cycle_id=cycle_id, compare_checkpoint=compare_checkpoint,
+        timeline_status=timeline_status, timeline_offset=timeline_offset,
+    )
+    status = json.loads(OBSERVATION_STATUS.read_text(encoding="utf-8")) if OBSERVATION_STATUS.is_file() else {}
+    return {
+        **result,
+        "observation_refresh": {**status, "running": observation_worker.running, "next_run": observation_worker.next_run},
+    }
+
+
+@router.get("/evaluation/detail")
+def evaluation_detail(cycle_id: CycleId, station_id: str):
+    """返回该站该轮的核验记录和原始发布上下文。"""
+    rows = cycle_rows(cycle_id, station_id, path=DB)
+    if not rows:
+        raise HTTPException(404, "该轮次没有此站点的核验记录")
+    try:
+        context = forecast_for_station(archived(cycle_id), station_id)
+    except HTTPException as error:
+        if error.status_code != 404:
+            raise
+        context = None
+    current = now()
+    return {
+        "cycle_id": cycle_id,
+        "forecast": context,
+        "records": [{**row, "status": verification_status(row, current)} for row in rows],
+    }
 
 
 @router.get("/evaluation/export")
@@ -339,17 +406,19 @@ def evaluation_export(
     station_id: str | None = None,
     horizon: int | None = Query(None, ge=1, le=6),
     checkpoint: str | None = Query(None, pattern=r"^[a-f0-9]{64}$"),
+    cycle_id: CycleId | None = None,
 ):
     """导出发布时已保存的预测、区间及后来到达的实测。"""
     start, end = evaluation_filters(start, end, station_id)
     data = latest()
-    checkpoint = checkpoint or (data["checkpoint_sha256"] if data else None)
-    rows, _ = evaluation_rows(checkpoint, start, end, station_id, horizon)
+    checkpoint = checkpoint or (data["checkpoint_sha256"] if data and not cycle_id else None)
+    rows, _ = evaluation_rows(checkpoint, start, end, station_id, horizon, cycle_id=cycle_id)
     output = io.StringIO()
     output.write("\ufeff")
     writer = csv.writer(output)
     fields = [
         "station_id",
+        "cycle_id",
         "issued_at",
         "origin",
         "target",

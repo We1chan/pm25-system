@@ -10,9 +10,11 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Download, Gauge, RefreshCw, Target, TrendingDown } from '@lucide/vue'
 import Chart from '../components/Chart.vue'
 import Notice from '../components/Notice.vue'
+import OnlineCase from '../components/OnlineCase.vue'
 import PanelCard from '../components/PanelCard.vue'
 import StatCard from '../components/StatCard.vue'
 import { api, apiHref } from '../lib/api'
+import { verificationHref } from '../lib/liveLinks'
 import {
   beijingDay,
   bjDateTime,
@@ -45,8 +47,24 @@ const end = ref(beijingDay(0))
 const station = ref('')
 const horizon = ref('')
 const checkpoint = ref('')
+const compareCheckpoint = ref('')
+const cycleId = ref('')
+const openedCase = ref(null)
+const caseDetail = ref(null)
+const caseError = ref('')
+const caseBusy = ref(false)
+const timelineStatus = ref('')
+const timelineOffset = ref(0)
+const statusLabels = {
+  scheduled: '目标时刻未到',
+  waiting: '等待数据源发布',
+  verified: '已核验',
+  missing: '实测缺失',
+}
 
 let timer = 0
+let requestId = 0
+let caseRequestId = 0
 
 function params() {
   return {
@@ -55,40 +73,125 @@ function params() {
     station_id: station.value,
     horizon: horizon.value,
     checkpoint: checkpoint.value,
+    compare_checkpoint: compareCheckpoint.value,
+    cycle_id: cycleId.value.trim(),
+  }
+}
+
+const applied = ref(params())
+
+function applyFilters() {
+  applied.value = params()
+  timelineOffset.value = 0
+  return load()
+}
+
+function readCaseLink() {
+  const query = new URLSearchParams(location.hash.split('?')[1])
+  const cycle = query.get('cycle_id')
+  const stationId = query.get('station_id')
+  openedCase.value = cycle && stationId
+    ? { cycle_id: cycle, station_id: stationId, target: query.get('target') || '' }
+    : null
+  return loadCase()
+}
+
+async function loadCase() {
+  const selected = openedCase.value || result.value?.recent_case
+  const id = ++caseRequestId
+  caseBusy.value = Boolean(selected)
+  caseError.value = ''
+  if (caseDetail.value?.cycle_id !== selected?.cycle_id ||
+      caseDetail.value?.records[0]?.station_id !== selected?.station_id) {
+    caseDetail.value = null
+  }
+  if (!selected) return
+  try {
+    const detail = await api('live/evaluation/detail', {
+      cycle_id: selected.cycle_id, station_id: selected.station_id,
+    })
+    if (id === caseRequestId) caseDetail.value = detail
+  } catch (reason) {
+    if (id === caseRequestId) caseError.value = reason.message
+  } finally {
+    if (id === caseRequestId) caseBusy.value = false
   }
 }
 
 async function load() {
+  const id = ++requestId
   busy.value = true
   try {
     const [evaluation, meta, model] = await Promise.all([
-      api('live/evaluation', params()),
+      api('live/evaluation', {
+        ...applied.value, timeline_status: timelineStatus.value, timeline_offset: timelineOffset.value,
+      }),
       api('live/meta'),
       api('live/model'),
     ])
+    if (id !== requestId) return
     result.value = evaluation
     liveMeta.value = meta
     report.value = model
     error.value = ''
+    if (!timelineStatus.value) {
+      timelineStatus.value = Object.keys(statusLabels).find(key => evaluation.timeline?.[key]?.count) || 'waiting'
+    }
+    timelineOffset.value = evaluation.timeline?.[timelineStatus.value]?.offset || 0
+    await loadCase()
   } catch (reason) {
-    error.value = reason.message
+    if (id === requestId) error.value = reason.message
   } finally {
-    busy.value = false
+    if (id === requestId) busy.value = false
   }
 }
 
 onMounted(() => {
+  readCaseLink()
+  window.addEventListener('hashchange', readCaseLink)
   load()
   // 实测陆续到达，每 30 秒自动更新一次统计
   timer = setInterval(load, 30000)
 })
 
-onBeforeUnmount(() => clearInterval(timer))
+onBeforeUnmount(() => {
+  clearInterval(timer)
+  window.removeEventListener('hashchange', readCaseLink)
+  requestId += 1
+  caseRequestId += 1
+})
 
-const exportHref = computed(() => apiHref('live/evaluation/export', params()))
+const exportHref = computed(() => {
+  const { compare_checkpoint, ...filters } = applied.value
+  return apiHref('live/evaluation/export', {
+    ...filters,
+    checkpoint: result.value?.checkpoint_sha256 || filters.checkpoint,
+  })
+})
 
 const summary = computed(() => result.value?.summary || {})
 const collection = computed(() => result.value?.collection || {})
+const timeline = computed(() => result.value?.timeline?.[timelineStatus.value])
+const caseStation = computed(() => openedCase.value?.station_id || result.value?.recent_case?.station_id)
+const observation = computed(() => result.value?.observation_refresh || {})
+const observationLabels = {
+  collecting: '正在采集实测',
+  idle: '暂无到期记录需要补录',
+  complete: '实测采集完成',
+  partial: '部分实测来源未取得',
+  failed: '实测补录未完成',
+}
+
+function showTimeline(key) {
+  timelineStatus.value = key
+  timelineOffset.value = 0
+  if (timeline.value?.offset) load()
+}
+
+function moveTimeline(step) {
+  timelineOffset.value = Math.max(0, timelineOffset.value + step * 24)
+  load()
+}
 
 const stationNames = computed(() => {
   const names = {}
@@ -123,6 +226,25 @@ const stationRows = computed(() => {
   const rows = [...(result.value?.by_station || [])]
   return rows.sort((a, b) => (b.rmse ?? -1) - (a.rmse ?? -1))
 })
+
+const heatmap = computed(() => {
+  const cells = result.value?.by_station_horizon || []
+  const stations = new Map()
+  for (const cell of cells) {
+    if (!stations.has(cell.station_id)) stations.set(cell.station_id, new Map())
+    stations.get(cell.station_id).set(cell.horizon, cell)
+  }
+  return { stations, max: Math.max(1, ...cells.map(cell => cell.rmse)) }
+})
+
+function selectDay(event) {
+  const day = event.name
+  if (!(result.value?.by_day || []).some(row => row.key === day && row.n > 0)) return
+  start.value = day
+  end.value = day
+  timelineStatus.value = 'verified'
+  applyFilters()
+}
 
 function covered(row) {
   if (row.lower === null || row.lower === undefined) {
@@ -249,6 +371,60 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
   <div class="stack">
     <Notice v-if="error" kind="error">{{ error }}</Notice>
 
+    <OnlineCase
+      v-if="result || openedCase"
+      :title="openedCase ? '发布轮次核验详情' : '最近一次核验'"
+      :station-name="caseStation ? stationLabel(caseStation) : ''"
+      :initial="openedCase ? null : result?.recent_case"
+      :detail="caseDetail"
+      :target="openedCase?.target"
+      :status-labels="statusLabels"
+      :busy="caseBusy"
+      :error="caseError"
+    />
+    <a v-if="openedCase" class="button small return-link" href="#online">返回最近一次核验</a>
+
+    <PanelCard v-if="result?.timeline" title="核验时间轴">
+      <template #actions>
+        <span v-if="observation.phase" class="tag">{{ observationLabels[observation.phase] }}</span>
+      </template>
+      <div class="timeline-filters" aria-label="按核验状态选择">
+        <button
+          v-for="(label, key) in statusLabels"
+          :key="key"
+          class="button small"
+          :class="{ primary: timelineStatus === key }"
+          type="button"
+          :aria-pressed="timelineStatus === key"
+          @click="showTimeline(key)"
+        >
+          {{ label }} {{ fmtInt(result.timeline[key]?.count) }}
+        </button>
+      </div>
+      <p v-if="observation.failed_sources?.length" class="panel-text">
+        {{ observation.failed_sources.length }} 份实测文件未取得，后续会继续补录。
+      </p>
+      <p v-else-if="observation.error" class="panel-text">{{ observation.error }}</p>
+      <p v-if="!timeline?.records.length" class="panel-text">当前筛选范围内没有这类记录。</p>
+      <ol v-else class="verification-timeline">
+        <li v-for="row in timeline.records" :key="`${row.cycle_id}-${row.station_id}-${row.target}`">
+          <time :datetime="row.target">{{ bjDateTime(row.target) }}</time>
+          <a :href="verificationHref(row.cycle_id, row.station_id, row.target)">{{ stationLabel(row.station_id) }}</a>
+          <span>预测 {{ fmt(row.prediction) }} · 实测 {{ fmt(row.actual) }} μg/m³</span>
+        </li>
+      </ol>
+      <div v-if="timeline?.count > 24" class="timeline-filters">
+        <button class="button small" type="button" :disabled="busy || !timeline.offset"
+          @click="moveTimeline(-1)">上一页</button>
+        <span class="panel-text">{{ timeline.offset + 1 }}–{{ timeline.offset + timeline.records.length }} / {{ timeline.count }}</span>
+        <button class="button small" type="button" :disabled="busy || timeline.offset + timeline.records.length >= timeline.count"
+          @click="moveTimeline(1)">下一页</button>
+      </div>
+      <template #note>
+        每页 24 条。目标时刻过去 24 小时仍无实测时标记为缺失，实测到达后仍可补录。
+      </template>
+    </PanelCard>
+
     <PanelCard kicker="筛选" title="选择要核验的预测">
       <template #actions>
         <button class="button small" type="button" :disabled="busy" @click="load">
@@ -298,7 +474,20 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
             </option>
           </select>
         </label>
-        <button class="button primary" type="button" :disabled="busy" @click="load">应用筛选</button>
+        <label class="field wide">
+          对照模型
+          <select v-model="compareCheckpoint">
+            <option value="">不比较</option>
+            <option v-for="model in result?.models" :key="model.checkpoint_sha256" :value="model.checkpoint_sha256">
+              {{ modelLabel(model) }}
+            </option>
+          </select>
+        </label>
+        <label class="field wide">
+          发布轮次
+          <input v-model="cycleId" maxlength="80" placeholder="全部轮次" />
+        </label>
+        <button class="button primary" type="button" :disabled="busy" @click="applyFilters">应用筛选</button>
         <a class="button" :href="exportHref"><Download :size="14" />导出明细</a>
       </div>
       <template #note>
@@ -310,6 +499,33 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
     <Notice v-if="!result && !error" kind="loading">正在读取在线核验记录…</Notice>
 
     <template v-if="result">
+      <PanelCard v-if="applied.compare_checkpoint" title="同批实测的模型对比">
+        <template v-if="result.comparison?.primary.n">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>模型版本</th><th class="num">共同样本</th><th class="num">MAE</th><th class="num">RMSE</th><th class="num">区间覆盖率</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>主模型 {{ result.checkpoint_sha256?.slice(0, 8) }}</td>
+                  <td class="num">{{ fmtInt(result.comparison.primary.n) }}</td>
+                  <td class="num">{{ fmt(result.comparison.primary.mae, 2) }}</td>
+                  <td class="num">{{ fmt(result.comparison.primary.rmse, 2) }}</td>
+                  <td class="num">{{ fmtPercent(result.comparison.primary.coverage) }}</td>
+                </tr>
+                <tr>
+                  <td>对照 {{ result.comparison.checkpoint_sha256.slice(0, 8) }}</td>
+                  <td class="num">{{ fmtInt(result.comparison.comparison.n) }}</td>
+                  <td class="num">{{ fmt(result.comparison.comparison.mae, 2) }}</td>
+                  <td class="num">{{ fmt(result.comparison.comparison.rmse, 2) }}</td>
+                  <td class="num">{{ fmtPercent(result.comparison.comparison.coverage) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="panel-text">比较使用站点、起点、目标时刻、提前量和实测值均一致的记录。</p>
+        </template>
+        <p v-else class="panel-text">请选择两个不同版本。当前筛选条件下没有可比较的共同实测。</p>
+      </PanelCard>
       <div class="stat-row">
         <StatCard
           label="已到达实测的预测"
@@ -378,8 +594,8 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
       </PanelCard>
 
       <div class="grid-2">
-        <PanelCard kicker="逐日" title="模型与基线的每日误差" note="RMSE 越低越好；样本少时日间波动大。">
-          <Chart :option="dayErrorOption" height="260px" label="在线 TCN 与持续性基线逐日 RMSE" />
+        <PanelCard kicker="逐日" title="模型与基线的每日误差" note="点击日误差点查看当天的核验记录。样本少时日间波动较大。">
+          <Chart :option="dayErrorOption" height="260px" label="在线 TCN 与持续性基线逐日 RMSE" @select="selectDay" />
         </PanelCard>
         <PanelCard
           kicker="逐日"
@@ -389,6 +605,29 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
           <Chart :option="coverageOption" height="260px" label="在线预测区间每日实际覆盖率" />
         </PanelCard>
       </div>
+
+      <PanelCard title="站点与提前量误差热力图" note="数值为 RMSE（μg/m³）。点开单元格可查看该组误差最大的已核验记录。">
+        <p v-if="!heatmap.stations.size" class="panel-text">匹配到实测后显示误差。</p>
+        <div v-else class="table-wrap tall">
+          <table class="error-heatmap">
+            <thead><tr><th>站点</th><th v-for="lead in 6" :key="lead">+{{ lead }} h</th></tr></thead>
+            <tbody>
+              <tr v-for="[stationId, leads] in heatmap.stations" :key="stationId">
+                <th scope="row">{{ stationLabel(stationId) }}</th>
+                <td v-for="lead in 6" :key="lead">
+                  <a v-if="leads.has(lead)"
+                    :href="verificationHref(leads.get(lead).cycle_id, stationId, leads.get(lead).target)"
+                    :aria-label="`${stationLabel(stationId)} +${lead} h，RMSE ${fmt(leads.get(lead).rmse, 2)}，查看案例`"
+                    :style="{ backgroundColor: `rgba(190, 83, 35, ${0.08 + 0.4 * leads.get(lead).rmse / heatmap.max})` }">
+                    {{ fmt(leads.get(lead).rmse, 2) }}
+                  </a>
+                  <span v-else>—</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </PanelCard>
 
       <PanelCard kicker="按提前量" title="预测越远，误差如何变化">
         <div class="table-wrap">
@@ -495,7 +734,7 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
                 :key="`${row.cycle_id}-${row.station_id}-${row.target}`"
               >
                 <td>{{ bjDateTime(row.target) }}</td>
-                <td>{{ stationLabel(row.station_id) }}</td>
+                <td><a :href="verificationHref(row.cycle_id, row.station_id, row.target)">{{ stationLabel(row.station_id) }}</a></td>
                 <td>第 {{ row.horizon }} 个</td>
                 <td class="num">{{ fmt(row.prediction) }}</td>
                 <td class="num">{{ fmt(row.actual) }}</td>
@@ -620,6 +859,61 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
 </template>
 
 <style scoped>
+.timeline-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.verification-timeline {
+  display: grid;
+  gap: 0;
+  max-height: 24rem;
+  overflow: auto;
+  padding: 0 0 0 16px;
+  list-style: none;
+}
+
+.verification-timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) minmax(0, 12rem);
+  gap: 4px 12px;
+  padding: 9px 8px 9px 12px;
+  border-left: 1px solid var(--border-strong);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.verification-timeline li::before {
+  position: absolute;
+  top: 16px;
+  left: -4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand);
+  content: "";
+}
+
+.verification-timeline time,
+.verification-timeline span { color: var(--ink-2); }
+.return-link { align-self: flex-start; }
+.error-heatmap td { text-align: center; }
+.error-heatmap th { white-space: nowrap; }
+.error-heatmap a {
+  display: block;
+  min-width: 48px;
+  padding: 5px;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-decoration: underline;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 620px) {
+  .verification-timeline li { grid-template-columns: minmax(0, 1fr); }
+}
 .toolbar .field.wide {
   flex-basis: 300px;
 }
