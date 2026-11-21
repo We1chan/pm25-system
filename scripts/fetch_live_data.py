@@ -69,6 +69,8 @@ def fetch(job, directory):
         except (requests.RequestException, ValueError) as e:
             last_error = str(e)[:300]
             if isinstance(e, requests.HTTPError) and e.response.status_code == 404:
+                if job.get("archive_pending"):
+                    return {**job, "status": "not_yet_published", "http_status": 404}
                 break
             if attempt < 2:
                 time.sleep(1 + attempt)
@@ -96,6 +98,8 @@ def main():
                 "path": f"{kind}/china_{kind}_{day}.csv",
                 "url": f"https://quotsoft.net/air/data/china_{kind}_{day}.csv",
                 "immutable": offset >= 2,
+                # QuotSoft normally completes the previous day's archive after 02:00.
+                "archive_pending": offset == 0 or (offset == 1 and issued.hour < 2),
             })
     for city in config["cities"]:
         jobs.append({
@@ -130,16 +134,21 @@ def main():
             },
         })
     results = []
+    pending_archives = []
     with ThreadPoolExecutor(max_workers=4) as pool:
         for f in as_completed([pool.submit(fetch, j, folder) for j in jobs]):
             r = f.result()
-            results.append(r)
-            print(r["kind"], r["path"], r.get("bytes", r.get("error")), flush=True)
+            if r.get("status") == "not_yet_published":
+                pending_archives.append(r)
+            else:
+                results.append(r)
+            print(r["kind"], r["path"], r.get("bytes", r.get("error", r.get("status"))), flush=True)
     manifest = {
         "cycle_id": a.cycle,
         "started_at": issued.isoformat(),
         "completed_at": now().isoformat(),
         "files": results,
+        "pending_archives": pending_archives,
         "air_note": (
             "Official CNEMC live station readings, with recent original quotsoft hourly"
             " station/city CSVs for history"
