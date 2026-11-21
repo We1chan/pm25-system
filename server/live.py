@@ -195,7 +195,7 @@ def meta(cycle_id: CycleId | None = None):
         "archived": cycle_id is not None,
         "refresh": status,
         "refreshing": worker.running,
-        "next_refresh": worker.next_run,
+        "next_refresh": None if worker.running else worker.next_run,
         "refresh_interval_seconds": 600,
     }
     if data is None:

@@ -1505,7 +1505,7 @@ station_id 必须存在；time 为2024-01-01T00:00至2025-12-31T17:00的北京�
 | `refresh.cycle_id` | string | 数据采集与预测轮次标识 |
 | `refresh.completed_at` | string | 训练或本轮处理完成时间 |
 | `refreshing` | boolean | 后台是否正在运行一个轮次 |
-| `next_refresh` | string | 下一次计划刷新时间；尚未计算为 null |
+| `next_refresh` | string 或 null | 下一次计划刷新时间，正在刷新或尚未排期时为 null |
 | `refresh_interval_seconds` | integer | 常规自动刷新间隔，秒 |
 | `cycle_id` | string | 数据采集与预测轮次标识 |
 | `issued_at` | string | 预测实际发布时间，北京时间 |

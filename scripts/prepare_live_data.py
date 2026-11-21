@@ -48,6 +48,8 @@ def main():
         SparkSession.builder.appName("PM25-Operational-Live-Features")
         .config("spark.sql.session.timeZone", "Asia/Shanghai")
         .config("spark.sql.shuffle.partitions", "8")
+        # 实时任务在单机 local[4] 运行，唯一执行器可读取全部 HDFS 分区。
+        .config("spark.locality.wait", "0s")
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("ERROR")
