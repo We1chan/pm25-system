@@ -52,7 +52,8 @@ def main():
             env=environment,
             timeout=30,
         )
-        run(["bash", "scripts/run_spark.sh", "live-prepare", "--cycle", cycle], timeout=240)
+        spark_timeout = int(os.environ.get("PM25_SPARK_TIMEOUT_SECONDS", "240"))
+        run(["bash", "scripts/run_spark.sh", "live-prepare", "--cycle", cycle], timeout=spark_timeout)
         progress("inference", cycle_id=cycle)
         predictor = (
             "scripts/predict_forecast_live.py"
