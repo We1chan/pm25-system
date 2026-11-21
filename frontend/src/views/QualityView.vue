@@ -25,6 +25,8 @@ import { cityIds, cityNames } from '../lib/labels'
 import { historyYear, loadHistoryMeta } from '../lib/state'
 import { baseOption, categoryAxis, greenRamp, ink } from '../lib/chart'
 
+const props = defineProps({ section: { type: String, required: true } })
+
 const meta = ref(null)
 const data = ref(null)
 const stationMeta = ref(null)
@@ -32,14 +34,18 @@ const error = ref('')
 
 onMounted(async () => {
   try {
-    const [history, quality] = await Promise.all([loadHistoryMeta(), api('quality')])
+    const [history, quality] = await Promise.all([
+      props.section === 'coverage' ? loadHistoryMeta() : null,
+      api('quality'),
+    ])
     meta.value = history
     data.value = quality
   } catch (reason) {
     error.value = reason.message
   }
-  // 站点摘要是补充信息，读取失败不影响本页主体
-  stationMeta.value = await api('stations/meta').catch(() => null)
+  if (props.section === 'sources') {
+    stationMeta.value = await api('stations/meta').catch(() => null)
+  }
 })
 
 const summary = computed(() => data.value?.summary || {})
@@ -117,15 +123,13 @@ const coverageOption = computed(() => {
 
 <template>
   <div class="stack">
-    <YearBar :years="meta?.years || []" exportable />
-
     <Notice v-if="error" kind="error">{{ error }}</Notice>
     <Notice v-if="!data && !error" kind="loading">正在读取数据质量报告…</Notice>
 
-    <template v-if="data">
+    <template v-if="data && section === 'coverage'">
       <div class="stat-row">
         <StatCard
-          label="六城 × 小时完整网格"
+          label="全期应有城市小时观测"
           :value="fmtInt(summary.panel_rows)"
           unit="行"
           :icon="Rows3"
@@ -133,19 +137,19 @@ const coverageOption = computed(() => {
           hint="每个城市每个小时一行；缺测保留为空"
         />
         <StatCard
-          label="有效 PM₂.₅ 小时观测"
+          label="全期有效 PM₂.₅ 小时观测"
           :value="fmtInt(summary.pm25_valid_hours_all_cities)"
           :icon="Database"
           :hint="`占网格的 ${fmtPercent(validRatio, 2)}`"
         />
         <StatCard
-          label="原始数据总量"
+          label="全期城市与气象原始数据"
           :value="fmtBytes(summary.raw_bytes)"
           :icon="HardDrive"
           :hint="rawFileHint"
         />
         <StatCard
-          label="来源缺失的整日文件"
+          label="全期来源缺失日期"
           :value="fmtInt(summary.source_missing_dates?.length)"
           unit="天"
           :icon="FileExclamationPoint"
@@ -161,6 +165,56 @@ const coverageOption = computed(() => {
         <Chart :option="coverageOption" height="270px" label="六城十一年 PM2.5 有效观测覆盖率" />
       </PanelCard>
 
+      <PanelCard :title="`逐年逐城覆盖明细 · ${yearTitle}`">
+        <template #actions>
+          <span class="tag">{{ rows.length }} 条记录</span>
+        </template>
+        <YearBar :years="meta?.years || []" label="明细年份" exportable class="coverage-year" />
+        <div class="table-wrap tall">
+          <table>
+            <thead>
+              <tr>
+                <th>年份</th>
+                <th>城市</th>
+                <th class="num">应有小时</th>
+                <th class="num">有效观测</th>
+                <th class="num">缺失比例</th>
+                <th class="num">PM₂.₅ 年均</th>
+                <th class="num">最小 / 最大</th>
+                <th class="num">非法值 / 冲突值</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in rows" :key="`${row.year}-${row.city_id}`">
+                <td>{{ row.year }}</td>
+                <td>{{ row.city_name }}</td>
+                <td class="num">{{ fmtInt(row.expected_hours) }}</td>
+                <td class="num">{{ fmtInt(row.pm25_valid_hours) }}</td>
+                <td class="num">{{ fmtPercent(row.pm25_missing_ratio, 2) }}</td>
+                <td class="num strong">{{ fmt(row.pm25_mean) }}</td>
+                <td class="num">{{ fmt(row.pm25_min, 0) }} / {{ fmt(row.pm25_max, 0) }}</td>
+                <td class="num">
+                  {{ fmtInt(row.invalid_air_values) }} / {{ fmtInt(row.conflicting_air_values) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <template #note>浓度单位 μg/m³。非法值（如负数）和同一小时的冲突值会被置空并计数。</template>
+      </PanelCard>
+
+      <PanelCard kicker="来源缺失" title="原始来源缺少的日期">
+        <div class="date-tags">
+          <span v-for="day in summary.source_missing_dates" :key="day" class="tag">
+            {{ formatDay(day) }}
+          </span>
+        </div>
+        <template #note>这些日期原站和存档都没有文件，分析和建模时保留为空，不做插值。</template>
+      </PanelCard>
+
+    </template>
+
+    <template v-if="data && section === 'sources'">
       <div class="grid-3">
         <section class="panel source">
           <Database :size="22" aria-hidden="true" />
@@ -205,59 +259,12 @@ const coverageOption = computed(() => {
         </section>
       </div>
 
-      <PanelCard kicker="质量报告" :title="`逐年逐城覆盖明细 · ${yearTitle}`">
-        <template #actions>
-          <span class="tag">{{ rows.length }} 条记录</span>
-        </template>
-        <div class="table-wrap tall">
-          <table>
-            <thead>
-              <tr>
-                <th>年份</th>
-                <th>城市</th>
-                <th class="num">应有小时</th>
-                <th class="num">有效观测</th>
-                <th class="num">缺失比例</th>
-                <th class="num">PM₂.₅ 年均</th>
-                <th class="num">最小 / 最大</th>
-                <th class="num">非法值 / 冲突值</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in rows" :key="`${row.year}-${row.city_id}`">
-                <td>{{ row.year }}</td>
-                <td>{{ row.city_name }}</td>
-                <td class="num">{{ fmtInt(row.expected_hours) }}</td>
-                <td class="num">{{ fmtInt(row.pm25_valid_hours) }}</td>
-                <td class="num">{{ fmtPercent(row.pm25_missing_ratio, 2) }}</td>
-                <td class="num strong">{{ fmt(row.pm25_mean) }}</td>
-                <td class="num">{{ fmt(row.pm25_min, 0) }} / {{ fmt(row.pm25_max, 0) }}</td>
-                <td class="num">
-                  {{ fmtInt(row.invalid_air_values) }} / {{ fmtInt(row.conflicting_air_values) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <template #note>浓度单位 μg/m³。非法值（如负数）和同一小时的冲突值会被置空并计数。</template>
-      </PanelCard>
-
-      <PanelCard kicker="来源缺失" title="原始来源缺少的日期">
-        <div class="date-tags">
-          <span v-for="day in summary.source_missing_dates" :key="day" class="tag">
-            {{ formatDay(day) }}
-          </span>
-        </div>
-        <template #note>这些日期原站和存档都没有文件，分析和建模时保留为空，不做插值。</template>
-      </PanelCard>
-
       <PanelCard
         v-if="stationSummary"
-        kicker="第二代站点数据"
         :title="`${stationSummary.start} 至 ${stationSummary.end} 的站点数据`"
       >
         <template #actions>
-          <a href="#stations" class="button small">查看站点与 GPU <ArrowUpRight :size="13" /></a>
+          <a href="#forecast?tab=station" class="button small">查看站点历史回放 <ArrowUpRight :size="13" /></a>
         </template>
         <p class="panel-text">
           {{ fmtInt(stationSummary.stations) }} 个历史站点 ·
@@ -269,13 +276,15 @@ const coverageOption = computed(() => {
           {{ fmtInt(stationSummary.source_file_count) }} 份文件；原始日期覆盖
           {{ fmtInt(stationSummary.source_days) }} / {{ fmtInt(stationSummary.expected_days) }} 天。
         </p>
-        <template #note>两代数据保留各自的统计口径，不直接相加。</template>
+        <template #note>这里按单个站点统计；城市覆盖明细按城市统计。</template>
       </PanelCard>
     </template>
   </div>
 </template>
 
 <style scoped>
+.coverage-year { margin-bottom: 12px; }
+
 .source {
   display: flex;
   flex-direction: column;

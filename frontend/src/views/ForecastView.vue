@@ -34,8 +34,11 @@ const model = ref('best')
 const result = ref(null)
 const error = ref('')
 const busy = ref(false)
+const loadedModel = ref('')
 
 const lastPoint = computed(() => result.value?.points.at(-1) || null)
+const pendingChanges = computed(() => result.value && !busy.value
+  && (origin.value !== result.value.origin.replace(' ', 'T').slice(0, 16) || model.value !== loadedModel.value))
 
 // 自动择优时各时长实际使用的模型可能不同；图中颜色取第一个时长的模型
 const usedModel = computed(() => result.value?.points[0]?.model || 'rf')
@@ -43,8 +46,10 @@ const usedModel = computed(() => result.value?.points[0]?.model || 'rf')
 async function predict() {
   busy.value = true
   error.value = ''
+  const requestedModel = model.value
   try {
-    result.value = await api('forecast', { origin: origin.value, model: model.value })
+    result.value = await api('forecast', { origin: origin.value, model: requestedModel })
+    loadedModel.value = requestedModel
   } catch (reason) {
     result.value = null
     error.value = reason.message
@@ -149,7 +154,7 @@ const option = computed(() => {
 
 <template>
   <div class="stack">
-    <PanelCard kicker="选择回放起点" title="用当时已知的信息，预测接下来的六小时">
+    <PanelCard title="选择预测起点与模型">
       <div class="toolbar">
         <label class="field">
           预测起点（北京时间）
@@ -187,6 +192,7 @@ const option = computed(() => {
     </Notice>
     <Notice v-if="error" kind="error">{{ error }}</Notice>
     <Notice v-if="busy" kind="loading">正在读取六个预测时长的模型输出…</Notice>
+    <Notice v-if="pendingChanges" kind="info">下方仍是上次回放的结果。点击「运行回放」应用新的起点或模型。</Notice>
 
     <template v-if="result">
       <div class="stat-row">
@@ -218,7 +224,7 @@ const option = computed(() => {
         />
       </div>
 
-      <PanelCard kicker="历史回放" title="前 48 小时观测 + 未来 6 小时预测">
+      <PanelCard title="起点前 48 小时实测与起点后 6 小时预测">
         <template #actions>
           <button class="button small" type="button" @click="exportCsv">
             <Download :size="14" />导出 CSV

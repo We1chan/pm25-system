@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   Download,
   Info,
+  LocateFixed,
   RefreshCw,
   Search,
 } from '@lucide/vue'
@@ -21,7 +22,7 @@ import PmLegend from '../components/PmLegend.vue'
 import { api, apiHref, postApi } from '../lib/api'
 import { bjDateTime, bjTime, fmt, fmtInt, fmtPercent, isNumber } from '../lib/format'
 import { refreshPhaseText, refreshSteps, weatherVariables } from '../lib/labels'
-import { verificationHref } from '../lib/liveLinks'
+import { verificationHref, verificationRecordsHref } from '../lib/liveLinks'
 import {
   BAND_NAME,
   axisTime,
@@ -43,7 +44,11 @@ import {
 
 const live = ref(null)
 const forecast = ref(null)
-const selected = ref('mean')
+const stationPreferenceKey = 'pm25-live-station'
+const selected = ref('')
+const nearby = ref([])
+const locating = ref(false)
+const locationMessage = ref('')
 const comparison = ref('')
 const comparisonForecast = ref(null)
 const comparisonError = ref('')
@@ -65,6 +70,8 @@ let lastCycle = ''
 let cycleBeforeRefresh = ''
 let polling = false
 let active = true
+let locationRequest = 0
+let preferenceLoaded = false
 
 // ---------- 状态推导 ----------
 
@@ -118,6 +125,8 @@ const selectedStation = computed(() => stations.value.find(station => station.st
 const selectedName = computed(() => selected.value === 'mean'
   ? '北京覆盖站点均值'
   : selectedStation.value?.name || selected.value)
+const selectedDistance = computed(() => nearby.value.find(item => item.id === selected.value)?.km)
+const nearestAvailable = computed(() => nearby.value.find(item => canForecast(item.id)))
 
 const lastPoint = computed(() => forecast.value?.points.at(-1) || null)
 
@@ -183,6 +192,48 @@ function canForecast(stationId) {
   return stationId === 'mean' || stations.value.some(station => station.station_id === stationId && station.available)
 }
 
+function findNearbyStations(latitude, longitude) {
+  const radians = Math.PI / 180
+  const userLatitude = latitude * radians
+  return stations.value
+    .filter(station => isNumber(station.latitude) && isNumber(station.longitude))
+    .map(station => {
+      const stationLatitude = station.latitude * radians
+      const deltaLatitude = stationLatitude - userLatitude
+      const deltaLongitude = (station.longitude - longitude) * radians
+      const arc = Math.sin(deltaLatitude / 2) ** 2
+        + Math.cos(userLatitude) * Math.cos(stationLatitude) * Math.sin(deltaLongitude / 2) ** 2
+      return { id: station.station_id, km: 12742 * Math.asin(Math.sqrt(Math.min(1, arc))) }
+    })
+    .sort((a, b) => a.km - b.km)
+}
+
+function locateStation() {
+  if (!navigator.geolocation) {
+    locationMessage.value = '当前浏览器无法定位，请手动选择监测站。'
+    return
+  }
+  const request = ++locationRequest
+  locating.value = true
+  locationMessage.value = ''
+  navigator.geolocation.getCurrentPosition(({ coords }) => {
+    if (!active || request !== locationRequest) return
+    nearby.value = findNearbyStations(coords.latitude, coords.longitude)
+    if (nearby.value.length) {
+      selectStation(nearby.value[0].id)
+    } else {
+      locating.value = false
+      locationMessage.value = '站点暂无坐标，请手动选择监测站。'
+    }
+  }, error => {
+    if (!active || request !== locationRequest) return
+    locating.value = false
+    locationMessage.value = error.code === 1
+      ? '浏览器未授权定位，请手动选站，或允许定位后重试。'
+      : '暂时无法取得位置，请重试或手动选站。'
+  }, { timeout: 8000 })
+}
+
 // ---------- 数据加载 ----------
 
 async function loadForecast(stationId, target, error, token) {
@@ -219,6 +270,15 @@ async function poll() {
     if (!active) return
     live.value = meta
     pollError.value = ''
+    if (stations.value.length && !preferenceLoaded) {
+      preferenceLoaded = true
+      try {
+        const saved = localStorage.getItem(stationPreferenceKey)
+        if (!selected.value && stations.value.some(station => station.station_id === saved)) selectStation(saved)
+      } catch {
+        // 浏览器不提供存储时显示站点选择器。
+      }
+    }
     if (cycleBeforeRefresh && meta.cycle_id !== cycleBeforeRefresh && !meta.refreshing
       && meta.refresh?.phase === 'complete') {
       notice.value = '最新实测与预测已更新'
@@ -260,8 +320,18 @@ async function refresh() {
 }
 
 function selectStation(stationId) {
+  locationRequest += 1
+  locating.value = false
+  locationMessage.value = ''
   if (stationId === comparison.value) comparison.value = ''
   selected.value = stationId
+  if (stationId && stationId !== 'mean') {
+    try {
+      localStorage.setItem(stationPreferenceKey, stationId)
+    } catch {
+      // 私密浏览或禁用存储时仍可在当前页面选站。
+    }
+  }
 }
 
 function onMapSelect(event) {
@@ -450,9 +520,9 @@ const mapOption = computed(() => {
             {{ step.name }}
           </li>
         </ol>
-        <button class="button primary" type="button" :disabled="refreshing" @click="refresh">
+        <button class="button small" type="button" :disabled="refreshing" @click="refresh">
           <RefreshCw :size="15" :class="{ spinning: refreshing }" aria-hidden="true" />
-          {{ refreshing ? '正在更新' : '立即更新实测与预测' }}
+          {{ refreshing ? '正在更新数据' : '手动更新数据' }}
         </button>
       </section>
 
@@ -477,25 +547,49 @@ const mapOption = computed(() => {
 
       <template v-else>
         <PanelCard
-          :title="`${selectedName} · 未来六个整点`"
+          :title="selected ? `${selectedName} · 未来六个整点` : '查看附近站点预测'"
           class="forecast-summary"
         >
           <template #actions>
-            <span class="tag">北京覆盖 {{ fmtInt(live.forecast_stations) }} / {{ fmtInt(live.beijing_stations) }} 站</span>
-            <button v-if="selected !== 'mean'" class="button small" type="button" @click="selectStation('mean')">
-              查看北京均值
-            </button>
+            <a v-if="fresh && forecast.cycle_id" class="button small"
+              :href="selected === 'mean' ? verificationRecordsHref(forecast) : verificationHref(forecast.cycle_id, selected)">
+              {{ selected === 'mean' ? '查看本轮逐站核验' : '查看本站本轮核验' }}
+            </a>
           </template>
+          <div class="forecast-location">
+            <button class="button" :class="{ primary: !selected }" type="button"
+              :disabled="locating || !stations.length" @click="locateStation">
+              <LocateFixed :size="16" aria-hidden="true" />
+              {{ locating ? '正在定位…' : '定位最近站点' }}
+            </button>
+            <label class="location-station">
+              监测站
+              <select class="select" :value="selected" @change="selectStation($event.target.value)">
+                <option value="" disabled>选择监测站</option>
+                <option v-for="station in stations" :key="station.station_id" :value="station.station_id">
+                  {{ stationOptionText(station) }}
+                </option>
+                <option value="mean">北京覆盖站点均值（参考）</option>
+              </select>
+            </label>
+            <span v-if="selectedDistance != null" class="panel-text">
+              {{ selected === nearby[0]?.id ? '最近站 · ' : '' }}直线距离约 {{ fmt(selectedDistance) }} 公里
+            </span>
+          </div>
+          <p v-if="locationMessage" class="panel-text location-message" role="status">{{ locationMessage }}</p>
+          <p v-if="selected === 'mean'" class="panel-text location-message">
+            本轮覆盖 {{ fmtInt(live.forecast_stations) }} / {{ fmtInt(live.beijing_stations) }} 个北京站点。
+          </p>
           <template v-if="fresh">
             <p class="strip-context">
               {{ bjTime(forecast.origin) }} 实测 {{ fmt(forecast.current) }} μg/m³
               <span v-if="isNumber(live.nominal_coverage)"> · 预计范围为 {{ fmtPercent(live.nominal_coverage, 0) }} 预测区间</span>
-              <span> · 趋势相对上一时刻</span>
+              <span> · 序号从发布后的第一个整点算起</span>
             </p>
             <ol class="strip" aria-label="未来六个整点 PM₂.₅ 预测">
               <li v-for="point in forecastHours" :key="point.target">
                 <i class="strip-level" :style="{ background: pmColor(point.prediction) }"></i>
-                <span class="strip-time">{{ bjTime(point.target) }} · +{{ point.horizon }} h</span>
+                <span class="strip-time">{{ bjTime(point.target) }} · 第 {{ point.horizon }} 个整点</span>
                 <span class="strip-value"><strong>{{ fmt(point.prediction) }}</strong> <small>μg/m³</small></span>
                 <span class="strip-sub">{{ point.range }}</span>
                 <span class="strip-trend" :class="{ rising: point.change > 0, falling: point.change < 0 }">
@@ -507,7 +601,12 @@ const mapOption = computed(() => {
           </template>
           <Notice v-else-if="selectedStation && !selectedStation.available" kind="warn">
             {{ selectedName }}本轮暂不可预测。{{ selectedStation.reason || '缺少所需输入资料' }}
+            <button v-if="nearestAvailable && live.usable" class="button small" type="button"
+              @click="selectStation(nearestAvailable.id)">
+              查看附近可预测站点
+            </button>
           </Notice>
+          <p v-else-if="!selected" class="panel-text location-message">定位后会选中距离最近的监测站。也可以按站名手动选择。</p>
           <Notice v-else-if="forecastError" kind="error">{{ forecastError }}</Notice>
           <Notice v-else-if="live.usable && forecast?.station_id !== selected" kind="loading">正在读取站点预测…</Notice>
           <Notice v-else kind="warn">上一轮预测已过期，正在等待新的当前预测。</Notice>
@@ -540,15 +639,11 @@ const mapOption = computed(() => {
             </ul>
           </PanelCard>
 
-          <PanelCard :title="`${selectedName} · 实测与预测`">
+          <PanelCard :title="selected ? `${selectedName} · 实测与预测` : '站点实测与预测'">
             <template #actions>
               <a v-if="fresh" class="button small" :href="exportHref"><Download :size="14" />导出 CSV</a>
-              <a v-if="fresh && selected !== 'mean'" class="button small"
-                :href="verificationHref(forecast.cycle_id, selected)">
-                查看本轮核验
-              </a>
             </template>
-            <label v-if="stations.length" class="comparison-picker">
+            <label v-if="fresh && stations.length" class="comparison-picker">
               并排比较
               <select v-model="comparison" class="select" aria-label="选择对比站点">
                 <option value="">选择对比站点</option>
@@ -566,7 +661,7 @@ const mapOption = computed(() => {
                   {{ selectedStation.reason || '该站点本轮缺少所需输入资料。' }}
                 </Notice>
                 <Notice v-else-if="forecastError" kind="error">{{ forecastError }}</Notice>
-                <p v-else class="panel-text">等待可用预测。</p>
+                <p v-else class="panel-text">{{ selected ? '等待可用预测。' : '选择监测站后查看曲线。' }}</p>
               </div>
               <div v-if="comparison">
                 <h3>{{ stations.find(station => station.station_id === comparison)?.name || comparison }}</h3>
@@ -640,7 +735,7 @@ const mapOption = computed(() => {
               ? `实测存在延迟，最后 ${live.extension_hours} 个整点通过递推覆盖，误差可能更大。`
               : '本轮六个整点均由模型直接输出。' }}
             {{ live.interval_note }}
-            6 小时后预计 {{ fmt(lastPoint?.prediction) }} μg/m³。
+            {{ bjDateTime(lastPoint?.target) }} 预计 {{ fmt(lastPoint?.prediction) }} μg/m³。
             历史测试显示，高浓度和浓度突变时区间覆盖不足。<a href="#online">查看在线核验 →</a>
           </template>
         </PanelCard>
@@ -681,7 +776,9 @@ const mapOption = computed(() => {
             </div>
         </details>
 
-        <div v-if="fresh" class="grid-wide-left">
+        <details v-if="fresh" class="more weather-details">
+          <summary>查看模型使用的天气资料</summary>
+          <div class="grid-wide-left">
           <PanelCard kicker="天气输入" title="模型读取的天气：过去 72 小时 + 未来预报">
             <template #actions>
               <select v-model="weatherVar" class="select" aria-label="选择气象变量">
@@ -699,7 +796,7 @@ const mapOption = computed(() => {
             </template>
           </PanelCard>
 
-          <PanelCard kicker="天气预报" title="未来六个整点的天气">
+          <PanelCard title="用于预测的城市天气资料">
             <div class="table-wrap">
               <table>
                 <thead>
@@ -724,48 +821,22 @@ const mapOption = computed(() => {
             </div>
             <template #note>未来的污染物浓度在发布时未知，模型只读取未来的天气预报。</template>
           </PanelCard>
-        </div>
-
-        <PanelCard kicker="上线后的真实检验" title="等实测到达，再计算误差">
-          <template #actions>
-            <span class="tag">已匹配 {{ fmtInt(live.online_evaluation?.matched) }} 条</span>
-            <span class="tag">等待实测 {{ fmtInt(live.online_evaluation?.pending) }} 条</span>
-          </template>
-          <p v-if="!live.online_evaluation?.matched" class="panel-text">
-            本轮预测已经存档。目标时刻过去、实测到达后才会计算在线误差；目前还没有可以报告的在线误差。
-          </p>
-          <div v-else class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>发布后第几个整点</th>
-                  <th class="num">已匹配</th>
-                  <th class="num">等待实测</th>
-                  <th class="num">TCN MAE</th>
-                  <th class="num">TCN RMSE</th>
-                  <th class="num">基线 RMSE</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="row in live.online_evaluation.by_horizon" :key="row.horizon">
-                  <td>第 {{ row.horizon }} 个</td>
-                  <td class="num">{{ fmtInt(row.n) }}</td>
-                  <td class="num">{{ fmtInt(row.pending) }}</td>
-                  <td class="num">{{ fmt(row.mae, 2) }}</td>
-                  <td class="num strong">{{ fmt(row.rmse, 2) }}</td>
-                  <td class="num">{{ fmt(row.baseline_rmse, 2) }}</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
-          <template #note>
-            {{ live.online_evaluation?.note }}
-            <a href="#online">查看逐日、分站点、分浓度的完整核验 →</a>
+        </details>
+
+        <PanelCard title="当前模型的在线核验">
+          <template #actions>
+            <a href="#online" class="button small">查看核验进度与误差</a>
           </template>
+          <p class="panel-text">
+            当前模型累计已匹配 {{ fmtInt(live.online_evaluation?.matched) }} 条，等待实测
+            {{ fmtInt(live.online_evaluation?.pending) }} 条。每条记录对应一个站点和一个目标整点。
+          </p>
+          <template #note>在线误差按单站预测计算。</template>
         </PanelCard>
 
         <details class="panel more technical-details">
-          <summary>数据详情</summary>
+          <summary>本轮数据来源与处理记录</summary>
           <dl class="run-details">
             <div><dt>发布轮次</dt><dd><code>{{ live.cycle_id || '—' }}</code></dd></div>
             <div><dt>模型 SHA-256</dt><dd><code>{{ live.checkpoint_sha256 || '—' }}</code></dd></div>
@@ -826,6 +897,37 @@ const mapOption = computed(() => {
 </template>
 
 <style scoped>
+.forecast-location,
+.location-station {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+
+.forecast-location {
+  margin-bottom: 12px;
+}
+
+.location-station {
+  max-width: 100%;
+  font-size: 13px;
+}
+
+.location-station select {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.location-message {
+  margin-block: 8px;
+}
+
+.weather-details > div {
+  margin-top: 12px;
+}
+
 .status-bar {
   display: flex;
   flex-wrap: wrap;

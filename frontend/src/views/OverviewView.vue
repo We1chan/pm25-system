@@ -84,14 +84,6 @@ function barWidth(value) {
 
 const rising = computed(() => (overview.value?.yoy_percent ?? 0) > 0)
 
-const strongest = computed(() => {
-  const rows = overview.value?.analysis.city_correlations || []
-  const others = rows.filter(row => row.city === 'beijing' && row.other !== 'beijing')
-  return others.sort((a, b) => b.correlation - a.correlation)[0] || null
-})
-
-// ---------- 数据加载 ----------
-
 async function loadOverview() {
   const token = ++overviewToken
   try {
@@ -237,13 +229,12 @@ const trendOption = computed(() => {
 
 <template>
   <div class="stack">
-    <YearBar :years="meta?.years || []" exportable />
-
     <Notice v-if="error" kind="error">{{ error }}</Notice>
     <Notice v-if="!overview && !error" kind="loading">正在读取区域观测…</Notice>
 
     <template v-if="overview">
-      <div class="stat-row">
+      <YearBar :years="meta?.years || []" label="统计年份" exportable />
+      <div class="stat-row three">
         <StatCard
           :label="`北京 PM₂.₅ 平均浓度 · ${yearLabel}`"
           :value="fmt(overview.beijing_mean)"
@@ -273,16 +264,36 @@ const trendOption = computed(() => {
           <div class="meter"><i :style="{ width: `${overview.coverage * 100}%` }"></i></div>
           <span class="meter-caption">缺测小时保留为空，不做插值</span>
         </StatCard>
-        <StatCard
-          label="与北京联动最强的城市"
-          :value="strongest ? cityNames[strongest.other] : null"
-          word
-          :hint="strongest ? `小时浓度相关系数 r = ${fmt(strongest.correlation, 2)}（2015—2025）` : ''"
-        />
       </div>
 
+      <PanelCard
+        :title="period === 'all' ? '2015—2025 年月均浓度对比' : `${concreteYear} 年日均浓度对比`"
+      >
+        <template #actions>
+          <Segmented
+            v-model="period"
+            label="时间范围"
+            :options="[{ value: 'all', label: '十一年月均' }, { value: 'year', label: '所选年日均' }]"
+          />
+        </template>
+        <div class="pills city-pills" role="group" aria-label="选择城市">
+          <button
+            v-for="id in cityIds"
+            :key="id"
+            type="button"
+            :class="{ active: activeCities.includes(id) }"
+            :aria-pressed="activeCities.includes(id)"
+            @click="toggleCity(id)"
+          >
+            <i class="swatch" :style="{ background: cityColors[id] }"></i>{{ cityNames[id] }}
+          </button>
+        </div>
+        <Chart :option="trendOption" height="320px" label="各城市 PM2.5 浓度变化" />
+        <template #note>均值按有效观测小时计算；曲线中的空缺是缺测，可拖动底部时间条查看局部。</template>
+      </PanelCard>
+
       <div class="grid-wide-left">
-        <PanelCard kicker="空间分布" title="某一时刻，六座城市的空气如何">
+        <PanelCard title="指定时刻的六城浓度">
           <div class="map-controls">
             <input
               v-model="snapshotDate"
@@ -312,12 +323,12 @@ const trendOption = computed(() => {
           <Chart :option="mapOption" height="360px" label="六城 PM2.5 浓度分布地图" />
           <PmLegend />
           <template #note>
-            点的大小和颜色都表示城市小时均值浓度。边界数据来自
+            日期与小时只控制本图和右侧排序。点的大小与颜色表示城市小时均值。边界数据来自
             <a href="https://geo.datav.aliyun.com/" target="_blank" rel="noreferrer">DataV</a>。
           </template>
         </PanelCard>
 
-        <PanelCard kicker="城市对比" :title="`${snapshot?.time.slice(0, 16) || ''} 浓度排序`">
+        <PanelCard :title="snapshot ? `${snapshot.time.slice(0, 16)} 浓度排序` : '六城浓度排序'">
           <ol class="ranking">
             <li v-for="(item, index) in ranking" :key="item.city_id">
               <span class="rank">{{ index + 1 }}</span>
@@ -352,55 +363,9 @@ const trendOption = computed(() => {
         </PanelCard>
       </div>
 
-      <PanelCard
-        kicker="时间变化"
-        :title="period === 'all' ? '十一年的变化：月均浓度' : `${concreteYear} 年的变化：日均浓度`"
-      >
-        <template #actions>
-          <Segmented
-            v-model="period"
-            label="时间范围"
-            :options="[{ value: 'all', label: '十一年月均' }, { value: 'year', label: '所选年日均' }]"
-          />
-        </template>
-        <div class="pills city-pills" role="group" aria-label="选择城市">
-          <button
-            v-for="id in cityIds"
-            :key="id"
-            type="button"
-            :class="{ active: activeCities.includes(id) }"
-            :aria-pressed="activeCities.includes(id)"
-            @click="toggleCity(id)"
-          >
-            <i class="swatch" :style="{ background: cityColors[id] }"></i>{{ cityNames[id] }}
-          </button>
-        </div>
-        <Chart :option="trendOption" height="320px" label="各城市 PM2.5 浓度变化" />
-        <template #note>均值按有效观测小时计算；曲线中的空缺是缺测，可拖动底部时间条查看局部。</template>
-      </PanelCard>
-
-      <div class="grid-2">
-        <div class="insight">
-          <span class="insight-index">01</span>
-          <div>
-            <h3>区域联动，值得关注</h3>
-            <p>
-              北京与{{ cityNames[strongest?.other] || '周边城市' }}的小时浓度相关系数为
-              <strong>{{ fmt(strongest?.correlation, 2) }}</strong>，说明污染常常在区域内同步起落。
-              这是统计关联，不代表因果。<a href="#analysis">查看城市间相关矩阵 →</a>
-            </p>
-          </div>
-        </div>
-        <div class="insight">
-          <span class="insight-index">02</span>
-          <div>
-            <h3>从观测走向预测</h3>
-            <p>
-              用起点之前的污染、气象和周边城市信息预测未来六小时，并和"保持当前值不变"的基线比较。
-              <a href="#models">查看独立测试表现 →</a>
-            </p>
-          </div>
-        </div>
+      <div class="observation-links">
+        <a href="#analysis?tab=patterns">查看季节规律与城市相关矩阵 →</a>
+        <a href="#forecast?tab=city">回放北京城市均值预测 →</a>
       </div>
     </template>
   </div>
@@ -520,29 +485,11 @@ const trendOption = computed(() => {
   margin-bottom: 8px;
 }
 
-.insight {
+.observation-links {
   display: flex;
-  gap: 14px;
-  padding: 18px 20px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-.insight-index {
-  font-size: 22px;
-  font-weight: 650;
-  color: var(--brand);
-  line-height: 1.2;
-}
-
-.insight h3 {
-  margin-bottom: 4px;
-  font-size: 15px;
-}
-
-.insight p {
+  flex-wrap: wrap;
+  gap: 8px 20px;
   font-size: 13px;
-  color: var(--ink-2);
 }
+
 </style>

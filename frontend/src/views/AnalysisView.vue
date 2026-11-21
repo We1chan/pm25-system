@@ -2,7 +2,7 @@
 /*
  * 时空分析页（第一代，2015—2025 城市小时均值）。
  * 数据：/api/pattern（月份 × 小时平均与四季平均）、/api/weather（气象与浓度散点及相关系数）、
- *       /api/trend（所选城市浓度曲线）、/api/overview（城市间相关矩阵）。
+ *       /api/overview（城市间相关矩阵）。
  * 散点图为了绘图速度按时间等距抽样，相关系数用全部有效小时计算。相关不代表因果。
  */
 import { computed, onMounted, ref, watch } from 'vue'
@@ -15,7 +15,6 @@ import { fmt, fmtInt } from '../lib/format'
 import { cityIds, cityNames } from '../lib/labels'
 import { historyYear, loadHistoryMeta } from '../lib/state'
 import {
-  axisTime,
   barSeries,
   baseOption,
   categoryAxis,
@@ -23,11 +22,7 @@ import {
   cityColors,
   greenRamp,
   ink,
-  lineSeries,
-  timeAxis,
-  timeTooltip,
   valueAxis,
-  zoomControls,
 } from '../lib/chart'
 
 const weatherOptions = {
@@ -41,38 +36,26 @@ const city = ref('beijing')
 const variable = ref('relative_humidity_2m')
 const pattern = ref(null)
 const weather = ref(null)
-const trend = ref(null)
 const analysis = ref(null)
 const error = ref('')
 const busy = ref(true)
 
 let request = 0
 
-const yearLabel = computed(() => {
-  return historyYear.value === 'all' ? '2015—2025 年' : `${historyYear.value} 年`
-})
-
 async function load() {
   const token = ++request
   busy.value = true
   error.value = ''
   const year = historyYear.value
-  const whole = year === 'all'
   try {
-    const [patternResult, weatherResult, trendResult, overviewResult] = await Promise.all([
+    const [patternResult, weatherResult, overviewResult] = await Promise.all([
       api('pattern', { city: city.value, year }),
       api('weather', { city: city.value, year, variable: variable.value }),
-      api('trend', {
-        cities: city.value,
-        start: whole ? '2015-01-01' : `${year}-01-01`,
-        end: whole ? '2025-12-31' : `${year}-12-31`,
-      }),
       api('overview', { year }),
     ])
     if (token === request) {
       pattern.value = patternResult
       weather.value = weatherResult
-      trend.value = trendResult
       analysis.value = overviewResult.analysis
     }
   } catch (reason) {
@@ -98,26 +81,6 @@ onMounted(async () => {
 watch([city, variable, historyYear], load)
 
 // ---------- 图表 ----------
-
-const trendOption = computed(() => {
-  const series = trend.value?.series || []
-  const monthly = trend.value?.resolution === 'month'
-  const base = baseOption()
-  return {
-    ...base,
-    grid: { ...base.grid, top: 34, bottom: 62 },
-    tooltip: { ...base.tooltip, formatter: timeTooltip({ precision: monthly ? 'month' : 'day' }) },
-    xAxis: timeAxis(),
-    yAxis: valueAxis(monthly ? '月均 μg/m³' : '日均 μg/m³'),
-    dataZoom: zoomControls(0),
-    series: series.map(item => lineSeries({
-      name: item.name,
-      data: item.points.map(point => [axisTime(point.time), point.value]),
-      color: cityColors[item.city_id],
-      area: true,
-    })),
-  }
-})
 
 const heatOption = computed(() => {
   const cells = (pattern.value?.cells || []).filter(cell => cell.value !== null)
@@ -281,27 +244,15 @@ const matrixOption = computed(() => {
     <Notice v-if="busy && !pattern" kind="loading">正在计算分析视图…</Notice>
 
     <template v-if="pattern">
-      <PanelCard
-        kicker="时间序列"
-        :title="`${cityNames[city]} · ${yearLabel}的浓度变化`"
-      >
-        <template #actions>
-          <span class="tag">{{ trend?.resolution === 'month' ? '月均' : '日均' }}</span>
-        </template>
-        <Chart :option="trendOption" height="280px" label="所选城市 PM2.5 浓度变化" />
-      </PanelCard>
-
       <div class="grid-wide-left">
         <PanelCard
-          kicker="月份 × 小时"
-          title="污染的时间纹理：一年中的哪个月、一天中的哪个钟点更高"
+          :title="`${cityNames[city]}各月各小时平均浓度`"
           note="每格为该月该小时全部有效观测的平均浓度（μg/m³），颜色越深浓度越高。"
         >
           <Chart :option="heatOption" height="360px" label="月份与小时的 PM2.5 平均浓度热力图" />
         </PanelCard>
         <PanelCard
-          kicker="季节"
-          title="四季平均浓度"
+          :title="`${cityNames[city]}四季平均浓度`"
           note="按日历月份分季：春 3—5 月，夏 6—8 月，秋 9—11 月，冬 12—2 月。"
         >
           <Chart :option="seasonOption" height="360px" label="四季 PM2.5 平均浓度" />
@@ -309,7 +260,7 @@ const matrixOption = computed(() => {
       </div>
 
       <div class="grid-2">
-        <PanelCard kicker="气象关联" :title="`${weatherOptions[variable].name}与 PM₂.₅ 的关系`">
+        <PanelCard :title="`${cityNames[city]}：${weatherOptions[variable].name}与 PM₂.₅ 的关联`">
           <template #actions>
             <select v-model="variable" class="select" aria-label="选择气象变量">
               <option v-for="(info, key) in weatherOptions" :key="key" :value="key">
@@ -326,9 +277,8 @@ const matrixOption = computed(() => {
           <template #note>相关不代表因果；气象为 ERA5 历史再分析资料。</template>
         </PanelCard>
         <PanelCard
-          kicker="区域联动"
-          title="城市之间的共同变化"
-          note="对每对城市，用两地同时有观测的小时计算 Pearson 相关系数；数值越接近 1 越同步。"
+          title="六城浓度相关矩阵"
+          note="使用 2015—2025 年全期数据。每对城市只统计两地同时有观测的小时，相关系数越接近 1 越同步。"
         >
           <template #actions>
             <span class="tag">2015—2025 全时段</span>

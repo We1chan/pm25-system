@@ -10,6 +10,7 @@ import { historyYear } from '../lib/state'
 
 const props = defineProps({
   years: { type: Array, default: () => [] },
+  label: { type: String, default: '分析年份' },
   exportable: { type: Boolean, default: false },
   allowAll: { type: Boolean, default: true },
 })
@@ -36,8 +37,8 @@ const exportHref = computed(() => apiHref('export', {
 <template>
   <div class="year-bar">
     <label class="year-field">
-      分析年份
-      <select v-model="year" class="select" aria-label="分析年份">
+      {{ label }}
+      <select v-model="year" class="select">
         <option v-if="allowAll" value="all">2015—2025 全部</option>
         <option v-for="item in sortedYears" :key="item" :value="String(item)">{{ item }} 年</option>
       </select>

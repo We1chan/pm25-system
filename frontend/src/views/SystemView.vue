@@ -234,6 +234,20 @@ const hdfsOption = computed(() => {
         <code>{{ warning.path }}</code>：{{ warning.message }}
       </Notice>
 
+      <PanelCard title="从数据下载到网页展示的六个阶段">
+        <ol class="flow">
+          <li v-for="stage in stages" :key="stage.step">
+            <span class="flow-step">{{ stage.step }}</span>
+            <strong>{{ stage.tool }}</strong>
+            <span v-for="line in stage.lines" :key="line">{{ line }}</span>
+          </li>
+        </ol>
+        <template #note>
+          HDFS 负责存储，Spark 负责清洗、连接和窗口计算，PyTorch 在显卡上训练和推理 TCN；
+          这是单机实验环境，不声称已完成多机性能实验。
+        </template>
+      </PanelCard>
+
       <div class="stat-row">
         <StatCard
           label="HDFS 项目数据总量"
@@ -264,20 +278,6 @@ const hdfsOption = computed(() => {
           :hint="system.versions.gpu || '报告未记录显卡'"
         />
       </div>
-
-      <PanelCard kicker="数据流水线" title="一条数据从下载到网页经过的六个阶段">
-        <ol class="flow">
-          <li v-for="stage in stages" :key="stage.step">
-            <span class="flow-step">{{ stage.step }}</span>
-            <strong>{{ stage.tool }}</strong>
-            <span v-for="line in stage.lines" :key="line">{{ line }}</span>
-          </li>
-        </ol>
-        <template #note>
-          HDFS 负责存储，Spark 负责清洗、连接和窗口计算，PyTorch 在显卡上训练和推理 TCN；
-          这是单机实验环境，不声称已完成多机性能实验。
-        </template>
-      </PanelCard>
 
       <PanelCard kicker="HDFS 盘点" title="HDFS 各子目录的真实规模">
         <template #actions>

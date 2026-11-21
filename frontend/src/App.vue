@@ -1,20 +1,18 @@
 <script setup>
 /*
- * 应用外壳：左侧按"三代系统 + 平台"分组的导航、顶栏和页面标题区。
+ * 应用外壳：左侧按实时、历史、资料分组的导航、顶栏和页面标题区。
  * 路由用地址栏的 # 部分（如 #live），不引入路由库；默认页面是实时预测。
  * pages 数组是页面目录：新增页面只需在 views/ 写组件并在这里登记。
  */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   BadgeCheck,
-  ChartNoAxesCombined,
   Clock3,
-  Cpu,
   Database,
   FileText,
   FlaskConical,
   History,
-  Map,
+  Map as MapIcon,
   Radio,
   Server,
   Wind,
@@ -22,6 +20,7 @@ import {
 import { api } from './lib/api'
 import { bjFull } from './lib/format'
 import LiveView from './views/LiveView.vue'
+import WeatherEvaluationView from './views/WeatherEvaluationView.vue'
 import OnlineView from './views/OnlineView.vue'
 import StationView from './views/StationView.vue'
 import OverviewView from './views/OverviewView.vue'
@@ -32,10 +31,9 @@ import QualityView from './views/QualityView.vue'
 import SystemView from './views/SystemView.vue'
 
 const groups = [
-  { id: 'live', name: '实时系统', note: '第三代' },
-  { id: 'station', name: '站点实验', note: '第二代' },
-  { id: 'city', name: '城市研究', note: '第一代' },
-  { id: 'platform', name: '平台与架构', note: '大数据组件' },
+  { id: 'live', name: '实时' },
+  { id: 'research', name: '历史' },
+  { id: 'evidence', name: '资料' },
 ]
 
 const pages = [
@@ -45,9 +43,7 @@ const pages = [
     name: '实时预测',
     icon: Radio,
     view: LiveView,
-    title: '现在的北京，接下来六个整点',
-    description: '查看北京监测站点的最新实测、PM₂.₅ 预测与预计范围。',
-    scope: [],
+    description: '定位或选择北京监测站，查看该站最新实测和接下来六个整点的 PM₂.₅ 预测。',
   },
   {
     id: 'online',
@@ -55,92 +51,114 @@ const pages = [
     name: '在线核验',
     icon: BadgeCheck,
     view: OnlineView,
-    title: '让每一轮预测接受随后实测的检验',
-    description: '预测发布时答案未知；目标时刻过去、真实观测到达后才计算误差。'
-      + '这里与历史测试成绩分开统计。',
-    scope: ['真实发布记录', '按模型版本分开', '与持续性基线对比'],
-  },
-  {
-    id: 'stations',
-    group: 'station',
-    name: '站点与 GPU',
-    icon: Cpu,
-    view: StationView,
-    title: '从城市均值走向每个监测站',
-    description: '保留每个监测站点各自的差异，加入过去 72 小时天气，'
-      + '在同一批样本上比较 Spark 随机森林与 CUDA 时序卷积网络。',
-    scope: ['2022—2025 历史', '2022—23 训练 · 2024 验证 · 2025 测试', 'Spark + CUDA'],
-  },
-  {
-    id: 'overview',
-    group: 'city',
-    name: '区域概览',
-    icon: Map,
-    view: OverviewView,
-    title: '北京与周边五城的空气质量概览',
-    description: '基于 2015—2025 年城市小时均值，查看长期变化、某一时刻的区域分布和城市对比。',
-    scope: ['2015—2025 历史', '六城城市均值', 'ERA5 再分析气象'],
+    description: '把实际发布的北京单站预测与后来到达的实测逐条匹配。每条样本对应一个站点和一个目标整点。',
   },
   {
     id: 'analysis',
-    group: 'city',
-    name: '时空分析',
-    icon: ChartNoAxesCombined,
-    view: AnalysisView,
-    title: '时间、季节与气象中的污染规律',
-    description: '月份 × 小时热力图、四季对比、气象相关和城市间联动。统计关联不代表因果。',
-    scope: ['2015—2025 历史', '有效小时观测', 'Pearson 相关'],
+    group: 'research',
+    name: '历史观测',
+    icon: MapIcon,
+    tabs: [
+      {
+        id: 'overview', label: '地图与趋势', title: '六城污染地图与趋势', view: OverviewView,
+        description: '查看 2015—2025 年北京及周边五城的城市均值。地图按所选时刻显示，趋势图可切换全期月均与所选年日均。',
+      },
+      {
+        id: 'patterns', label: '季节与气象', title: '季节规律与气象关联', view: AnalysisView,
+        description: '按年份查看城市的月内小时分布、季节均值与气象关联。六城浓度相关矩阵使用全期观测。',
+      },
+    ],
   },
   {
     id: 'forecast',
-    group: 'city',
-    name: '预测回放',
+    group: 'research',
+    name: '历史预测回放',
     icon: History,
-    view: ForecastView,
-    title: '选择历史时刻，回放六小时预测',
-    description: '只用起点及之前的信息做预测，再与后来真实发生的浓度对照。'
-      + '这是历史回放，不代表现在的预报。',
-    scope: ['2024 验证 · 2025 测试', 'Spark ML 批量预测', '北京城市均值'],
+    tabs: [
+      {
+        id: 'city', label: '北京城市均值', title: '北京城市均值回放', view: ForecastView,
+        description: '选择 2024—2025 年的预测起点和模型，比较起点之后六小时的预测、实测和持续性基线。',
+      },
+      {
+        id: 'station', label: '单个监测站', title: '监测站预测回放', view: StationView,
+        props: { section: 'replay' },
+        description: '选择六城中的一个站点和 2024—2025 年的预测起点，查看接下来六小时的模型结果与实测。',
+      },
+    ],
   },
   {
     id: 'models',
-    group: 'city',
-    name: '模型评估',
+    group: 'research',
+    name: '离线模型评估',
     icon: FlaskConical,
-    view: ModelsView,
-    title: '与基线比较，让预测经得起检验',
-    description: '按时间划分训练、验证和测试；推荐模型只由 2024 年验证集决定，2025 年测试集只负责最后评价。',
-    scope: ['2015—23 训练 · 2024 验证 · 2025 测试', 'Spark ML 随机森林 · 梯度提升树'],
+    tabs: [
+      {
+        id: 'city', label: '北京城市均值', title: '北京城市均值预测评估', view: ModelsView,
+        description: '在同一批北京城市均值样本上比较 Spark 随机森林、梯度提升树和持续性基线。可切换 2025 年独立测试和 2024 年验证。',
+        related: { href: '#forecast?tab=city', label: '回放某个历史时刻' },
+      },
+      {
+        id: 'station', label: '监测站误差', title: '监测站预测评估', view: StationView,
+        props: { section: 'evaluation' },
+        description: '比较 TCN、随机森林与持续性基线在单站预测上的误差。可切换北京或六城站点，以及验证集或测试集。',
+        related: { href: '#forecast?tab=station', label: '回放某个站点' },
+      },
+      {
+        id: 'weather', label: '未来天气对照实验', title: '未来天气对照实验', view: WeatherEvaluationView,
+        description: '在同一批 2025 年历史站点样本上，比较是否加入未来天气预报对误差的影响，并查看预测区间的覆盖率。',
+        related: { href: '#online', label: '查看上线后的实测核验' },
+      },
+    ],
   },
   {
     id: 'quality',
-    group: 'city',
-    name: '数据质量',
+    group: 'evidence',
+    name: '数据来源与质量',
     icon: Database,
-    view: QualityView,
-    title: '每一个数字都有据可查',
-    description: '观测覆盖率、缺失日期、数据来源和清洗核验结果。缺失保留为空，不当作零浓度。',
-    scope: ['逐年逐城覆盖', '来源与 SHA-256 清单', 'Spark 清洗核验'],
+    tabs: [
+      {
+        id: 'coverage', label: '观测覆盖与缺测', title: '历史观测覆盖与缺测', view: QualityView,
+        props: { section: 'coverage' },
+        description: '查看六城城市小时数据的全期覆盖与源文件缺失。年份筛选只用于逐年逐城明细及北京小时数据导出。',
+      },
+      {
+        id: 'sources', label: '来源与核验', title: '数据来源与清洗核验', view: QualityView,
+        props: { section: 'sources' },
+        description: '查看城市空气质量、气象和监测站数据来自哪里，以及清洗、抽查和导出后回读的记录。',
+      },
+    ],
   },
   {
     id: 'system',
-    group: 'platform',
-    name: '大数据平台',
+    group: 'evidence',
+    name: '处理与训练记录',
     icon: Server,
-    view: SystemView,
-    title: 'HDFS 与 Spark 实际做了什么',
-    description: '数据从下载到网页的完整流水线、HDFS 各目录的真实规模、组件版本和各阶段产物。'
-      + '数字来自离线盘点与已保存的报告。',
-    scope: ['HDFS 盘点快照', 'Spark 3.5.8 local[4]', 'PyTorch CUDA'],
+    tabs: [
+      {
+        id: 'pipeline', label: '数据流水线', title: '数据处理流水线', view: SystemView,
+        description: '按步骤查从数据下载、HDFS 存储、Spark 清洗到模型与网页的数据产物。目录规模和组件信息取自项目盘点。',
+        related: { href: '#quality?tab=sources', label: '查看原始数据来源' },
+      },
+      {
+        id: 'gpu', label: 'CUDA 训练记录', title: '站点 TCN 的 CUDA 训练记录', view: StationView,
+        props: { section: 'training' },
+        description: '查看站点 TCN 训练归档中的设备、显存、耗时和每轮验证误差。',
+        related: { href: '#models?tab=station', label: '查看站点模型评估' },
+      },
+    ],
   },
 ]
 
+const legacyRoutes = new Map([['stations', ['forecast', 'station']], ['overview', ['analysis', 'overview']]])
+
 const pageId = ref('live')
+const tabId = ref('')
 const health = ref(null)
 const healthError = ref(false)
 const now = ref(Date.now())
 
 const current = computed(() => pages.find(page => page.id === pageId.value) || pages[0])
+const currentTab = computed(() => current.value.tabs?.find(tab => tab.id === tabId.value) || current.value.tabs?.[0])
 const currentGroup = computed(() => groups.find(group => group.id === current.value.group))
 
 function pagesOf(groupId) {
@@ -148,9 +166,11 @@ function pagesOf(groupId) {
 }
 
 function route() {
-  const hash = location.hash.slice(1).split('?')[0]
-  pageId.value = pages.some(page => page.id === hash) ? hash : 'live'
-  document.title = `${current.value.name} · 北京空气观察`
+  const [hash, query] = location.hash.slice(1).split('?')
+  const [page, tab] = legacyRoutes.get(hash) || [hash, new URLSearchParams(query).get('tab')]
+  pageId.value = pages.some(item => item.id === page) ? page : 'live'
+  tabId.value = tab || (hash === 'analysis' ? 'patterns' : '')
+  document.title = `${currentTab.value?.title || current.value.name} · 北京空气观察`
   window.scrollTo({ top: 0 })
 }
 
@@ -195,12 +215,11 @@ onBeforeUnmount(() => {
         <div v-for="group in groups" :key="group.id" class="nav-group">
           <div class="nav-group-label">
             <span>{{ group.name }}</span>
-            <small>{{ group.note }}</small>
           </div>
           <a
             v-for="page in pagesOf(group.id)"
             :key="page.id"
-            :href="`#${page.id}`"
+            :href="page.tabs ? `#${page.id}?tab=${page.tabs[0].id}` : `#${page.id}`"
             class="nav-item"
             :class="{ active: current.id === page.id }"
             :aria-current="current.id === page.id ? 'page' : undefined"
@@ -227,7 +246,12 @@ onBeforeUnmount(() => {
         <div class="breadcrumb">
           <span>{{ currentGroup.name }}</span>
           <span aria-hidden="true">/</span>
-          <strong>{{ current.name }}</strong>
+          <template v-if="currentTab">
+            <a :href="`#${current.id}?tab=${current.tabs[0].id}`">{{ current.name }}</a>
+            <span aria-hidden="true">/</span>
+            <strong>{{ currentTab.label }}</strong>
+          </template>
+          <strong v-else>{{ current.name }}</strong>
         </div>
         <div class="topbar-right">
           <span class="clock"><Clock3 :size="14" aria-hidden="true" />北京时间 {{ bjFull(now) }}</span>
@@ -237,15 +261,28 @@ onBeforeUnmount(() => {
 
       <div class="page">
         <header class="page-head">
-          <div v-if="current.id !== 'live'" class="page-eyebrow">{{ currentGroup.note }} · {{ currentGroup.name }}</div>
-          <h1>{{ current.title }}</h1>
-          <p>{{ current.description }}</p>
-          <div v-if="current.scope.length" class="scope-chips">
-            <span v-for="item in current.scope" :key="item">{{ item }}</span>
-          </div>
+          <h1>{{ currentTab?.title || current.name }}</h1>
+          <p>{{ currentTab?.description || current.description }}</p>
+          <a v-if="currentTab?.related" class="related-link" :href="currentTab.related.href">
+            {{ currentTab.related.label }} →
+          </a>
         </header>
 
-        <component :is="current.view" :key="current.id" />
+        <nav v-if="current.tabs" class="toolbar section-nav" :aria-label="current.name">
+          <a
+            v-for="tab in current.tabs"
+            :key="tab.id"
+            :href="`#${current.id}?tab=${tab.id}`"
+            class="button small"
+            :class="{ primary: currentTab?.id === tab.id }"
+            :aria-current="currentTab?.id === tab.id ? 'page' : undefined"
+          >{{ tab.label }}</a>
+        </nav>
+        <component
+          :is="currentTab?.view || current.view"
+          :key="`${current.id}/${currentTab?.id || ''}`"
+          v-bind="currentTab?.props || {}"
+        />
 
         <footer class="page-foot">
           <span>北京市 PM₂.₅ 时空分析与短时预测系统</span>
@@ -255,3 +292,30 @@ onBeforeUnmount(() => {
     </main>
   </div>
 </template>
+
+<style scoped>
+.related-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.breadcrumb a {
+  color: var(--ink-2);
+}
+
+@media (max-width: 600px) {
+  .breadcrumb a { display: none; }
+}
+
+.section-nav {
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.section-nav [aria-current="page"] {
+  border-color: var(--brand);
+  color: var(--brand-strong);
+  background: var(--brand-soft);
+}
+</style>

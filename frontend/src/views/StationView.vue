@@ -7,15 +7,14 @@
  * 模型比较只在同一批有效站点小时上进行；推荐模型只看 2024 年北京站点验证集 RMSE。
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Cpu, Database, Download, Info, ScanLine, Timer } from '@lucide/vue'
+import { Cpu, Download, Info, ScanLine, Timer } from '@lucide/vue'
 import Chart from '../components/Chart.vue'
 import Notice from '../components/Notice.vue'
 import PanelCard from '../components/PanelCard.vue'
 import PmLegend from '../components/PmLegend.vue'
 import Segmented from '../components/Segmented.vue'
-import StatCard from '../components/StatCard.vue'
 import { api } from '../lib/api'
-import { bjFull, fmt, fmtBytes, fmtDuration, fmtInt } from '../lib/format'
+import { bjFull, fmt, fmtDuration, fmtInt } from '../lib/format'
 import { cityIds, cityNames, stationModelNames, weatherVariables } from '../lib/labels'
 import {
   axisTime,
@@ -43,6 +42,8 @@ const forecastError = ref('')
 const busy = ref(false)
 
 const city = ref('beijing')
+const props = defineProps({ section: { type: String, required: true } })
+
 const stationId = ref('1001A')
 const time = ref('2025-12-30T12:00')
 const model = ref('best')
@@ -55,6 +56,9 @@ const snapshot = ref(null)
 const history = ref(null)
 const trend = ref(null)
 const forecast = ref(null)
+const loadedModel = ref('')
+const pendingReplayChanges = computed(() => forecast.value && !busy.value
+  && (time.value !== forecast.value.origin.replace(' ', 'T').slice(0, 16) || model.value !== loadedModel.value))
 
 let request = 0
 let setupTimer = 0
@@ -111,7 +115,7 @@ async function setup() {
     const [stationMeta, models] = await Promise.all([api('stations/meta'), api('stations/models')])
     meta.value = stationMeta
     registry.value = models
-    if (stationMeta.ready && !snapshot.value) {
+    if (props.section === 'replay' && stationMeta.ready && !snapshot.value) {
       time.value = stationMeta.default_origin || time.value
       await load()
     }
@@ -129,16 +133,18 @@ async function load() {
   busy.value = true
   error.value = ''
   forecastError.value = ''
+  const requestedModel = model.value
   const results = await Promise.allSettled([
     api('stations/snapshot', { time: time.value, city: city.value }),
     api('stations/history', { station_id: stationId.value, end: time.value, hours: 72 }),
     api('stations/trend', { station_id: stationId.value, year: year.value }),
-    api('stations/forecast', { station_id: stationId.value, time: time.value, model: model.value }),
+    api('stations/forecast', { station_id: stationId.value, time: time.value, model: requestedModel }),
   ])
   if (token !== request) {
     return
   }
   const targets = [snapshot, history, trend, forecast]
+  loadedModel.value = requestedModel
   results.forEach((outcome, index) => {
     if (outcome.status === 'fulfilled') {
       targets[index].value = outcome.value
@@ -417,200 +423,174 @@ const trainingOption = computed(() => {
     </PanelCard>
 
     <template v-if="meta?.ready">
-      <div class="stat-row">
-        <StatCard
-          label="六城历史监测站点"
-          :value="fmtInt(meta.summary.stations)"
-          unit="个"
-          :icon="Database"
-          featured
-          hint="包含期间停运和新增的站点"
-        />
-        <StatCard
-          label="有效站点小时 PM₂.₅"
-          :value="fmt(meta.summary.valid_pm25 / 10000, 1)"
-          unit="万条"
-          :hint="`完整小时网格 ${fmtInt(meta.summary.grid_hours)} 行`"
-        />
-        <StatCard
-          label="全国原始档案"
-          :value="fmtBytes(meta.summary.raw_archive_bytes)"
-          :hint="`${fmtInt(meta.summary.source_file_count)} 份逐站小时文件`"
-        />
-        <StatCard
-          label="CUDA 训练峰值利用率"
-          :value="fmt(gpu?.peak_gpu_util_percent, 0)"
-          unit="%"
-          :icon="Cpu"
-          :hint="gpu?.device"
-        />
-      </div>
-
-      <PanelCard kicker="选择站点与时刻" title="历史回放：同一时刻的站点观测与两种模型预测">
-        <div class="toolbar">
-          <label class="field">
-            城市
-            <select v-model="city">
-              <option value="all">全部六城</option>
-              <option v-for="id in cityIds" :key="id" :value="id">{{ cityNames[id] }}</option>
-            </select>
-          </label>
-          <label class="field wide">
-            监测站点
-            <select v-model="stationId">
-              <option v-for="item in stations" :key="item.station_id" :value="item.station_id">
-                {{ item.name }}（{{ item.station_id }}）
-              </option>
-            </select>
-          </label>
-          <label class="field">
-            预测起点（北京时间）
-            <input
-              v-model="time"
-              type="datetime-local"
-              :min="meta.forecast_range?.[0]"
-              :max="meta.forecast_range?.[1]"
-              step="3600"
-            />
-          </label>
-          <label class="field">
-            选用模型
-            <select v-model="model">
-              <option v-for="(name, id) in stationModelNames" :key="id" :value="id">
-                {{ name }}
-              </option>
-            </select>
-          </label>
-          <button class="button primary" type="button" :disabled="busy" @click="load">
-            <ScanLine :size="15" />{{ busy ? '正在读取' : '读取观测与预测' }}
-          </button>
-        </div>
-        <template #note>
-          可选范围是 2024 年验证期和 2025 年测试期；训练期 2022—2023 年的样本不用于回放。
+      <template v-if="section === 'replay'">
+        <PanelCard title="选择站点、预测起点与模型">
+          <div class="toolbar">
+            <label class="field">
+              城市
+              <select v-model="city">
+                <option value="all">全部六城</option>
+                <option v-for="id in cityIds" :key="id" :value="id">{{ cityNames[id] }}</option>
+              </select>
+            </label>
+            <label class="field wide">
+              监测站点
+              <select v-model="stationId">
+                <option v-for="item in stations" :key="item.station_id" :value="item.station_id">
+                  {{ item.name }}（{{ item.station_id }}）
+                </option>
+              </select>
+            </label>
+            <label class="field">
+              预测起点（北京时间）
+              <input
+                v-model="time"
+                type="datetime-local"
+                :min="meta.forecast_range?.[0]"
+                :max="meta.forecast_range?.[1]"
+                step="3600"
+              />
+            </label>
+            <label class="field">
+              选用模型
+              <select v-model="model">
+                <option v-for="(name, id) in stationModelNames" :key="id" :value="id">
+                  {{ name }}
+                </option>
+              </select>
+            </label>
+            <button class="button primary" type="button" :disabled="busy" @click="load">
+              <ScanLine :size="15" />{{ busy ? '正在读取' : '读取观测与预测' }}
+            </button>
+          </div>
+          <template #note>
+            可选范围是 2024 年验证期和 2025 年测试期；训练期 2022—2023 年的样本不用于回放。
         </template>
-      </PanelCard>
+        </PanelCard>
 
-      <Notice v-if="busy" kind="loading">正在读取站点观测和真实模型输出…</Notice>
+        <Notice v-if="busy" kind="loading">正在读取站点观测和真实模型输出…</Notice>
+        <Notice v-if="pendingReplayChanges" kind="info">下方仍是上次回放的结果。点击「读取观测与预测」应用新的起点或模型。</Notice>
 
-      <template v-else>
-        <div class="grid-wide-left">
+        <template v-else>
+          <Notice v-if="forecastError" kind="error">{{ forecastError }}</Notice>
+
           <PanelCard
-            kicker="站点观测 · 点击站点切换"
-            :title="`${snapshot ? bjFull(snapshot.time) : ''} 各站点浓度`"
-            note="可缩放拖动；只显示该时刻有坐标的站点，灰色表示无实测。"
+            v-if="forecast"
+            :title="`${selected?.name || stationId} · 六小时预测与实测`"
           >
-            <Chart :option="mapOption" height="360px" label="监测站点 PM2.5 地图" @select="onMapSelect" />
-            <PmLegend />
-          </PanelCard>
-          <PanelCard
-            kicker="站点对比"
-            :title="`${city === 'all' ? '六城' : cityNames[city]}站点浓度排序`"
-            note="缺测保留为空；站点停运或尚未启用的时段也没有观测。"
-          >
-            <div class="table-wrap tall">
+            <template #actions>
+              <span class="tag">起点 {{ bjFull(forecast.origin) }} · {{ fmt(forecast.current) }} μg/m³</span>
+              <button class="button small" type="button" @click="downloadCsv">
+                <Download :size="14" />导出 CSV
+              </button>
+            </template>
+            <Chart :option="forecastOption" height="330px" label="站点六小时预测、实测与基线" />
+            <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>站点</th>
-                    <th class="num">PM₂.₅ μg/m³</th>
+                    <th>目标时刻</th>
+                    <th class="num">Spark 随机森林</th>
+                    <th class="num">CUDA TCN</th>
+                    <th class="num">真实值</th>
+                    <th class="num">持续性基线</th>
+                    <th>本次选用</th>
+                    <th class="num">选用结果</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="item in rankingRows"
-                    :key="item.station_id"
-                    class="clickable"
-                    :class="{ selected: item.station_id === stationId }"
-                    @click="stationId = item.station_id"
-                  >
-                    <td>{{ item.name }} <span class="muted">{{ item.station_id }}</span></td>
-                    <td class="num strong">{{ fmt(item.pm25) }}</td>
+                  <tr v-for="point in forecast.points" :key="point.horizon">
+                    <td>
+                      {{ bjFull(point.target) }} <span class="tag">+{{ point.horizon }} h</span>
+                    </td>
+                    <td class="num">{{ fmt(point.rf) }}</td>
+                    <td class="num">{{ fmt(point.tcn72) }}</td>
+                    <td class="num">{{ fmt(point.actual) }}</td>
+                    <td class="num">{{ fmt(point.baseline) }}</td>
+                    <td>{{ stationModelNames[point.model] }}</td>
+                    <td class="num strong">{{ fmt(point.prediction) }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            <template #note>
+              {{ forecast.split === 'test' ? '2025 年独立测试期：未参与模型选择。' : '2024 年验证期：用于选择推荐模型。' }}
+              页面读取真实模型的批量输出；缺失的真实值不参与误差计算。
+            </template>
           </PanelCard>
-        </div>
 
-        <Notice v-if="forecastError" kind="error">{{ forecastError }}</Notice>
-
-        <PanelCard
-          v-if="forecast"
-          kicker="CPU 与 GPU 模型的历史回放"
-          :title="`${selected?.name || stationId}：未来六小时的两种预测`"
-        >
-          <template #actions>
-            <span class="tag">起点 {{ fmt(forecast.current) }} μg/m³</span>
-            <button class="button small" type="button" @click="downloadCsv">
-              <Download :size="14" />导出 CSV
-            </button>
-          </template>
-          <Chart :option="forecastOption" height="330px" label="站点 CPU 与 GPU 模型六小时预测与真实值" />
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>目标时刻</th>
-                  <th class="num">Spark 随机森林</th>
-                  <th class="num">CUDA TCN</th>
-                  <th class="num">真实值</th>
-                  <th class="num">持续性基线</th>
-                  <th>本次选用</th>
-                  <th class="num">选用结果</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="point in forecast.points" :key="point.horizon">
-                  <td>
-                    {{ bjFull(point.target) }} <span class="tag">+{{ point.horizon }} h</span>
-                  </td>
-                  <td class="num">{{ fmt(point.rf) }}</td>
-                  <td class="num">{{ fmt(point.tcn72) }}</td>
-                  <td class="num">{{ fmt(point.actual) }}</td>
-                  <td class="num">{{ fmt(point.baseline) }}</td>
-                  <td>{{ stationModelNames[point.model] }}</td>
-                  <td class="num strong">{{ fmt(point.prediction) }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="grid-wide-left">
+            <PanelCard
+              kicker="站点观测 · 点击站点切换"
+              :title="`${snapshot ? bjFull(snapshot.time) : ''} 各站点浓度`"
+              note="可缩放拖动；只显示该时刻有坐标的站点，灰色表示无实测。"
+            >
+              <Chart :option="mapOption" height="360px" label="监测站点 PM2.5 地图" @select="onMapSelect" />
+              <PmLegend />
+            </PanelCard>
+            <PanelCard
+              kicker="站点对比"
+              :title="`${city === 'all' ? '六城' : cityNames[city]}站点浓度排序`"
+              note="缺测保留为空；站点停运或尚未启用的时段也没有观测。"
+            >
+              <div class="table-wrap tall">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>站点</th>
+                      <th class="num">PM₂.₅ μg/m³</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="item in rankingRows"
+                      :key="item.station_id"
+                      class="clickable"
+                      :class="{ selected: item.station_id === stationId }"
+                      @click="stationId = item.station_id"
+                    >
+                      <td>{{ item.name }} <span class="muted">{{ item.station_id }}</span></td>
+                      <td class="num strong">{{ fmt(item.pm25) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </PanelCard>
           </div>
-          <template #note>
-            {{ forecast.split === 'test' ? '2025 年独立测试期：未参与模型选择。' : '2024 年验证期：用于选择推荐模型。' }}
-            页面读取真实模型的批量输出；缺失的真实值不参与误差计算。
-          </template>
-        </PanelCard>
 
-        <div class="grid-2">
-          <PanelCard
-            kicker="模型输入"
-            title="预测起点之前 72 小时的天气"
-            note="ERA5 再分析资料，取城市代表坐标，同城站点共享；不是空气站的气象实测。"
-          >
-            <template #actions>
-              <select v-model="weatherVar" class="select" aria-label="选择气象变量">
-                <option v-for="(variable, key) in weatherVariables" :key="key" :value="key">
-                  {{ variable.name }}
-                </option>
-              </select>
-            </template>
-            <Chart :option="weatherOption" height="250px" label="预测起点之前 72 小时天气" />
-          </PanelCard>
-          <PanelCard
-            kicker="站点逐日"
-            :title="`${selected?.name || stationId}的日均浓度`"
-            note="按有效小时计算日均值；全天无观测时保留空缺。"
-          >
-            <template #actions>
-              <select v-model="year" class="select" aria-label="选择年份">
-                <option v-for="item in yearOptions" :key="item" :value="item">{{ item }} 年</option>
-              </select>
-            </template>
-            <Chart :option="trendOption" height="250px" label="所选站点日均 PM2.5" />
-          </PanelCard>
-        </div>
+          <div class="grid-2">
+            <PanelCard
+              kicker="模型输入"
+              title="预测起点之前 72 小时的天气"
+              note="ERA5 再分析资料，取城市代表坐标，同城站点共享；不是空气站的气象实测。"
+            >
+              <template #actions>
+                <select v-model="weatherVar" class="select" aria-label="选择气象变量">
+                  <option v-for="(variable, key) in weatherVariables" :key="key" :value="key">
+                    {{ variable.name }}
+                  </option>
+                </select>
+              </template>
+              <Chart :option="weatherOption" height="250px" label="预测起点之前 72 小时天气" />
+            </PanelCard>
+            <PanelCard
+              kicker="站点逐日"
+              :title="`${selected?.name || stationId}的日均浓度`"
+              note="按有效小时计算日均值；全天无观测时保留空缺。"
+            >
+              <template #actions>
+                <select v-model="year" class="select" aria-label="选择年份">
+                  <option v-for="item in yearOptions" :key="item" :value="item">{{ item }} 年</option>
+                </select>
+              </template>
+              <Chart :option="trendOption" height="250px" label="所选站点日均 PM2.5" />
+            </PanelCard>
+          </div>
+        </template>
+
       </template>
 
-      <PanelCard kicker="同一批样本上的比较" title="TCN、随机森林与持续性基线">
+      <PanelCard v-if="section === 'evaluation'" kicker="同一批样本上的比较" title="TCN、随机森林与持续性基线">
         <template #actions>
           <Segmented v-model="scope" label="评估范围" :options="scopeOptions" />
           <Segmented v-model="split" label="评估期间" :options="splitOptions" />
@@ -660,7 +640,8 @@ const trainingOption = computed(() => {
         </template>
       </PanelCard>
 
-      <PanelCard v-if="gpu" kicker="CUDA 训练证据" title="显卡确实参与了训练">
+      <Notice v-if="section === 'training' && !gpu">CUDA 训练记录尚未就绪。</Notice>
+      <PanelCard v-if="section === 'training' && gpu" title="训练指标与验证误差">
         <template #actions>
           <span class="tag brand"><Cpu :size="13" />{{ gpu.device }}</span>
         </template>
@@ -691,7 +672,7 @@ const trainingOption = computed(() => {
         </template>
       </PanelCard>
 
-      <div class="method-note">
+      <div v-if="section === 'replay'" class="method-note">
         <Info :size="16" aria-hidden="true" />
         <p>
           Spark 从全国档案中提取六城站点，去重并构建完整小时网格，保留历史站点身份；
