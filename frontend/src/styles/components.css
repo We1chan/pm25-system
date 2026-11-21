@@ -204,6 +204,92 @@
   padding: 0 8px;
 }
 
+select {
+  min-width: 0;
+  max-width: 100%;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+select:disabled {
+  color: var(--ink-3);
+  background: var(--surface-sunken);
+  cursor: default;
+}
+
+select:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@supports (appearance: base-select) and selector(select::picker(select)) {
+  select,
+  select::picker(select) {
+    appearance: base-select;
+  }
+
+  select {
+    align-items: center;
+    gap: 8px;
+  }
+
+  select::picker-icon {
+    color: var(--ink-2);
+    flex-shrink: 0;
+  }
+
+  select:open {
+    border-color: var(--brand);
+  }
+
+  select:open::picker-icon {
+    color: var(--brand);
+    rotate: 180deg;
+  }
+
+  select::picker(select) {
+    max-inline-size: calc(100dvw - 16px);
+    max-block-size: min(320px, 50dvh);
+    margin-block: 4px;
+    padding: 4px;
+    overflow: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    font: inherit;
+  }
+
+  select option {
+    align-items: center;
+    min-block-size: 32px;
+    padding: 5px 8px;
+    border-radius: var(--radius-sm);
+    overflow-wrap: anywhere;
+  }
+
+  select option:checked {
+    background: var(--brand-soft);
+    color: var(--brand-strong);
+  }
+
+  select option:enabled:not(:checked):is(:hover, :focus-visible) {
+    background: var(--surface-hover);
+  }
+
+  select option:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: -2px;
+  }
+
+  select option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    padding-inline-start: 8px;
+  }
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
