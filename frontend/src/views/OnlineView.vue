@@ -631,7 +631,7 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
 
       <PanelCard kicker="按提前量" title="预测越远，误差如何变化">
         <div class="table-wrap">
-          <table>
+          <table class="horizon-table">
             <thead>
               <tr>
                 <th>发布后第几个整点</th>
@@ -859,6 +859,15 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
 </template>
 
 <style scoped>
+.horizon-table .num {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.horizon-table .num:last-child {
+  padding-inline: 20px;
+}
+
 .timeline-filters {
   display: flex;
   flex-wrap: wrap;
