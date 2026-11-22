@@ -7,7 +7,7 @@
 
 | 项目 | 状态 |
 | --- | --- |
-| 新模块 `heavy_weighting` `neighbor_features` `eval_metrics` | 已写，17 项合成数据测试通过（Windows、无 Spark） |
+| 新模块 `heavy_weighting` `neighbor_features` `eval_metrics` | 已写，16 项合成数据测试通过（Windows、无 Spark） |
 | `train_forecast_model.py` 新选项 | **未运行**，只做了语法检查 |
 | `predict_forecast_live.py` 邻域通道重建 | **未运行**，只做了语法检查 |
 | `spark_station_train.py` 的 `--heavy-weight` | **未运行**，只做了语法检查 |
@@ -31,7 +31,7 @@ SPARK_LOCAL_IP=127.0.0.1 PYSPARK_PYTHON=/home/hadoop/venvs/pm25/bin/python \
   /home/hadoop/venvs/pm25/bin/python -m unittest discover -s tests -v
 ```
 
-期望：全部通过（原有测试 + `test_integrated_methods.py` 的 17 项）。
+期望：全部通过（原有测试 + `test_integrated_methods.py` 的 16 项）。
 有失败先停下，不要继续训练。
 
 ### 2. 用冒烟方式验证新选项能跑通
