@@ -677,9 +677,9 @@ const coverageOption = computed(() => {
 
       </template>
 
-      <template v-if="result && section === 'analysis'">
-        <Notice v-if="!summary.n" kind="info">当前范围暂无已核验样本。实测入库后可查看误差趋势、分组和案例。</Notice>
-        <template v-else>
+      <template v-if="result && (section === 'overview' || section === 'analysis')">
+        <Notice v-if="section === 'analysis' && !summary.n" kind="info">当前范围暂无已核验样本。实测入库后可查看误差趋势、分组和案例。</Notice>
+        <template v-if="section === 'analysis' && summary.n">
         <div class="grid-2">
           <PanelCard title="模型与基线的每日误差" note="点击日误差点，将日期筛选切换到当天并打开核验记录。">
             <Chart :option="dayErrorOption" height="260px" label="在线 TCN 与持续性基线逐日 RMSE" @select="selectDay" />
@@ -798,40 +798,6 @@ const coverageOption = computed(() => {
           </PanelCard>
         </div>
 
-        <PanelCard title="误差最大的预测" note="按绝对误差降序列出最多 20 条已核验记录，浓度和误差单位为 μg/m³。">
-          <p v-if="!result.failures.length" class="panel-text">等待当前模型的目标实测到达。</p>
-          <div v-else class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>目标时刻</th>
-                  <th>站点</th>
-                  <th>发布后第几个整点</th>
-                  <th class="num">预测</th>
-                  <th class="num">实测</th>
-                  <th class="num">绝对误差</th>
-                  <th class="num">发布时的区间</th>
-                  <th>实测落在区间内</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="row in result.failures"
-                  :key="`${row.cycle_id}-${row.station_id}-${row.target}`"
-                >
-                  <td>{{ bjDateTime(row.target) }}</td>
-                  <td><a :href="recordHref(row)">{{ stationLabel(row.station_id) }}</a></td>
-                  <td>第 {{ row.horizon }} 个</td>
-                  <td class="num">{{ fmt(row.prediction) }}</td>
-                  <td class="num">{{ fmt(row.actual) }}</td>
-                  <td class="num strong">{{ fmt(row.absolute_error) }}</td>
-                  <td class="num">{{ intervalText(row) }}</td>
-                  <td>{{ covered(row) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </PanelCard>
         </template>
 
         <PanelCard
@@ -939,6 +905,41 @@ const coverageOption = computed(() => {
               </div>
               <p class="panel-text small">召回率是实际高值被提前报出的比例；没有事件时显示 —。</p>
             </div>
+          </div>
+        </PanelCard>
+
+        <PanelCard v-if="section === 'analysis' && summary.n" title="误差最大的预测" note="按绝对误差降序列出最多 20 条已核验记录，浓度和误差单位为 μg/m³。">
+          <p v-if="!result.failures.length" class="panel-text">等待当前模型的目标实测到达。</p>
+          <div v-else class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>目标时刻</th>
+                  <th>站点</th>
+                  <th>发布后第几个整点</th>
+                  <th class="num">预测</th>
+                  <th class="num">实测</th>
+                  <th class="num">绝对误差</th>
+                  <th class="num">发布时的区间</th>
+                  <th>实测落在区间内</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="row in result.failures"
+                  :key="`${row.cycle_id}-${row.station_id}-${row.target}`"
+                >
+                  <td>{{ bjDateTime(row.target) }}</td>
+                  <td><a :href="recordHref(row)">{{ stationLabel(row.station_id) }}</a></td>
+                  <td>第 {{ row.horizon }} 个</td>
+                  <td class="num">{{ fmt(row.prediction) }}</td>
+                  <td class="num">{{ fmt(row.actual) }}</td>
+                  <td class="num strong">{{ fmt(row.absolute_error) }}</td>
+                  <td class="num">{{ intervalText(row) }}</td>
+                  <td>{{ covered(row) }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </PanelCard>
       </template>
