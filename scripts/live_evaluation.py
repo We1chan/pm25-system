@@ -4,6 +4,8 @@
 import math, sqlite3, json
 from datetime import datetime, timedelta
 from pathlib import Path
+import numpy as np
+from eval_metrics import alert_metrics, day_block_bootstrap, level_breakdown
 from live_common import ROOT, safe_float, now
 
 DB = ROOT / "data/live/online.sqlite"
@@ -267,6 +269,41 @@ def cycle_rows(cycle_id, station_id=None, path=DB):
         db.close()
 
 
+def uncertainty(rows):
+    """对已有实测的在线记录做按目标日整块 bootstrap、污染分档和高值预警评价。
+
+    基线是发布时的持续性值。在线天数很少时区间很宽，n_days 小于 7 的结果只能当作进度参考。
+    """
+    matched = [r for r in rows if r["actual"] is not None]
+    if not matched:
+        return {"by_horizon": [], "pollution_levels": [], "alerts": []}
+    by_horizon = []
+    for horizon in sorted({r["horizon"] for r in matched}):
+        part = [r for r in matched if r["horizon"] == horizon]
+        days = np.array([r["target"][:10] for r in part])
+        model_error = np.array([r["prediction"] - r["actual"] for r in part])
+        base_error = np.array([r["baseline"] - r["actual"] for r in part])
+        item = day_block_bootstrap(days, model_error, base_error, metric="rmse")
+        item["horizon"] = horizon
+        item["reliable"] = item["n_days"] >= 7
+        by_horizon.append(item)
+    actual = np.array([r["actual"] for r in matched])
+    prediction = np.array([r["prediction"] for r in matched])
+    baseline = np.array([r["baseline"] for r in matched])
+    alerts = []
+    for threshold in (75.0, 150.0):
+        alerts.append({
+            "threshold": threshold,
+            "model": alert_metrics(actual, prediction, threshold),
+            "baseline": alert_metrics(actual, baseline, threshold),
+        })
+    return {
+        "by_horizon": by_horizon,
+        "pollution_levels": level_breakdown(actual, prediction, baseline),
+        "alerts": alerts,
+    }
+
+
 def evaluation(checkpoint=None, start=None, end=None, station_id=None, horizon=None, path=DB,
                *, cycle_id=None, compare_checkpoint=None, timeline_status=None, timeline_offset=0):
     """返回误差分组、失败样本和真实在线积累时长。"""
@@ -374,6 +411,7 @@ def evaluation(checkpoint=None, start=None, end=None, station_id=None, horizon=N
         "by_station": groups(lambda r: r["station_id"]),
         "by_station_horizon": station_horizon,
         "by_regime": by_regime,
+        "uncertainty": uncertainty(rows),
         "failures": [{**r, "absolute_error": abs(r["prediction"] - r["actual"])} for r in worst],
         "recent_case": {**recent, "status": verification_status(recent, current)} if recent else None,
         "timeline": timeline_page,

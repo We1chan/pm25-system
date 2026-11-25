@@ -9,6 +9,7 @@ import torch
 from forecast_model import ForecastTCN, WX, add_intervals
 from live_common import ROOT, TZ, WEATHER, now, atomic, plan_targets, sha256, safe_float
 from live_evaluation import record
+from neighbor_features import neighbor_channels, NEIGHBOR_NAMES
 from predict_live import average
 
 
@@ -65,6 +66,19 @@ def main():
     t = table.column("hour_index").to_numpy()
     x[s, t] = np.column_stack([table.column(c).to_numpy(zero_copy_only=False) for c in columns])
     wind[s, t] = table.column("wind_direction_10m").to_numpy(zero_copy_only=False)
+    neighbors = cp.get("neighbor_channels") or []
+    if neighbors:
+        # 邻站通道必须与训练时同名同序，缺失的邻站观测保持 NaN，不用旧值替代。
+        if neighbors != NEIGHBOR_NAMES:
+            raise ValueError("Neighbor channel contract mismatch")
+        extra = neighbor_channels(
+            x[:, :, 0],
+            [v["latitude"] for v in sites],
+            [v["longitude"] for v in sites],
+            [v["city_id"] for v in sites],
+        )
+        x = np.concatenate([x, extra], axis=2)
+    flag_columns = list(range(6)) + list(range(x.shape[2] - len(neighbors), x.shape[2]))
     anchor = int((origin - start).total_seconds() / 3600)
     if anchor < 71 or anchor + 9 >= x.shape[1]:
         raise ValueError("Complete past72/future9 grid required")
@@ -81,7 +95,7 @@ def main():
     active = np.flatnonzero(eligible)
     active_lookup = {int(v): i for i, v in enumerate(active)}
     past = x[active, anchor - 71 : anchor + 1].copy()
-    missing = (~np.isfinite(past[:, :, :6])).astype("float32")
+    missing = (~np.isfinite(past[:, :, flag_columns])).astype("float32")
     past = np.where(np.isfinite(past), past, np.array(cp["medians"], dtype="float32"))
     past = np.concatenate(
         [np.clip((past - np.array(cp["mean"])) / np.array(cp["std"]), -15, 15), missing], axis=2

@@ -163,6 +163,16 @@ GPU 证据来自 `reports/station_cuda_results.json.gpu`：实际设备 **NVIDIA
 
 当前模型版本：`90a9fbbd5415a6a1a68e357d97c5eb83c8b6e5b74c8db6077b868249d502a81c`。已发布结果保留当时模型与区间；线上记录等真实目标观测到达后才评分，跨版本分开统计。稳定实时表现需要持续积累，历史回放不计作在线运行。
 
+**算法移植实验（尚未验证）**：仓库还包含三项来自空气质量预测研究原型的改进，代码已实现并有 16 项合成数据测试，但**均未做过训练对比，没有精度结论，也没有替换线上模型**：
+
+| 改进 | 作用 | 状态 |
+| --- | --- | --- |
+| 重污染样本加权 `heavy_weighting` | 训练损失对 ≥75 / ≥150 μg/m³ 的样本加权 ×3 / ×10，目标是改善被系统性低估的重度档 | 未训练；推荐模型仍只按未加权验证 RMSE 选 |
+| 邻站输送特征 `neighbor_features` | 用异城站点的 nb5、距离反比、同城差值三个通道描述区域输送 | 未训练；实时推理通道重建未实跑 |
+| 在线不确定性评价 `eval_metrics` / `live_evaluation.uncertainty` | 在线核验按目标自然日整块 bootstrap 算提升区间，并给出浓度分档和高值预警指标 | 合成数据验证；真实在线库未验证，需覆盖至少 7 天才判定可靠 |
+
+这些选项通过 `train_forecast_model.py` 的 `--heavy-weight`、`--neighbors` 显式开启，默认关闭，不影响上面表格中的现用模型结果。在线核验页的"不确定性与重污染"面板读取这些字段；因在线实测仍在积累，面板在样本不足时只作进度参考。接手步骤和风险见 [算法交接说明](docs/handoff-yi199044.md)。
+
 ## 运行方法
 
 直接双击项目根目录 **`启动系统.cmd`**，打开 [本地系统](http://localhost:8000/#live)；停止时双击 `停止系统.cmd`。已有原始数据、数据库和模型可以直接复用。
@@ -176,6 +186,17 @@ bash scripts/stop.sh
 ```
 
 日常运行只执行需要的启动或停止命令。历史分析和回放查询 SQLite；当前刷新还需 HDFS，流水线会尝试启动已配置的 Hadoop。网络采集在既有 Windows Python 中执行以使用当前网络，Spark 和 PyTorch 在 WSL 项目虚拟环境中执行。
+
+依赖按用途分为四份文件，环境已经建好时无需重复安装：
+
+| 文件 | 用途 |
+| --- | --- |
+| `requirements.txt` | 基础运行环境（Spark、Web、HTTP），**不含** torch / pyarrow |
+| `requirements.lock.txt` | 基础环境的固定版本锁定 |
+| `requirements.gpu.txt` | GPU 训练与区间校准所需，在前者的基础上额外安装 `torch`（CUDA 12.6）和 `pyarrow` |
+| `requirements.gpu.lock.txt` | GPU 环境的完整固定版本锁定 |
+
+只在 CPU 上浏览历史页面用基础文件即可；要跑 TCN 训练、模型重载核验或读取 parquet，必须安装 `requirements.gpu.txt`，否则会缺少 torch 或 pyarrow。实际运行环境的 Python、CUDA 版本以 `reports/` 中的证据为准。
 
 更新实时预测可在网页点击刷新或调用：
 
@@ -206,7 +227,7 @@ PYSPARK_PYTHON=/home/hadoop/venvs/pm25/bin/python \
 
 覆盖原始字段和单位、冲突/缺失、小时网格、跨年度标签、过去窗口、CUDA 因果性与梯度、真实 SQLite 接口、模型版本、在线等待实测、区间、参数及 Bash LF 换行。组件接口测试还验证请求期间不调用外部命令。
 
-本轮完整测试 **40 项通过**；运行日志与耗时汇总在 `reports/documentation_verification.json.test_runs`。README 的数字抽查也保存在该报告中。
+阶段 0—4 验收时的完整测试为 **40 项通过**，运行日志与耗时汇总在 `reports/documentation_verification.json.test_runs`，README 的数字抽查也保存在该报告中。此后合并了研究原型的算法移植分支，新增 `tests/test_integrated_methods.py` 的 16 项合成数据测试，当前 `tests/` 共 56 个用例；这 16 项只做过无 Spark 的本地验证，尚未在 WSL 全量环境随其余用例重跑，交付前应重新执行一次完整 `unittest discover`。
 
 答辩讲述、真实数据走读、页面说明及教师问答见 [docs/答辩讲解.md](docs/答辩讲解.md)。
 

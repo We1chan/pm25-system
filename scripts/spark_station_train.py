@@ -1,6 +1,7 @@
 """使用 Spark MLlib 训练站点随机森林并与持续性基线比较。
 读取站点特征 Parquet，输出各提前时长的模型、预测及严格时间划分的指标。"""
 
+import argparse
 import csv
 import json
 import math
@@ -13,6 +14,22 @@ from pyspark.ml.regression import RandomForestRegressor
 from pyspark.sql import SparkSession, functions as F
 from station_features import ROOT, feature_columns, chronological
 from download_data import atomic_json
+from heavy_weighting import (
+    DEFAULT_HEAVY_WEIGHT,
+    DEFAULT_MID_WEIGHT,
+    HEAVY_THRESHOLD,
+    MID_THRESHOLD,
+    describe,
+)
+
+
+def weight_expression(column, mid_weight, heavy_weight):
+    """与 heavy_weighting.pollution_weights 同口径的 Spark 权重列，缺失标签权重为 1。"""
+    return (
+        F.when(F.col(column) >= HEAVY_THRESHOLD, F.lit(float(heavy_weight)))
+        .when(F.col(column) >= MID_THRESHOLD, F.lit(float(mid_weight)))
+        .otherwise(F.lit(1.0))
+    )
 
 
 def metrics(frame):
@@ -49,6 +66,17 @@ def metrics(frame):
 
 def main():
     """使用 Spark MLlib 训练站点随机森林并与持续性基线比较。输入输出约定见模块说明。"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--heavy-weight", action="store_true", help="重污染样本加权")
+    parser.add_argument("--mid-weight", type=float, default=DEFAULT_MID_WEIGHT)
+    parser.add_argument("--heavy-weight-value", type=float, default=DEFAULT_HEAVY_WEIGHT)
+    parser.add_argument("--tag", default="", help="实验标签，区分注册表、HDFS 模型和预测输出")
+    args = parser.parse_args()
+    if args.heavy_weight and not args.tag:
+        raise ValueError("使用 --heavy-weight 必须指定 --tag，避免覆盖正式模型")
+    if args.tag and not all(c.isalnum() or c in "_-" for c in args.tag):
+        raise ValueError("--tag 只能包含字母、数字、下划线和连字符")
+    suffix = f"_{args.tag}" if args.tag else ""
     config = json.loads((ROOT / "config.json").read_text())
     base = config["hdfs_root"] + "/stations_v2"
     summary = json.loads((ROOT / "reports/station_summary.json").read_text())
@@ -62,7 +90,7 @@ def main():
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("WARN")
-    path = ROOT / "models/station_registry.json"
+    path = ROOT / f"models/station_registry{suffix}.json"
     registry = {
         "engine": "Spark ML + PyTorch CUDA",
         "splits": summary["splits"],
@@ -75,9 +103,12 @@ def main():
             "Observed origin PM2.5; origin+6h within split; individual target must be observed;"
             " first72h excluded"
         ),
+        "heavy_weighting": (
+            describe(args.mid_weight, args.heavy_weight_value) if args.heavy_weight else None
+        ),
         "weather": "City-representative ERA5; 72h historical input; no future realized weather",
     }
-    output = ROOT / "data/app/station_predictions"
+    output = ROOT / f"data/app/station_predictions{suffix}"
     output.mkdir(parents=True, exist_ok=True)
 
     def checkpoint(current):
@@ -150,9 +181,18 @@ def main():
                 train = prepared.filter(
                     chronological("train", 6) & F.col(f"label_h{h}").isNotNull()
                 ).withColumn("label", F.col(f"label_h{h}") - F.col("pm25"))
+                if args.heavy_weight:
+                    # 权重依据真实目标浓度，而不是残差标签。
+                    train = train.withColumn(
+                        "sample_weight",
+                        weight_expression(
+                            f"label_h{h}", args.mid_weight, args.heavy_weight_value
+                        ),
+                    )
                 n = train.count()
                 model = RandomForestRegressor(
                     labelCol="label",
+                    **({"weightCol": "sample_weight"} if args.heavy_weight else {}),
                     featuresCol="features",
                     predictionCol="residual_prediction",
                     numTrees=40,
@@ -172,7 +212,7 @@ def main():
                     .withColumn("actual", F.col(f"label_h{h}"))
                 ).persist(StorageLevel.DISK_ONLY)
                 result = metrics(predictions)
-                destination = base + f"/models/{variant}/rf/h{h}"
+                destination = base + f"/models{suffix}/{variant}/rf/h{h}"
                 PipelineModel(stages=[*processor.stages, model]).write().overwrite().save(
                     destination
                 )

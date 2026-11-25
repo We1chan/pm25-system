@@ -1,17 +1,32 @@
 """训练并比较历史序列与未来天气两组 GPU 模型，独立选择和校准。
 读取冻结训练张量，输出模型权重、分位数校准参数、预测与测试报告。"""
 
-import copy, json, threading, time, subprocess
+import argparse, copy, json, threading, time, subprocess
 from pathlib import Path
 import numpy as np
 import torch
 from torch import nn
 from forecast_model import ForecastTCN, WX, HORIZONS, conformal_adjustment, add_intervals
 from live_common import ROOT, atomic, sha256, now
+from eval_metrics import alert_metrics, day_block_bootstrap
+from heavy_weighting import pollution_weights, describe
+from neighbor_features import neighbor_channels, NEIGHBOR_NAMES
 
 
 def main():
     """训练并比较历史序列与未来天气两组 GPU 模型，独立选择和校准。输入输出约定见模块说明。"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--heavy-weight", action="store_true", help="重污染样本加权")
+    parser.add_argument("--mid-weight", type=float, default=3.0)
+    parser.add_argument("--heavy-weight-value", type=float, default=10.0)
+    parser.add_argument("--neighbors", action="store_true", help="加入异城邻站输送通道")
+    parser.add_argument("--tag", default="", help="实验标签，用于区分输出文件")
+    args = parser.parse_args()
+    if (args.heavy_weight or args.neighbors) and not args.tag:
+        raise ValueError("使用 --heavy-weight 或 --neighbors 必须指定 --tag，避免覆盖线上模型")
+    if args.tag and not all(c.isalnum() or c in "_-" for c in args.tag):
+        raise ValueError("--tag 只能包含字母、数字、下划线和连字符")
+    suffix = f"_{args.tag}" if args.tag else ""
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is required for this experiment")
     torch.set_num_threads(4)
@@ -21,9 +36,20 @@ def main():
     raw = np.load(directory / "x.npy")
     truth = np.load(directory / "y.npy")
     weather = np.load(directory / "wx.npy")
+    sites = meta["stations_metadata"]
+    neighbor_names = []
+    if args.neighbors:
+        neighbor_names = list(NEIGHBOR_NAMES)
+        extra = neighbor_channels(
+            raw[:, :, 0],
+            [s["latitude"] for s in sites],
+            [s["longitude"] for s in sites],
+            [s["city_id"] for s in sites],
+        )
+        raw = np.concatenate([raw, extra], axis=2)
+        del extra
     S, T, D = raw.shape
     timestamps = np.datetime64(meta["start"], "h") + np.arange(T).astype("timedelta64[h]")
-    sites = meta["stations_metadata"]
     city = np.array([meta["cities"].index(s["city_id"]) for s in sites])
     bj = np.array([s["city_id"] == "beijing" for s in sites])
     observed = np.isfinite(raw[:, :, 0])
@@ -58,7 +84,9 @@ def main():
     fit = observed & (timestamps < np.datetime64("2024-09-01", "h"))[None, :]
     med = np.nanmedian(raw[fit], axis=0)
     med = np.nan_to_num(med, nan=0.0).astype("float32")
-    missing = (~np.isfinite(raw[:, :, :6])).astype("float32")
+    # 前 6 列污染物和邻域通道都附带缺失标记，缺失值不会被默默当成真实观测。
+    flag_columns = list(range(6)) + list(range(D - len(neighbor_names), D))
+    missing = (~np.isfinite(raw[:, :, flag_columns])).astype("float32")
     values = np.where(np.isfinite(raw), raw, med)
     mean = values[fit].mean(axis=0)
     std = np.maximum(values[fit].std(axis=0), 1e-3)
@@ -72,6 +100,8 @@ def main():
     normalized_weather = np.nan_to_num(np.clip((weather - wm) / ws, -15, 15), nan=0.0).astype(
         "float32"
     )
+    # 自然日编号：同一天的所有站点共用一个 bootstrap 重采样单位。
+    days = timestamps.astype("datetime64[D]").astype("int64")
     offsets = np.arange(-71, 1)
     future = np.arange(1, 10)
     telemetry = []
@@ -160,7 +190,21 @@ def main():
                     "mean_width": float((hi[z] - lo[z]).mean()) if len(e) else None,
                 }
 
-            result.append({"horizon": h + 1, **score(valid)})
+            result.append({
+                "horizon": h + 1,
+                **score(valid),
+                "block_bootstrap": day_block_bootstrap(
+                    days[t[valid]], p[valid] - y[valid], current[s[valid], t[valid]] - y[valid]
+                ),
+                "alert_ge75": alert_metrics(y[valid], p[valid], 75.0),
+                "alert_ge150": alert_metrics(y[valid], p[valid], 150.0),
+                "baseline_alert_ge75": alert_metrics(
+                    y[valid], current[s[valid], t[valid]], 75.0
+                ),
+                "baseline_alert_ge150": alert_metrics(
+                    y[valid], current[s[valid], t[valid]], 150.0
+                ),
+            })
             counts = np.bincount(t[valid], minlength=T)
             expected = np.bincount(t, minlength=T)
             ok = (counts >= 5) & (counts == expected)
@@ -182,6 +226,7 @@ def main():
                 "pm_lt35": y < 35,
                 "pm_35_75": (y >= 35) & (y < 75),
                 "pm_ge75": y >= 75,
+                "pm_ge150": y >= 150,
                 "abrupt_ge20": np.abs(y - current[s, t]) >= 20,
             }.items():
                 groups.setdefault(name, []).append({"horizon": h + 1, **score(mask)})
@@ -191,7 +236,7 @@ def main():
         for name, use_future in [("history_only", False), ("future_weather", True)]:
             torch.manual_seed(42)
             rng = np.random.default_rng(42)
-            model = ForecastTCN(D + 6, use_future=use_future).cuda()
+            model = ForecastTCN(D + len(flag_columns), use_future=use_future).cuda()
             optimizer = torch.optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.0001)
             scaler = torch.amp.GradScaler("cuda")
             best = float("inf")
@@ -212,7 +257,12 @@ def main():
                     target = torch.from_numpy(
                         np.where(valid, (actual - current[s, t, None]) / 20.0, 0).astype("float32")
                     ).cuda()
-                    mask = torch.from_numpy(valid.astype("float32")).cuda()
+                    sample_weight = valid.astype("float32")
+                    if args.heavy_weight:
+                        sample_weight = sample_weight * pollution_weights(
+                            actual, args.mid_weight, args.heavy_weight_value
+                        )
+                    mask = torch.from_numpy(sample_weight).cuda()
                     optimizer.zero_grad(set_to_none=True)
                     with torch.autocast("cuda", dtype=torch.float16):
                         q = model(x, w)
@@ -248,7 +298,7 @@ def main():
                     best_epoch = epoch
                     weights = copy.deepcopy({k: v.cpu() for k, v in model.state_dict().items()})
                 atomic(
-                    ROOT / "reports/forecast_training_progress.json",
+                    ROOT / f"reports/forecast_training_progress{suffix}.json",
                     {
                         "phase": "training",
                         "variant": name,
@@ -300,18 +350,18 @@ def main():
                 torch.save(
                     {
                         "state_dict": weights,
-                        "inputs": D + 6,
+                        "inputs": D + len(flag_columns),
                         "channels": 48,
                         "use_future": False,
                         "source_manifest_sha256": meta["source_manifest_sha256"],
                     },
-                    ROOT / "models/forecast_history_control.pt",
+                    ROOT / f"models/forecast_history_control{suffix}.pt",
                 )
             if use_future:
                 checkpoint = {
                     "version": 3,
                     "state_dict": weights,
-                    "inputs": D + 6,
+                    "inputs": D + len(flag_columns),
                     "channels": 48,
                     "use_future": True,
                     "horizons": 9,
@@ -330,10 +380,16 @@ def main():
                     "best_epoch": best_epoch,
                     "splits": meta["splits"],
                     "source_manifest_sha256": meta["source_manifest_sha256"],
+                    "neighbor_channels": neighbor_names,
+                    "heavy_weighting": (
+                        describe(args.mid_weight, args.heavy_weight_value)
+                        if args.heavy_weight
+                        else None
+                    ),
                 }
-                candidate = ROOT / "models/forecast_tcn9.pt.tmp"
+                candidate = ROOT / f"models/forecast_tcn9{suffix}.pt.tmp"
                 torch.save(checkpoint, candidate)
-                candidate.replace(ROOT / "models/forecast_tcn9.pt")
+                candidate.replace(ROOT / f"models/forecast_tcn9{suffix}.pt")
                 s, t = splits["test"] // T, splits["test"] % T
                 y = truth[s, t, 5]
                 valid = np.flatnonzero(np.isfinite(y))
@@ -364,7 +420,16 @@ def main():
                 " nine future inputs were available before origin. Identical historical and live"
                 " weather contract."
             ),
-            "checkpoint_sha256": sha256(ROOT / "models/forecast_tcn9.pt"),
+            "checkpoint_sha256": sha256(ROOT / f"models/forecast_tcn9{suffix}.pt"),
+            "options": {
+                "tag": args.tag,
+                "heavy_weighting": (
+                    describe(args.mid_weight, args.heavy_weight_value)
+                    if args.heavy_weight
+                    else None
+                ),
+                "neighbor_channels": neighbor_names,
+            },
             "gpu": {
                 "device": torch.cuda.get_device_name(0),
                 "pytorch": str(torch.__version__),
@@ -374,9 +439,9 @@ def main():
                 "telemetry": telemetry,
             },
         }
-        atomic(ROOT / "reports/forecast_model_results.json", report)
+        atomic(ROOT / f"reports/forecast_model_results{suffix}.json", report)
         atomic(
-            ROOT / "reports/forecast_training_progress.json",
+            ROOT / f"reports/forecast_training_progress{suffix}.json",
             {
                 "phase": "complete",
                 "device": torch.cuda.get_device_name(0),
