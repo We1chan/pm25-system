@@ -395,6 +395,38 @@ const coverageOption = computed(() => {
     </template>
 
     <template v-else>
+      <PanelCard v-if="result && !error && section === 'overview'" title="预测和实测差多少？">
+        <p class="panel-text">
+          {{ displayed.start }} 至 {{ displayed.end }} ·
+          {{ displayed.station_id ? stationLabel(displayed.station_id) : '全部北京站点' }}
+          <span v-if="displayed.cycle_id"> · 按发布轮次筛选</span>
+        </p>
+        <div class="verification-answer">
+          <section>
+            <h3>最近核验的一条</h3>
+            <template v-if="result.recent_case?.status === 'verified'">
+              <p>{{ stationLabel(result.recent_case.station_id) }} · {{ bjDateTime(result.recent_case.target) }}</p>
+              <p>
+                预测 <strong>{{ fmt(result.recent_case.prediction) }}</strong>，
+                实测 <strong>{{ fmt(result.recent_case.actual) }}</strong>，
+                相差 <strong>{{ fmt(Math.abs(result.recent_case.prediction - result.recent_case.actual)) }}</strong> μg/m³
+              </p>
+              <a :href="recordHref(result.recent_case)">查看这条预测的详情</a>
+            </template>
+            <p v-else>当前范围还没有配对成功的预测与实测。</p>
+          </section>
+          <section>
+            <h3>整体预测表现</h3>
+            <p v-if="summary.n">共核验 {{ fmtInt(summary.n) }} 条，预测与实测平均相差 <strong>{{ fmt(summary.mae, 2) }} μg/m³</strong>。</p>
+            <p v-if="summary.rmse_skill != null">
+              与「沿用起点实测值」相比，模型 RMSE
+              <strong>{{ summary.rmse_skill > 0 ? '低' : summary.rmse_skill < 0 ? '高' : '相同' }}<template v-if="summary.rmse_skill">{{ fmtPercent(Math.abs(summary.rmse_skill)) }}</template></strong>。
+              RMSE 越低，整体误差越小。
+            </p>
+            <p v-else>暂无可比较的基线成绩。</p>
+          </section>
+        </div>
+      </PanelCard>
       <PanelCard title="核验范围" class="verification-filters">
         <form class="scope-form" @submit.prevent="applyFilters">
           <div class="scope-fields">
@@ -510,7 +542,7 @@ const coverageOption = computed(() => {
           <p v-if="!recordCount" class="panel-text">当前范围没有发布记录，可扩大日期范围或选择其他模型版本。</p>
         </PanelCard>
 
-        <PanelCard title="已核验预测的精度">
+        <PanelCard title="误差与区间指标">
           <p v-if="!summary.n" class="panel-text">暂无预测与实测配对。实测入库后自动计算精度。</p>
           <dl v-else class="verification-metrics">
             <div>
@@ -915,6 +947,21 @@ const coverageOption = computed(() => {
 </template>
 
 <style scoped>
+.verification-answer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 12px 24px;
+  margin-top: 12px;
+}
+
+.verification-answer section {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.verification-answer h3 { font-size: 14px; }
+.verification-answer p { margin-block: 4px; }
+
 .verification {
   gap: 16px;
 }
