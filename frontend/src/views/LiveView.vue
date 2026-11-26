@@ -45,6 +45,7 @@ import {
 const live = ref(null)
 const forecast = ref(null)
 const stationPreferenceKey = 'pm25-live-station'
+const initialSelection = new URLSearchParams(location.hash.split('?')[1])
 const selected = ref('')
 const nearby = ref([])
 const locating = ref(false)
@@ -71,7 +72,7 @@ let cycleBeforeRefresh = ''
 let polling = false
 let active = true
 let locationRequest = 0
-let preferenceLoaded = false
+let selectionRestored = false
 
 // ---------- 状态推导 ----------
 
@@ -164,6 +165,11 @@ const searchResults = computed(() => {
   )
 })
 
+const liveReturnHref = computed(() => {
+  const query = new URLSearchParams({ station_id: selected.value })
+  if (comparison.value) query.set('compare', comparison.value)
+  return '#live?' + query.toString()
+})
 const exportHref = computed(() => apiHref('live/export', {
   station_id: forecast.value?.station_id, cycle_id: forecast.value?.cycle_id,
 }))
@@ -262,6 +268,27 @@ function loadForecasts() {
   ])
 }
 
+function restoreSelection() {
+  if (selectionRestored || !stations.value.length || selected.value) return false
+  selectionRestored = true
+  const linkedStation = initialSelection.get('station_id')
+  if (linkedStation === 'mean' || stations.value.some(station => station.station_id === linkedStation)) {
+    selectStation(linkedStation)
+    const linkedComparison = initialSelection.get('compare')
+    if (linkedComparison !== linkedStation && stations.value.some(station => station.station_id === linkedComparison)) {
+      comparison.value = linkedComparison
+    }
+  } else {
+    try {
+      const saved = localStorage.getItem(stationPreferenceKey)
+      if (stations.value.some(station => station.station_id === saved)) selectStation(saved)
+    } catch {
+      // 浏览器不提供存储时，可以直接选站。
+    }
+  }
+  return Boolean(selected.value)
+}
+
 async function poll() {
   if (polling) return
   polling = true
@@ -270,15 +297,7 @@ async function poll() {
     if (!active) return
     live.value = meta
     pollError.value = ''
-    if (stations.value.length && !preferenceLoaded) {
-      preferenceLoaded = true
-      try {
-        const saved = localStorage.getItem(stationPreferenceKey)
-        if (!selected.value && stations.value.some(station => station.station_id === saved)) selectStation(saved)
-      } catch {
-        // 浏览器不提供存储时显示站点选择器。
-      }
-    }
+    const restored = restoreSelection()
     if (cycleBeforeRefresh && meta.cycle_id !== cycleBeforeRefresh && !meta.refreshing
       && meta.refresh?.phase === 'complete') {
       notice.value = '最新实测与预测已更新'
@@ -294,7 +313,7 @@ async function poll() {
       && (comparisonForecast.value?.station_id !== comparison.value || comparisonForecast.value?.issued_at !== meta.issued_at)
     if (meta.cycle_id !== lastCycle || (meta.usable && (primaryNeedsData || comparisonNeedsData))) {
       lastCycle = meta.cycle_id
-      await loadForecasts()
+      if (!restored) await loadForecasts()
     }
   } catch (reason) {
     pollError.value = reason.message
@@ -495,7 +514,7 @@ const mapOption = computed(() => {
       <section class="panel status-bar">
         <div class="status-main">
           <div class="status-title">
-            <span class="dot" :class="{ live: fresh, off: !fresh }"></span>
+            <span class="dot" :class="{ live: live.usable, off: !live.usable }"></span>
             <strong>{{ headline }}</strong>
           </div>
           <div class="status-times">
@@ -552,7 +571,7 @@ const mapOption = computed(() => {
         >
           <template #actions>
             <a v-if="fresh && forecast.cycle_id" class="button small"
-              :href="selected === 'mean' ? verificationRecordsHref(forecast) : verificationHref(forecast.cycle_id, selected)">
+              :href="selected === 'mean' ? verificationRecordsHref(forecast, liveReturnHref) : verificationHref(forecast.cycle_id, selected, undefined, liveReturnHref)">
               {{ selected === 'mean' ? '查看本轮逐站核验' : '查看本站本轮核验' }}
             </a>
           </template>
@@ -566,10 +585,10 @@ const mapOption = computed(() => {
               监测站
               <select class="select" :value="selected" @change="selectStation($event.target.value)">
                 <option value="" disabled>选择监测站</option>
+                <option value="mean">北京覆盖站点均值（参考）</option>
                 <option v-for="station in stations" :key="station.station_id" :value="station.station_id">
                   {{ stationOptionText(station) }}
                 </option>
-                <option value="mean">北京覆盖站点均值（参考）</option>
               </select>
             </label>
             <span v-if="selectedDistance != null" class="panel-text">
@@ -613,40 +632,14 @@ const mapOption = computed(() => {
         </PanelCard>
 
         <div class="station-workspace">
-          <PanelCard title="北京站点地图">
-            <template #actions>
-              <label class="station-search">
-                <Search :size="16" aria-hidden="true" />
-                <input v-model="stationQuery" type="search" placeholder="站名或编号" aria-label="搜索站点" />
-              </label>
-            </template>
-            <Chart
-              :option="mapOption"
-              height="300px"
-              label="北京各站点最新 PM2.5 地图"
-              @select="onMapSelect"
-            />
-            <PmLegend />
-            <template #note>点击站点切换右侧曲线。灰色站点本轮不可预测，点击可查看原因。</template>
-            <ul v-if="stationQuery.trim()" class="station-results" aria-label="站点搜索结果">
-              <li v-for="station in searchResults" :key="station.station_id">
-                <button type="button" class="button small" :aria-pressed="selected === station.station_id"
-                  @click="selectStation(station.station_id)">
-                  {{ stationOptionText(station) }}
-                </button>
-              </li>
-              <li v-if="!searchResults.length" class="panel-text">没有匹配的站点。</li>
-            </ul>
-          </PanelCard>
-
           <PanelCard :title="selected ? `${selectedName} · 实测与预测` : '站点实测与预测'">
             <template #actions>
               <a v-if="fresh" class="button small" :href="exportHref"><Download :size="14" />导出 CSV</a>
             </template>
             <label v-if="fresh && stations.length" class="comparison-picker">
-              并排比较
+              对比站点
               <select v-model="comparison" class="select" aria-label="选择对比站点">
-                <option value="">选择对比站点</option>
+                <option value="">不比较</option>
                 <option v-for="station in stations" :key="station.station_id"
                   :value="station.station_id" :disabled="!station.available || station.station_id === selected">
                   {{ stationOptionText(station) }}
@@ -668,7 +661,7 @@ const mapOption = computed(() => {
                 <template v-if="comparisonFresh">
                   <Chart :option="comparisonOption" height="320px" :label="`${comparisonForecast.name}对比曲线`" />
                   <a class="button small" :href="comparisonExportHref"><Download :size="14" />导出对比站 CSV</a>
-                  <a class="button small" :href="verificationHref(comparisonForecast.cycle_id, comparison)">
+                  <a class="button small" :href="verificationHref(comparisonForecast.cycle_id, comparison, undefined, liveReturnHref)">
                     查看对比站核验
                   </a>
                 </template>
@@ -677,6 +670,32 @@ const mapOption = computed(() => {
                 <p v-else class="panel-text">等待与主站点同轮的预测。</p>
               </div>
             </div>
+          </PanelCard>
+
+          <PanelCard title="北京站点地图">
+            <template #actions>
+              <label class="station-search">
+                <Search :size="16" aria-hidden="true" />
+                <input v-model="stationQuery" type="search" placeholder="站名或编号" aria-label="搜索站点" />
+              </label>
+            </template>
+            <Chart
+              :option="mapOption"
+              height="300px"
+              label="北京各站点最新 PM2.5 地图"
+              @select="onMapSelect"
+            />
+            <PmLegend />
+            <template #note>点选站点会更新预测和曲线。灰色站点本轮不可预测，点开可查看原因。</template>
+            <ul v-if="stationQuery.trim()" class="station-results" aria-label="站点搜索结果">
+              <li v-for="station in searchResults" :key="station.station_id">
+                <button type="button" class="button small" :aria-pressed="selected === station.station_id"
+                  @click="selectStation(station.station_id)">
+                  {{ stationOptionText(station) }}
+                </button>
+              </li>
+              <li v-if="!searchResults.length" class="panel-text">没有匹配的站点。</li>
+            </ul>
           </PanelCard>
         </div>
 
@@ -1088,7 +1107,7 @@ const mapOption = computed(() => {
 
 .station-workspace {
   display: grid;
-  grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1.7fr);
+  grid-template-columns: minmax(0, 1.7fr) minmax(250px, 0.9fr);
   align-items: start;
   gap: 16px;
 }

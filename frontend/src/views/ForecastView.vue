@@ -12,7 +12,7 @@ import Notice from '../components/Notice.vue'
 import PanelCard from '../components/PanelCard.vue'
 import StatCard from '../components/StatCard.vue'
 import { api } from '../lib/api'
-import { bjFull, fmt, fmtSigned } from '../lib/format'
+import { bjFull, fmt, fmtSigned, isReplayOrigin } from '../lib/format'
 import { cityModelNames } from '../lib/labels'
 import { loadHistoryMeta } from '../lib/state'
 import {
@@ -46,9 +46,7 @@ watch([origin, model, () => meta.value?.models_ready], async ([selectedOrigin, s
   if (!modelsReady) return
 
   error.value = ''
-  const [first, last] = meta.value.forecast_range || []
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:00$/.test(selectedOrigin) ||
-      (first && selectedOrigin < first) || (last && selectedOrigin > last)) {
+  if (!isReplayOrigin(selectedOrigin, meta.value.forecast_range || [])) {
     result.value = null
     busy.value = false
     error.value = '请选择可用日期范围内的整点。'
@@ -72,7 +70,9 @@ watch([origin, model, () => meta.value?.models_ready], async ([selectedOrigin, s
 onMounted(async () => {
   try {
     const historyMeta = await loadHistoryMeta()
-    origin.value = historyMeta.default_origin.replace(' ', 'T').slice(0, 16)
+    const linkedOrigin = new URLSearchParams(location.hash.split('?')[1]).get('origin')
+    origin.value = isReplayOrigin(linkedOrigin, historyMeta.forecast_range || [])
+      ? linkedOrigin : historyMeta.default_origin.replace(' ', 'T').slice(0, 16)
     meta.value = historyMeta
   } catch (reason) {
     error.value = reason.message
@@ -279,15 +279,3 @@ const option = computed(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.replay-loading {
-  display: inline-flex;
-  min-width: 6.5em;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  color: var(--ink-2);
-  font-size: 12px;
-}
-</style>

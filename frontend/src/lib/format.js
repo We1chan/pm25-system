@@ -86,6 +86,14 @@ const partsFormatter = new Intl.DateTimeFormat('zh-CN', {
 
 const NAIVE_TIME = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2})(?::(\d{2}))?(?::\d{2}(?:\.\d+)?)?)?$/
 
+// 回放使用无时区的北京时间整点，按日期和小时原样比较。
+export function isReplayOrigin(value, [first, last] = []) {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:00$/.test(value)) return false
+  const parsed = new Date(value + 'Z')
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 16) === value
+    && (!first || value >= first) && (!last || value <= last)
+}
+
 // 拆出北京时间的年月日时分；无时区字符串本身就是北京时间，直接拆分
 function beijingParts(value) {
   if (value === null || value === undefined || value === '') {

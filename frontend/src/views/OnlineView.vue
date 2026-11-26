@@ -15,7 +15,6 @@ import PanelCard from '../components/PanelCard.vue'
 import { api, apiHref } from '../lib/api'
 import { verificationHref } from '../lib/liveLinks'
 import {
-  beijingDay,
   bjDateTime,
   fmt,
   fmtInt,
@@ -39,15 +38,15 @@ const error = ref('')
 const busy = ref(false)
 const section = ref('overview')
 const caseHeading = ref(null)
-const returnSection = ref('records')
+const caseBackLink = ref(null)
+const listBackLink = ref('')
 const sections = [
   { id: 'overview', label: '核验概览' },
   { id: 'records', label: '核验记录' },
   { id: 'analysis', label: '误差分析' },
 ]
 
-const initialQuery = new URLSearchParams(location.hash.split('?')[1])
-const initialCycle = initialQuery.has('station_id') ? '' : initialQuery.get('cycle_id') || ''
+
 const openedCase = ref(null)
 const caseDetail = ref(null)
 const caseError = ref('')
@@ -65,49 +64,79 @@ let timer = 0
 let requestId = 0
 let caseRequestId = 0
 
-const scope = ref(initialCycle ? {
-  start: initialQuery.get('start') || beijingDay(-13),
-  end: initialQuery.get('end') || beijingDay(0),
-  cycle_id: initialCycle,
-} : {})
+const scope = ref({})
 const displayed = ref(null)
 
-function loadScope(filters) {
-  scope.value = filters
-  timelineOffset.value = 0
-  return load()
+function sectionHref(view, { filters = scope.value, status = timelineStatus.value, offset = 0, back = listBackLink.value } = {}) {
+  const query = new URLSearchParams(filters)
+  if (view !== 'overview') query.set('view', view)
+  if (view === 'records' && status) query.set('status', status)
+  if (view === 'records' && offset) query.set('offset', offset)
+  if (back) query.set('back', back)
+  const params = query.toString()
+  return params ? '#online?' + params : '#online'
 }
 
 function clearScope() {
-  location.hash = sectionHref(section.value)
-  loadScope({})
-}
-
-function sectionHref(id) {
-  return id === 'overview' ? '#online' : `#online?view=${id}`
+  location.hash = sectionHref(section.value, { filters: {}, back: '' })
 }
 
 function recordHref(row) {
-  return `${verificationHref(row.cycle_id, row.station_id, row.target)}&from=${section.value}`
+  const back = sectionHref(section.value, { offset: timelineOffset.value })
+  return verificationHref(row.cycle_id, row.station_id, row.target, back)
+}
+
+function isLiveLink(href) {
+  return href === '#live' || href?.startsWith('#live?')
+}
+
+function getCaseBackLink(query) {
+  const back = query.get('back')
+  if (isLiveLink(back)) return { href: back, label: '返回实时预测' }
+  if (back === '#online' || back?.startsWith('#online?')) {
+    const view = new URLSearchParams(back.split('?')[1]).get('view') || 'overview'
+    const destination = sections.find(item => item.id === view) || sections[0]
+    return { href: back, label: '返回' + destination.label }
+  }
+  const destination = sections.find(item => item.id === query.get('from')) || sections[1]
+  return { href: sectionHref(destination.id), label: '返回' + destination.label }
 }
 
 function readRoute() {
-  if (location.hash.split('?')[0] !== '#online') return
-  const query = new URLSearchParams(location.hash.split('?')[1])
-  const view = query.get('view')
-  section.value = sections.some(item => item.id === view) ? view : 'overview'
-  const from = query.get('from')
-  returnSection.value = from === 'analysis' ? 'analysis' : 'records'
-  const status = query.get('status')
-  if (section.value === 'records' && Object.hasOwn(statusLabels, status)) showTimeline(status)
-
+  const [path, params] = location.hash.split('?')
+  if (path !== '#online') return
+  const query = new URLSearchParams(params)
   const cycle = query.get('cycle_id')
   const stationId = query.get('station_id')
-  openedCase.value = cycle && stationId
-    ? { cycle_id: cycle, station_id: stationId, target: query.get('target') || '' }
-    : null
-  if (openedCase.value) nextTick(() => caseHeading.value?.focus({ preventScroll: true }))
-  return loadCase()
+  const previousCase = openedCase.value
+  if (cycle && stationId) {
+    openedCase.value = { cycle_id: cycle, station_id: stationId, target: query.get('target') || '' }
+    caseBackLink.value = getCaseBackLink(query)
+    requestId += 1
+    busy.value = false
+    window.scrollTo({ top: 0 })
+    nextTick(() => caseHeading.value?.focus({ preventScroll: true }))
+    loadCase()
+    return
+  }
+
+  if (previousCase) {
+    openedCase.value = null
+    loadCase()
+  }
+  const view = query.get('view')
+  const nextSection = sections.find(item => item.id === view)?.id || 'overview'
+  if (previousCase || section.value !== nextSection) window.scrollTo({ top: 0 })
+  section.value = nextSection
+  scope.value = Object.fromEntries(['start', 'end', 'cycle_id']
+    .filter(key => query.get(key)).map(key => [key, query.get(key)]))
+  const back = query.get('back')
+  listBackLink.value = isLiveLink(back) ? back : ''
+  const status = query.get('status')
+  timelineStatus.value = nextSection === 'records' && Object.hasOwn(statusLabels, status) ? status : ''
+  const offset = Number(query.get('offset'))
+  timelineOffset.value = timelineStatus.value && Number.isSafeInteger(offset) && offset >= 0 ? offset : 0
+  load()
 }
 
 async function loadCase() {
@@ -137,12 +166,9 @@ async function load() {
   busy.value = true
   try {
     const filters = scope.value
-    const [evaluation, meta] = await Promise.all([
-      api('live/evaluation', {
-        ...filters, timeline_status: timelineStatus.value, timeline_offset: timelineOffset.value,
-      }),
-      api('live/meta'),
-    ])
+    const evaluation = await api('live/evaluation', {
+      ...filters, timeline_status: timelineStatus.value, timeline_offset: timelineOffset.value,
+    })
     if (id !== requestId) return
     result.value = evaluation
     displayed.value = {
@@ -150,7 +176,6 @@ async function load() {
       start: evaluation.filters?.start ?? filters.start,
       end: evaluation.filters?.end ?? filters.end,
     }
-    liveMeta.value = meta
     error.value = ''
     if (!timelineStatus.value) {
       timelineStatus.value = Object.keys(statusLabels).find(key => evaluation.timeline?.[key]?.count) || 'waiting'
@@ -166,11 +191,13 @@ async function load() {
 onMounted(() => {
   readRoute()
   window.addEventListener('hashchange', readRoute)
-  load()
-  // 实测陆续到达，每 30 秒自动更新一次统计
+  api('live/meta').then(meta => { liveMeta.value = meta }).catch(() => {
+    // 站点名称暂不可用时，仍可用编号查阅核验记录。
+  })
+  // 实测陆续到达，每 30 秒刷新正在查看的页面。
   timer = setInterval(() => {
-    load()
     if (openedCase.value) loadCase()
+    else load()
   }, 30000)
 })
 
@@ -209,14 +236,13 @@ const observationLabels = {
 }
 
 function showTimeline(key) {
-  timelineStatus.value = key
-  timelineOffset.value = 0
-  if (timeline.value?.offset || busy.value) load()
+  if (key === timelineStatus.value) return
+  location.hash = sectionHref('records', { status: key })
 }
 
 function moveTimeline(step) {
-  timelineOffset.value = Math.max(0, timelineOffset.value + step * 24)
-  load()
+  const offset = Math.max(0, timelineOffset.value + step * 24)
+  location.hash = sectionHref('records', { offset })
 }
 
 const stationNames = computed(() => {
@@ -275,9 +301,10 @@ const stationRows = computed(() => {
 function selectDay(event) {
   const day = event.name
   if (!(result.value?.by_day || []).some(row => row.key === day && row.n > 0)) return
-  timelineStatus.value = 'verified'
-  loadScope({ ...scope.value, start: day, end: day })
-  location.hash = sectionHref('records')
+  location.hash = sectionHref('records', {
+    filters: { ...scope.value, start: day, end: day },
+    status: 'verified',
+  })
 }
 
 function covered(row) {
@@ -349,9 +376,9 @@ const coverageOption = computed(() => {
 <template>
   <div class="stack verification">
     <template v-if="openedCase">
-      <a class="button small return-link" :href="sectionHref(returnSection)">
+      <a class="button small return-link" :href="caseBackLink.href">
         <ArrowLeft :size="14" aria-hidden="true" />
-        {{ returnSection === 'analysis' ? '返回误差分析' : '返回核验记录' }}
+        {{ caseBackLink.label }}
       </a>
       <div ref="caseHeading" class="case-detail" tabindex="-1">
         <OnlineCase
@@ -367,12 +394,37 @@ const coverageOption = computed(() => {
     </template>
 
     <template v-else>
+      <div class="verification-toolbar">
+        <nav class="verification-nav" aria-label="在线核验视图">
+          <a v-for="item in sections" :key="item.id" :href="sectionHref(item.id, { offset: item.id === section ? timelineOffset : 0 })"
+            :aria-current="section === item.id ? 'page' : undefined">{{ item.label }}</a>
+        </nav>
+        <div class="verification-actions">
+          <button class="button small" type="button" :disabled="busy" @click="load">
+            <RefreshCw :size="14" :class="{ spinning: busy }" aria-hidden="true" />
+            {{ busy ? '正在加载' : '刷新' }}
+          </button>
+          <a v-if="result && !error" class="button small" :href="exportHref">
+            <Download :size="14" aria-hidden="true" />导出 CSV
+          </a>
+        </div>
+      </div>
+
+      <p v-if="displayed" class="applied-scope">
+        {{ displayed.start }} 至 {{ displayed.end }} ·
+        全部北京站点 ·
+        全部提前量 · {{ displayedModel }}
+        <span v-if="displayed.cycle_id"> · 轮次 {{ displayed.cycle_id }}</span>
+        <button v-if="scope.start || scope.cycle_id" class="button small" type="button" :disabled="busy"
+          @click="clearScope">返回默认范围</button>
+        <a v-if="listBackLink" class="button small" :href="listBackLink">返回实时预测</a>
+      </p>
+      <Notice v-if="error" kind="error">
+        {{ error }}<template v-if="result">。下方保留上次成功查询的结果。</template>
+      </Notice>
+      <Notice v-else-if="!result" kind="loading">正在读取在线核验记录…</Notice>
+
       <PanelCard v-if="result && !error && section === 'overview'" title="预测和实测差多少？">
-        <p class="panel-text">
-          {{ displayed.start }} 至 {{ displayed.end }} ·
-          全部北京站点
-          <span v-if="displayed.cycle_id"> · 按发布轮次筛选</span>
-        </p>
         <div class="verification-answer">
           <section>
             <h3>最近核验的一条</h3>
@@ -399,34 +451,6 @@ const coverageOption = computed(() => {
           </section>
         </div>
       </PanelCard>
-      <div class="verification-toolbar">
-        <nav class="verification-nav" aria-label="在线核验视图">
-          <a v-for="item in sections" :key="item.id" :href="sectionHref(item.id)"
-            :aria-current="section === item.id ? 'page' : undefined">{{ item.label }}</a>
-        </nav>
-        <div class="verification-actions">
-          <button class="button small" type="button" :disabled="busy" @click="load">
-            <RefreshCw :size="14" :class="{ spinning: busy }" aria-hidden="true" />
-            {{ busy ? '正在加载' : '刷新' }}
-          </button>
-          <a v-if="result && !error" class="button small" :href="exportHref">
-            <Download :size="14" aria-hidden="true" />导出 CSV
-          </a>
-        </div>
-      </div>
-
-      <p v-if="displayed" class="applied-scope">
-        {{ displayed.start }} 至 {{ displayed.end }} ·
-        全部北京站点 ·
-        全部提前量 · {{ displayedModel }}
-        <span v-if="displayed.cycle_id"> · 轮次 {{ displayed.cycle_id }}</span>
-        <button v-if="scope.start || scope.cycle_id" class="button small" type="button" :disabled="busy"
-          @click="clearScope">返回默认范围</button>
-      </p>
-      <Notice v-if="error" kind="error">
-        {{ error }}<template v-if="result">。下方保留上次成功查询的结果。</template>
-      </Notice>
-      <Notice v-else-if="!result" kind="loading">正在读取在线核验记录…</Notice>
 
       <template v-if="result && section === 'overview'">
         <PanelCard title="核验进度">
@@ -434,7 +458,7 @@ const coverageOption = computed(() => {
             <div v-for="(label, key) in statusLabels" :key="key">
               <dt>{{ label }}</dt>
               <dd>
-                <a :href="`#online?view=records&status=${key}`" :aria-label="`查看${label}记录`">
+                <a :href="sectionHref('records', { status: key })" :aria-label="`查看${label}记录`">
                   {{ fmtInt(result.timeline?.[key]?.count || 0) }}
                   <ChevronRight :size="16" aria-hidden="true" />
                 </a>
@@ -556,7 +580,7 @@ const coverageOption = computed(() => {
         <Notice v-if="section === 'analysis' && !summary.n" kind="info">当前范围暂无已核验样本。实测入库后可查看误差趋势、分组和案例。</Notice>
         <template v-if="section === 'analysis' && summary.n">
         <div class="grid-2">
-          <PanelCard title="模型与基线的每日误差" note="点击日误差点，将日期筛选切换到当天并打开核验记录。">
+          <PanelCard title="模型与基线的每日误差" note="点击日期对应的数据点，查看当天的核验记录。">
             <Chart :option="dayErrorOption" height="260px" label="在线 TCN 与持续性基线逐日 RMSE" @select="selectDay" />
           </PanelCard>
           <PanelCard

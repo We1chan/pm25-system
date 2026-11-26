@@ -1,6 +1,6 @@
 /*
  * 外壳布局：左侧分组导航、顶栏、页面标题区和通用栅格。
- * 宽屏用于答辩投影；窄屏时侧栏变为顶部横向导航。
+ * 宽屏使用侧栏，窄屏使用可展开的分组菜单。
  */
 
 .app {
@@ -21,6 +21,10 @@
   overflow-y: auto;
   background: var(--surface);
   border-right: 1px solid var(--border);
+}
+
+.button.mobile-nav-toggle {
+  display: none;
 }
 
 .brand {
@@ -163,12 +167,6 @@
   color: var(--ink-2);
 }
 
-.topbar-right a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .clock {
   display: inline-flex;
   align-items: center;
@@ -295,39 +293,45 @@
   }
 
   .sidebar {
-    position: static;
+    z-index: 30;
     height: auto;
     padding: 12px 16px;
     border-right: 0;
     border-bottom: 1px solid var(--border);
   }
 
-  .brand {
-    padding-bottom: 8px;
-  }
-
-  /* 窄屏只保留一行可横向滚动的页面入口，分组标题收起 */
-  .nav-groups {
+  .sidebar-head {
     display: flex;
-    gap: 6px;
-    overflow-x: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
   }
 
-  .nav-group {
-    display: contents;
+  .brand {
+    padding: 0;
   }
 
-  .nav-group-label,
+  .button.mobile-nav-toggle {
+    display: inline-flex;
+    flex: none;
+    min-height: 40px;
+  }
+
+  .nav-groups,
   .sidebar-foot {
     display: none;
   }
 
-  .nav-item {
-    flex: none;
-    margin: 0;
+  .nav-groups.is-open {
+    display: block;
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
   }
 
   .topbar {
+    position: static;
     padding: 0 16px;
   }
 
@@ -343,8 +347,7 @@
 
 @media (max-width: 600px) {
   /* 手机宽度下顶栏只保留页面名称和时间 */
-  .breadcrumb span,
-  .topbar-right a {
+  .breadcrumb span {
     display: none;
   }
 

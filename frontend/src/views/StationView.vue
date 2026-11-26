@@ -3,18 +3,18 @@
  * 站点与 GPU 页（第二代，2022—2025 历史数据）。
  * 数据：/api/stations/meta、/api/stations/models（模型登记与 GPU 训练证据）、
  *       /api/stations/snapshot、/history、/trend、/forecast（所选站点与时刻）。
- * 页面只读取已训练模型的批量预测结果，点击按钮不会重新训练。
+ * 页面读取已训练模型的批量预测结果。
  * 模型比较只在同一批有效站点小时上进行；推荐模型只看 2024 年北京站点验证集 RMSE。
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Cpu, Download, Info, ScanLine, Timer } from '@lucide/vue'
+import { Cpu, Download, Info, Timer } from '@lucide/vue'
 import Chart from '../components/Chart.vue'
 import Notice from '../components/Notice.vue'
 import PanelCard from '../components/PanelCard.vue'
 import PmLegend from '../components/PmLegend.vue'
 import Segmented from '../components/Segmented.vue'
 import { api } from '../lib/api'
-import { bjFull, fmt, fmtDuration, fmtInt } from '../lib/format'
+import { bjFull, fmt, fmtDuration, fmtInt, isReplayOrigin } from '../lib/format'
 import { cityIds, cityNames, stationModelNames, weatherVariables } from '../lib/labels'
 import {
   axisTime,
@@ -39,6 +39,8 @@ const meta = ref(null)
 const registry = ref(null)
 const error = ref('')
 const forecastError = ref('')
+const observationError = ref('')
+const trendError = ref('')
 const busy = ref(false)
 
 const city = ref('beijing')
@@ -56,11 +58,7 @@ const snapshot = ref(null)
 const history = ref(null)
 const trend = ref(null)
 const forecast = ref(null)
-const loadedModel = ref('')
-const pendingReplayChanges = computed(() => forecast.value && !busy.value
-  && (time.value !== forecast.value.origin.replace(' ', 'T').slice(0, 16) || model.value !== loadedModel.value))
 
-let request = 0
 let setupTimer = 0
 
 const stations = computed(() => {
@@ -68,9 +66,8 @@ const stations = computed(() => {
   return all.filter(item => city.value === 'all' || item.city_id === city.value)
 })
 
-const selected = computed(() => {
-  return meta.value?.stations.find(item => item.station_id === stationId.value)
-})
+const replayReady = computed(() => props.section === 'replay' && Boolean(meta.value?.ready))
+const validTime = computed(() => isReplayOrigin(time.value, meta.value?.forecast_range || []))
 
 const yearOptions = ['2025', '2024', '2023', '2022']
 const scopeOptions = [
@@ -112,85 +109,94 @@ function metric(modelId, horizon, variant) {
 
 async function setup() {
   try {
-    const [stationMeta, models] = await Promise.all([api('stations/meta'), api('stations/models')])
+    const [stationMeta, models] = await Promise.all([
+      api('stations/meta'),
+      props.section === 'replay' ? null : api('stations/models'),
+    ])
+    if (props.section === 'replay' && stationMeta.ready && !meta.value?.ready) {
+      time.value = stationMeta.default_origin || time.value
+    }
     meta.value = stationMeta
     registry.value = models
-    if (props.section === 'replay' && stationMeta.ready && !snapshot.value) {
-      time.value = stationMeta.default_origin || time.value
-      await load()
-    }
+    error.value = ''
   } catch (reason) {
     error.value = reason.message
   }
 }
 
-// 四个请求互不依赖，一个失败不影响其他三个显示
-async function load() {
-  if (!meta.value?.ready) {
-    return
-  }
-  const token = ++request
-  busy.value = true
-  error.value = ''
+async function loadForecast([ready, id, origin, requestedModel], _previous, onCleanup) {
+  let active = true
+  onCleanup(() => { active = false })
   forecastError.value = ''
-  const requestedModel = model.value
-  const results = await Promise.allSettled([
-    api('stations/snapshot', { time: time.value, city: city.value }),
-    api('stations/history', { station_id: stationId.value, end: time.value, hours: 72 }),
-    api('stations/trend', { station_id: stationId.value, year: year.value }),
-    api('stations/forecast', { station_id: stationId.value, time: time.value, model: requestedModel }),
-  ])
-  if (token !== request) {
+  if (!ready || !id || !validTime.value) {
+    busy.value = false
+    forecast.value = null
     return
   }
-  const targets = [snapshot, history, trend, forecast]
-  loadedModel.value = requestedModel
-  results.forEach((outcome, index) => {
-    if (outcome.status === 'fulfilled') {
-      targets[index].value = outcome.value
-      return
-    }
-    targets[index].value = null
-    if (index === 3) {
-      forecastError.value = outcome.reason.message
-    } else {
-      error.value = outcome.reason.message
-    }
-  })
-  busy.value = false
-}
 
-async function loadTrend() {
+  busy.value = true
   try {
-    trend.value = await api('stations/trend', { station_id: stationId.value, year: year.value })
+    const next = await api('stations/forecast', { station_id: id, time: origin, model: requestedModel })
+    if (active) forecast.value = next
   } catch (reason) {
-    error.value = reason.message
+    if (active) {
+      forecast.value = null
+      forecastError.value = reason.message
+    }
+  } finally {
+    if (active) busy.value = false
   }
 }
 
-onMounted(async () => {
-  await setup()
-  // 流水线未完成时每 15 秒检查一次进度
+async function loadObservations([ready, cityId, id, origin], _previous, onCleanup) {
+  let active = true
+  onCleanup(() => { active = false })
+  snapshot.value = null
+  history.value = null
+  observationError.value = ''
+  if (!ready || !id || !validTime.value) return
+
+  const [observations, past] = await Promise.allSettled([
+    api('stations/snapshot', { time: origin, city: cityId }),
+    api('stations/history', { station_id: id, end: origin, hours: 72 }),
+  ])
+  if (!active) return
+  snapshot.value = observations.value || null
+  history.value = past.value || null
+  observationError.value = observations.reason?.message || past.reason?.message || ''
+}
+
+async function loadTrend([ready, id, selectedYear], _previous, onCleanup) {
+  let active = true
+  onCleanup(() => { active = false })
+  trend.value = null
+  trendError.value = ''
+  if (!ready || !id) return
+  try {
+    const next = await api('stations/trend', { station_id: id, year: selectedYear })
+    if (active) trend.value = next
+  } catch (reason) {
+    if (active) trendError.value = reason.message
+  }
+}
+
+onMounted(() => {
+  setup()
+  // 流水线未完成时每 15 秒检查一次进度。
   setupTimer = setInterval(() => {
-    if (!meta.value?.ready) {
-      setup()
-    }
+    if (!meta.value?.ready) setup()
   }, 15000)
 })
-
 onBeforeUnmount(() => clearInterval(setupTimer))
 
-watch(city, () => {
-  const exists = stations.value.some(item => item.station_id === stationId.value)
-  if (exists) {
-    load()
-  } else {
-    stationId.value = stations.value[0]?.station_id || '1001A'
+watch(stations, items => {
+  if (!items.some(item => item.station_id === stationId.value)) {
+    stationId.value = items[0]?.station_id || ''
   }
 })
-
-watch(stationId, load)
-watch(year, loadTrend)
+watch([replayReady, stationId, time, model], loadForecast)
+watch([replayReady, city, stationId, time], loadObservations)
+watch([replayReady, stationId, year], loadTrend)
 
 function onMapSelect(event) {
   if (event.data?.id) {
@@ -201,12 +207,10 @@ function onMapSelect(event) {
 // 把当前回放结果导出为 CSV（带 BOM，Excel 可直接打开中文）
 function downloadCsv() {
   const result = forecast.value
-  if (!result) {
-    return
-  }
-  const header = ['站点', '预测起点', '目标时刻', '提前小时', 'Spark随机森林', 'CUDA TCN', '真实值', '持续性基线']
+  if (!result || busy.value) return
+  const header = ['站点', '预测起点', '目标时刻', '提前小时', 'Spark随机森林', 'CUDA TCN', '真实值', '持续性基线', '选用模型', '预测PM2.5']
   const rows = result.points.map(point => [
-    stationId.value,
+    result.station.station_id,
     point.origin,
     point.target,
     point.horizon,
@@ -214,12 +218,14 @@ function downloadCsv() {
     point.tcn72,
     point.actual ?? '',
     point.baseline,
+    stationModelNames[point.model],
+    point.prediction,
   ])
   const text = '﻿' + [header, ...rows].map(row => row.join(',')).join('\r\n')
   const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }))
   const anchor = document.createElement('a')
   anchor.href = url
-  anchor.download = `station_${stationId.value}_forecast.csv`
+  anchor.download = `station_${result.station.station_id}_forecast.csv`
   anchor.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
@@ -267,26 +273,29 @@ const forecastOption = computed(() => {
     points: true,
     ...extra,
   })
+  const curves = [
+    lineSeries({
+      name: '历史观测',
+      data: result.history.map(point => [axisTime(point.ts), point.pm25]),
+      color: roleColors.observed,
+    }),
+    series('prediction', '模型预测', modelColors[result.points[0]?.model] || palette.green, { width: 2.5, z: 4 }),
+    series('actual', '后续真实值', roleColors.observed, { dashed: true, z: 5 }),
+  ]
+  if (result.model !== 'persistence') {
+    curves.push(series('baseline', '持续性基线', roleColors.baseline, { dashed: true, points: false }))
+  }
   const base = baseOption()
   return {
     ...base,
-    legend: legend(['历史观测', 'CUDA TCN', 'Spark 随机森林', '后续真实值', '持续性基线']),
+    animation: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    legend: legend(curves.map(curve => curve.name)),
     grid: { ...base.grid, bottom: 62 },
     tooltip: { ...base.tooltip, formatter: timeTooltip() },
     xAxis: timeAxis(),
     yAxis: valueAxis(),
     dataZoom: zoomControls(55),
-    series: [
-      lineSeries({
-        name: '历史观测',
-        data: result.history.map(point => [axisTime(point.ts), point.pm25]),
-        color: roleColors.observed,
-      }),
-      series('tcn72', 'CUDA TCN', modelColors.tcn72, { width: 2.5, z: 4 }),
-      series('rf', 'Spark 随机森林', modelColors.rf, { z: 3 }),
-      series('actual', '后续真实值', roleColors.observed, { dashed: true, z: 5 }),
-      series('baseline', '持续性基线', roleColors.baseline, { dashed: true, points: false }),
-    ],
+    series: curves,
   }
 })
 
@@ -435,7 +444,7 @@ const trainingOption = computed(() => {
             </label>
             <label class="field wide">
               监测站点
-              <select v-model="stationId">
+              <select v-model="stationId" :disabled="!stations.length">
                 <option v-for="item in stations" :key="item.station_id" :value="item.station_id">
                   {{ item.name }}（{{ item.station_id }}）
                 </option>
@@ -444,7 +453,7 @@ const trainingOption = computed(() => {
             <label class="field">
               预测起点（北京时间）
               <input
-                v-model="time"
+                v-model.lazy="time"
                 type="datetime-local"
                 :min="meta.forecast_range?.[0]"
                 :max="meta.forecast_range?.[1]"
@@ -452,50 +461,54 @@ const trainingOption = computed(() => {
               />
             </label>
             <label class="field">
-              选用模型
+              预测模型
               <select v-model="model">
                 <option v-for="(name, id) in stationModelNames" :key="id" :value="id">
                   {{ name }}
                 </option>
               </select>
             </label>
-            <button class="button primary" type="button" :disabled="busy" @click="load">
-              <ScanLine :size="15" />{{ busy ? '正在读取' : '读取观测与预测' }}
-            </button>
           </div>
           <template #note>
-            可选范围是 2024 年验证期和 2025 年测试期；训练期 2022—2023 年的样本不用于回放。
+            选择站点、起点或模型后自动更新。可回放 2024 年验证期和 2025 年测试期的整点。
         </template>
         </PanelCard>
 
-        <Notice v-if="busy" kind="loading">正在读取站点观测和真实模型输出…</Notice>
-        <Notice v-if="pendingReplayChanges" kind="info">下方仍是上次回放的结果。点击「读取观测与预测」应用新的起点或模型。</Notice>
+        <Notice v-if="!stationId">该城市暂无可回放的监测站，可切换城市。</Notice>
+        <Notice v-else-if="!validTime" kind="warn">请选择可用日期范围内的整点。</Notice>
+        <Notice v-if="busy && !forecast" kind="loading">正在读取站点回放结果…</Notice>
 
-        <template v-else>
+        <template v-if="stationId && validTime">
           <Notice v-if="forecastError" kind="error">{{ forecastError }}</Notice>
 
           <PanelCard
             v-if="forecast"
-            :title="`${selected?.name || stationId} · 六小时预测与实测`"
+            :title="`${forecast.station.name || forecast.station.station_id} · 六小时预测与实测`"
           >
             <template #actions>
-              <span class="tag">起点 {{ bjFull(forecast.origin) }} · {{ fmt(forecast.current) }} μg/m³</span>
-              <button class="button small" type="button" @click="downloadCsv">
+              <span class="tag">{{ stationModelNames[forecast.model] }} · 起点 {{ bjFull(forecast.origin) }}</span>
+              <span class="replay-loading" role="status">
+                <template v-if="busy">
+                  <span class="spinner" aria-hidden="true"></span>
+                  正在读取
+                </template>
+              </span>
+              <button class="button small" type="button" :disabled="busy" @click="downloadCsv">
                 <Download :size="14" />导出 CSV
               </button>
             </template>
-            <Chart :option="forecastOption" height="330px" label="站点六小时预测、实测与基线" />
+            <Chart :option="forecastOption" :aria-busy="busy" height="330px" label="站点六小时预测、实测与基线" />
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
                     <th>目标时刻</th>
-                    <th class="num">Spark 随机森林</th>
-                    <th class="num">CUDA TCN</th>
+                    <th>选用模型</th>
+                    <th class="num">预测值</th>
                     <th class="num">真实值</th>
                     <th class="num">持续性基线</th>
-                    <th>本次选用</th>
-                    <th class="num">选用结果</th>
+                    <th class="num">随机森林参考</th>
+                    <th class="num">TCN 参考</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -503,12 +516,12 @@ const trainingOption = computed(() => {
                     <td>
                       {{ bjFull(point.target) }} <span class="tag">+{{ point.horizon }} h</span>
                     </td>
-                    <td class="num">{{ fmt(point.rf) }}</td>
-                    <td class="num">{{ fmt(point.tcn72) }}</td>
-                    <td class="num">{{ fmt(point.actual) }}</td>
-                    <td class="num">{{ fmt(point.baseline) }}</td>
                     <td>{{ stationModelNames[point.model] }}</td>
                     <td class="num strong">{{ fmt(point.prediction) }}</td>
+                    <td class="num">{{ fmt(point.actual) }}</td>
+                    <td class="num">{{ fmt(point.baseline) }}</td>
+                    <td class="num">{{ fmt(point.rf) }}</td>
+                    <td class="num">{{ fmt(point.tcn72) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -519,10 +532,11 @@ const trainingOption = computed(() => {
             </template>
           </PanelCard>
 
+          <Notice v-if="observationError" kind="error">{{ observationError }}</Notice>
           <div class="grid-wide-left">
             <PanelCard
               kicker="站点观测 · 点击站点切换"
-              :title="`${snapshot ? bjFull(snapshot.time) : ''} 各站点浓度`"
+              :title="snapshot ? bjFull(snapshot.time) + ' 各站点浓度' : '站点浓度地图'"
               note="可缩放拖动；只显示该时刻有坐标的站点，灰色表示无实测。"
             >
               <Chart :option="mapOption" height="360px" label="监测站点 PM2.5 地图" @select="onMapSelect" />
@@ -545,11 +559,14 @@ const trainingOption = computed(() => {
                     <tr
                       v-for="item in rankingRows"
                       :key="item.station_id"
-                      class="clickable"
                       :class="{ selected: item.station_id === stationId }"
-                      @click="stationId = item.station_id"
                     >
-                      <td>{{ item.name }} <span class="muted">{{ item.station_id }}</span></td>
+                      <td>
+                        <button class="button small ghost station-pick" type="button"
+                          :aria-pressed="item.station_id === stationId" @click="stationId = item.station_id">
+                          {{ item.name }} <span class="muted">{{ item.station_id }}</span>
+                        </button>
+                      </td>
                       <td class="num strong">{{ fmt(item.pm25) }}</td>
                     </tr>
                   </tbody>
@@ -575,15 +592,16 @@ const trainingOption = computed(() => {
             </PanelCard>
             <PanelCard
               kicker="站点逐日"
-              :title="`${selected?.name || stationId}的日均浓度`"
+              :title="trend ? (trend.station.name || trend.station.station_id) + ' · ' + trend.year + ' 年日均浓度' : '站点日均浓度'"
               note="按有效小时计算日均值；全天无观测时保留空缺。"
             >
               <template #actions>
-                <select v-model="year" class="select" aria-label="选择年份">
+                <select v-model="year" class="select" aria-label="选择日均趋势年份">
                   <option v-for="item in yearOptions" :key="item" :value="item">{{ item }} 年</option>
                 </select>
               </template>
-              <Chart :option="trendOption" height="250px" label="所选站点日均 PM2.5" />
+              <Notice v-if="trendError" kind="error">{{ trendError }}</Notice>
+              <Chart v-else :option="trendOption" height="250px" label="所选站点日均 PM2.5" />
             </PanelCard>
           </div>
         </template>
@@ -687,6 +705,12 @@ const trainingOption = computed(() => {
 <style scoped>
 .toolbar .field.wide {
   flex-basis: 220px;
+}
+
+.button.station-pick {
+  justify-content: flex-start;
+  text-align: left;
+  white-space: normal;
 }
 
 .sub-title {

@@ -13,9 +13,11 @@ import {
   FlaskConical,
   History,
   Map as MapIcon,
+  Menu,
   Radio,
   Server,
   Wind,
+  X as CloseMenu,
 } from '@lucide/vue'
 import { api } from './lib/api'
 import { bjFull } from './lib/format'
@@ -166,6 +168,8 @@ const pageId = ref('live')
 const tabId = ref('')
 const health = ref(null)
 const healthError = ref(false)
+const navOpen = ref(false)
+const navToggle = ref(null)
 const now = ref(Date.now())
 
 const current = computed(() => pages.find(page => page.id === pageId.value) || pages[0])
@@ -178,14 +182,23 @@ function pagesOf(groupId) {
   return pages.filter(page => page.group === groupId && !page.parentNavId)
 }
 
+function closeMenu() {
+  if (!navOpen.value) return
+  navOpen.value = false
+  navToggle.value?.focus()
+}
+
 function route() {
+  const previousPage = pageId.value
+  const previousTab = currentTab.value?.id
   const path = location.hash.slice(1)
   const [hash, query] = path.split('?')
   const [page, tab] = legacyRoutes.get(path) || legacyRoutes.get(hash) || [hash, new URLSearchParams(query).get('tab')]
   pageId.value = pages.some(item => item.id === page) ? page : 'live'
   tabId.value = tab || (hash === 'analysis' ? 'patterns' : '')
   document.title = `${currentTab.value?.title || current.value.name} · 北京空气观察`
-  window.scrollTo({ top: 0 })
+  navOpen.value = false
+  if (pageId.value !== previousPage || currentTab.value?.id !== previousTab) window.scrollTo({ top: 0 })
 }
 
 async function checkHealth() {
@@ -219,13 +232,20 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="app">
-    <aside class="sidebar">
-      <a href="#live" class="brand">
-        <span class="brand-mark"><Wind :size="22" :stroke-width="1.8" /></span>
-        <span class="brand-name">北京空气观察<small>PM₂.₅ 分析与短时预测</small></span>
-      </a>
+    <aside class="sidebar" @keydown.esc="closeMenu">
+      <div class="sidebar-head">
+        <a href="#live" class="brand" @click="closeMenu">
+          <span class="brand-mark"><Wind :size="22" :stroke-width="1.8" /></span>
+          <span class="brand-name">北京空气观察<small>PM₂.₅ 分析与短时预测</small></span>
+        </a>
+        <button ref="navToggle" class="button mobile-nav-toggle" type="button"
+          :aria-expanded="navOpen" aria-controls="main-navigation" @click="navOpen = !navOpen">
+          <component :is="navOpen ? CloseMenu : Menu" :size="16" aria-hidden="true" />
+          {{ navOpen ? '收起菜单' : '全部页面' }}
+        </button>
+      </div>
 
-      <nav class="nav-groups" aria-label="主要导航">
+      <nav id="main-navigation" class="nav-groups" :class="{ 'is-open': navOpen }" aria-label="主要导航">
         <div v-for="group in groups" :key="group.id" class="nav-group">
           <div class="nav-group-label">
             <span>{{ group.name }}</span>
@@ -236,10 +256,15 @@ onBeforeUnmount(() => {
             :href="page.tabs ? `#${page.id}?tab=${page.tabs[0].id}` : `#${page.id}`"
             class="nav-item"
             :class="{ active: activeNavId === page.id }"
+            @click="closeMenu"
             :aria-current="current.id === page.id ? 'page' : undefined"
           >
             <component :is="page.icon" :size="17" :stroke-width="1.8" aria-hidden="true" />
             <span>{{ page.name }}</span>
+          </a>
+          <a v-if="group.id === 'evidence'" href="/docs" class="nav-item" target="_blank" rel="noreferrer" @click="closeMenu">
+            <FileText :size="17" :stroke-width="1.8" aria-hidden="true" />
+            <span>接口文档</span>
           </a>
         </div>
       </nav>
@@ -269,7 +294,6 @@ onBeforeUnmount(() => {
         </div>
         <div class="topbar-right">
           <span class="clock"><Clock3 :size="14" aria-hidden="true" />北京时间 {{ bjFull(now) }}</span>
-          <a href="/docs" target="_blank" rel="noreferrer"><FileText :size="14" />接口文档</a>
         </div>
       </header>
 

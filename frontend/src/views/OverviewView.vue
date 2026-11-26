@@ -26,7 +26,7 @@ import Segmented from '../components/Segmented.vue'
 import StatCard from '../components/StatCard.vue'
 import YearBar from '../components/YearBar.vue'
 import { api } from '../lib/api'
-import { fmt, fmtPercent } from '../lib/format'
+import { fmt, fmtPercent, isReplayOrigin } from '../lib/format'
 import { cityIds, cityNames } from '../lib/labels'
 import { historyYear, loadHistoryMeta } from '../lib/state'
 import {
@@ -52,6 +52,12 @@ const hour = ref(12)
 const playing = ref(false)
 const period = ref('all')
 const activeCities = ref(['beijing', 'tianjin', 'langfang'])
+const snapshotTime = computed(() => snapshotDate.value
+  ? snapshotDate.value + 'T' + String(hour.value).padStart(2, '0') + ':00' : '')
+const canReplaySnapshot = computed(() => Boolean(meta.value?.forecast_range)
+  && isReplayOrigin(snapshotTime.value, meta.value.forecast_range))
+const replayHref = computed(() => canReplaySnapshot.value
+  ? '#forecast?tab=city&origin=' + encodeURIComponent(snapshotTime.value) : '#forecast?tab=city')
 
 let playTimer = 0
 let overviewToken = 0
@@ -100,11 +106,12 @@ async function loadOverview() {
 }
 
 async function loadSnapshot() {
-  if (!snapshotDate.value) {
+  const token = ++snapshotToken
+  const time = snapshotTime.value
+  if (!time) {
+    snapshot.value = null
     return
   }
-  const token = ++snapshotToken
-  const time = `${snapshotDate.value}T${String(hour.value).padStart(2, '0')}:00`
   try {
     const result = await api('snapshot', { time })
     if (token === snapshotToken) {
@@ -273,7 +280,7 @@ const trendOption = computed(() => {
           <Segmented
             v-model="period"
             label="时间范围"
-            :options="[{ value: 'all', label: '十一年月均' }, { value: 'year', label: '所选年日均' }]"
+            :options="[{ value: 'all', label: '十一年月均' }, { value: 'year', label: concreteYear + ' 年日均' }]"
           />
         </template>
         <div class="pills city-pills" role="group" aria-label="选择城市">
@@ -294,6 +301,11 @@ const trendOption = computed(() => {
 
       <div class="grid-wide-left">
         <PanelCard title="指定时刻的六城浓度">
+          <template #actions>
+            <a :href="replayHref" class="button small">
+              {{ canReplaySnapshot ? '从该时刻回放北京预测' : '查看北京城市均值回放' }}
+            </a>
+          </template>
           <div class="map-controls">
             <input
               v-model="snapshotDate"
@@ -365,7 +377,6 @@ const trendOption = computed(() => {
 
       <div class="observation-links">
         <a href="#analysis?tab=patterns">查看季节规律与城市相关矩阵 →</a>
-        <a href="#forecast?tab=city">回放北京城市均值预测 →</a>
       </div>
     </template>
   </div>
