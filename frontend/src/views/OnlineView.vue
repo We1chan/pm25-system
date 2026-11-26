@@ -48,13 +48,6 @@ const sections = [
 
 const initialQuery = new URLSearchParams(location.hash.split('?')[1])
 const initialCycle = initialQuery.has('station_id') ? '' : initialQuery.get('cycle_id') || ''
-const start = ref(initialCycle ? initialQuery.get('start') || beijingDay(-13) : beijingDay(-13))
-const end = ref(initialCycle ? initialQuery.get('end') || beijingDay(0) : beijingDay(0))
-const station = ref('')
-const horizon = ref('')
-const checkpoint = ref('')
-const compareCheckpoint = ref('')
-const cycleId = ref(initialCycle)
 const openedCase = ref(null)
 const caseDetail = ref(null)
 const caseError = ref('')
@@ -72,43 +65,30 @@ let timer = 0
 let requestId = 0
 let caseRequestId = 0
 
-function params() {
-  return {
-    start: start.value,
-    end: end.value,
-    station_id: station.value,
-    horizon: horizon.value,
-    checkpoint: checkpoint.value,
-    compare_checkpoint: compareCheckpoint.value,
-    cycle_id: cycleId.value.trim(),
-  }
-}
-
-const applied = ref(params())
+const scope = ref(initialCycle ? {
+  start: initialQuery.get('start') || beijingDay(-13),
+  end: initialQuery.get('end') || beijingDay(0),
+  cycle_id: initialCycle,
+} : {})
 const displayed = ref(null)
 
-function applyFilters() {
-  applied.value = params()
+function loadScope(filters) {
+  scope.value = filters
   timelineOffset.value = 0
   return load()
 }
 
-function clearCycle() {
-  cycleId.value = ''
-  if (initialCycle) {
-    start.value = beijingDay(-13)
-    end.value = beijingDay(0)
-    location.hash = sectionHref(section.value)
-  }
-  applyFilters()
+function clearScope() {
+  location.hash = sectionHref(section.value)
+  loadScope({})
 }
 
 function sectionHref(id) {
   return id === 'overview' ? '#online' : `#online?view=${id}`
 }
 
-function recordHref(row, stationId = row.station_id) {
-  return `${verificationHref(row.cycle_id, stationId, row.target)}&from=${section.value}`
+function recordHref(row) {
+  return `${verificationHref(row.cycle_id, row.station_id, row.target)}&from=${section.value}`
 }
 
 function readRoute() {
@@ -156,7 +136,7 @@ async function load() {
   const id = ++requestId
   busy.value = true
   try {
-    const filters = applied.value
+    const filters = scope.value
     const [evaluation, meta] = await Promise.all([
       api('live/evaluation', {
         ...filters, timeline_status: timelineStatus.value, timeline_offset: timelineOffset.value,
@@ -165,7 +145,11 @@ async function load() {
     ])
     if (id !== requestId) return
     result.value = evaluation
-    displayed.value = { ...filters, ...evaluation.filters }
+    displayed.value = {
+      ...filters,
+      start: evaluation.filters?.start ?? filters.start,
+      end: evaluation.filters?.end ?? filters.end,
+    }
     liveMeta.value = meta
     error.value = ''
     if (!timelineStatus.value) {
@@ -198,7 +182,7 @@ onBeforeUnmount(() => {
 })
 
 const exportHref = computed(() => {
-  const { compare_checkpoint, ...filters } = displayed.value || applied.value
+  const filters = displayed.value || scope.value
   return apiHref('live/evaluation/export', {
     ...filters,
     checkpoint: result.value?.checkpoint_sha256 || filters.checkpoint,
@@ -213,7 +197,7 @@ const recordCount = computed(() => Object.keys(statusLabels)
 const displayedModel = computed(() => {
   const hash = result.value?.checkpoint_sha256
   const model = result.value?.models?.find(item => item.checkpoint_sha256 === hash)
-  return model ? modelLabel(model, false) : hash?.slice(0, 8) || '当前线上模型'
+  return model ? modelLabel(model) : hash?.slice(0, 8) || '当前线上模型'
 })
 const observation = computed(() => result.value?.observation_refresh || {})
 const observationLabels = {
@@ -267,9 +251,9 @@ function stationLabel(stationId) {
   return name ? `${name}（${stationId}）` : stationId
 }
 
-function modelLabel(model, includeCount = true) {
+function modelLabel(model) {
   const name = model.model_name || '旧版 72 小时 TCN（无区间）'
-  return `${name} · ${model.checkpoint_sha256.slice(0, 8)}${includeCount ? ` · ${fmtInt(model.stored)} 条` : ''}`
+  return `${name} · ${model.checkpoint_sha256.slice(0, 8)}`
 }
 
 function percentValue(ratio) {
@@ -288,23 +272,11 @@ const stationRows = computed(() => {
   return rows.sort((a, b) => (b.rmse ?? -1) - (a.rmse ?? -1))
 })
 
-const heatmap = computed(() => {
-  const cells = result.value?.by_station_horizon || []
-  const stations = new Map()
-  for (const cell of cells) {
-    if (!stations.has(cell.station_id)) stations.set(cell.station_id, new Map())
-    stations.get(cell.station_id).set(cell.horizon, cell)
-  }
-  return { stations, max: Math.max(1, ...cells.map(cell => cell.rmse)) }
-})
-
 function selectDay(event) {
   const day = event.name
   if (!(result.value?.by_day || []).some(row => row.key === day && row.n > 0)) return
-  start.value = day
-  end.value = day
   timelineStatus.value = 'verified'
-  applyFilters()
+  loadScope({ ...scope.value, start: day, end: day })
   location.hash = sectionHref('records')
 }
 
@@ -398,7 +370,7 @@ const coverageOption = computed(() => {
       <PanelCard v-if="result && !error && section === 'overview'" title="预测和实测差多少？">
         <p class="panel-text">
           {{ displayed.start }} 至 {{ displayed.end }} ·
-          {{ displayed.station_id ? stationLabel(displayed.station_id) : '全部北京站点' }}
+          全部北京站点
           <span v-if="displayed.cycle_id"> · 按发布轮次筛选</span>
         </p>
         <div class="verification-answer">
@@ -427,76 +399,6 @@ const coverageOption = computed(() => {
           </section>
         </div>
       </PanelCard>
-      <PanelCard title="核验范围" class="verification-filters">
-        <form class="scope-form" @submit.prevent="applyFilters">
-          <div class="scope-fields">
-            <label class="field">
-              目标开始日期
-              <input v-model="start" type="date" required />
-            </label>
-            <label class="field">
-              目标结束日期
-              <input v-model="end" type="date" required />
-            </label>
-            <label class="field">
-              站点
-              <select v-model="station">
-                <option value="">全部北京站点</option>
-                <option
-                  v-for="item in liveMeta?.stations"
-                  :key="item.station_id"
-                  :value="item.station_id"
-                >
-                  {{ item.name }}（{{ item.station_id }}）
-                </option>
-              </select>
-            </label>
-            <label class="field">
-              发布后第几个整点
-              <select v-model="horizon">
-                <option value="">全部 1—6</option>
-                <option v-for="h in 6" :key="h" :value="h">第 {{ h }} 个整点</option>
-              </select>
-            </label>
-          </div>
-          <details class="scope-advanced" :open="Boolean(initialCycle) || undefined">
-            <summary>模型版本与发布轮次</summary>
-            <div class="scope-fields advanced-fields">
-              <label class="field">
-                模型版本
-                <select v-model="checkpoint">
-                  <option value="">当前线上模型</option>
-                  <option
-                    v-for="model in result?.models"
-                    :key="model.checkpoint_sha256"
-                    :value="model.checkpoint_sha256"
-                  >
-                    {{ modelLabel(model) }}
-                  </option>
-                </select>
-              </label>
-              <label class="field">
-                对照模型
-                <select v-model="compareCheckpoint">
-                  <option value="">不比较</option>
-                  <option v-for="model in result?.models" :key="model.checkpoint_sha256" :value="model.checkpoint_sha256">
-                    {{ modelLabel(model) }}
-                  </option>
-                </select>
-              </label>
-              <label class="field">
-                发布轮次
-                <input v-model="cycleId" maxlength="80" placeholder="全部轮次" />
-              </label>
-            </div>
-          </details>
-          <div class="scope-actions">
-            <p class="panel-text">筛选条件对概览、记录和误差分析同时生效。按目标日期查询，最多 90 天。</p>
-            <button class="button primary" type="submit" :disabled="busy">应用筛选</button>
-          </div>
-        </form>
-      </PanelCard>
-
       <div class="verification-toolbar">
         <nav class="verification-nav" aria-label="在线核验视图">
           <a v-for="item in sections" :key="item.id" :href="sectionHref(item.id)"
@@ -515,11 +417,11 @@ const coverageOption = computed(() => {
 
       <p v-if="displayed" class="applied-scope">
         {{ displayed.start }} 至 {{ displayed.end }} ·
-        {{ displayed.station_id ? stationLabel(displayed.station_id) : '全部北京站点' }} ·
-        {{ displayed.horizon ? `第 ${displayed.horizon} 个整点` : '全部提前量' }} · {{ displayedModel }}
+        全部北京站点 ·
+        全部提前量 · {{ displayedModel }}
         <span v-if="displayed.cycle_id"> · 轮次 {{ displayed.cycle_id }}</span>
-        <button v-if="displayed.cycle_id" class="button small" type="button" :disabled="busy"
-          @click="clearCycle">清除轮次筛选</button>
+        <button v-if="scope.start || scope.cycle_id" class="button small" type="button" :disabled="busy"
+          @click="clearScope">返回默认范围</button>
       </p>
       <Notice v-if="error" kind="error">
         {{ error }}<template v-if="result">。下方保留上次成功查询的结果。</template>
@@ -539,7 +441,7 @@ const coverageOption = computed(() => {
               </dd>
             </div>
           </dl>
-          <p v-if="!recordCount" class="panel-text">当前范围没有发布记录，可扩大日期范围或选择其他模型版本。</p>
+          <p v-if="!recordCount" class="panel-text">当前范围没有发布记录。</p>
         </PanelCard>
 
         <PanelCard title="误差与区间指标">
@@ -566,33 +468,6 @@ const coverageOption = computed(() => {
               <dd class="metric-note">{{ fmtInt(summary.interval_n) }} 条有区间 · 平均宽度 {{ fmt(summary.mean_width) }} μg/m³</dd>
             </div>
           </dl>
-        </PanelCard>
-        <PanelCard v-if="displayed?.compare_checkpoint" title="同批实测的模型对比">
-          <template v-if="result.comparison?.primary.n">
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>模型版本</th><th class="num">共同样本</th><th class="num">MAE（μg/m³）</th><th class="num">RMSE（μg/m³）</th><th class="num">区间覆盖率</th></tr></thead>
-                <tbody>
-                  <tr>
-                    <td>主模型 {{ result.checkpoint_sha256?.slice(0, 8) }}</td>
-                    <td class="num">{{ fmtInt(result.comparison.primary.n) }}</td>
-                    <td class="num">{{ fmt(result.comparison.primary.mae, 2) }}</td>
-                    <td class="num">{{ fmt(result.comparison.primary.rmse, 2) }}</td>
-                    <td class="num">{{ fmtPercent(result.comparison.primary.coverage) }}</td>
-                  </tr>
-                  <tr>
-                    <td>对照 {{ result.comparison.checkpoint_sha256.slice(0, 8) }}</td>
-                    <td class="num">{{ fmtInt(result.comparison.comparison.n) }}</td>
-                    <td class="num">{{ fmt(result.comparison.comparison.mae, 2) }}</td>
-                    <td class="num">{{ fmt(result.comparison.comparison.rmse, 2) }}</td>
-                    <td class="num">{{ fmtPercent(result.comparison.comparison.coverage) }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="panel-text">比较使用站点、起点、目标时刻、提前量和实测值均一致的记录。</p>
-          </template>
-          <p v-else class="panel-text">请选择两个不同版本。当前筛选条件下没有可比较的共同实测。</p>
         </PanelCard>
         <PanelCard title="样本积累与实测采集">
           <template #actions>
@@ -654,7 +529,7 @@ const coverageOption = computed(() => {
               {{ label }} {{ fmtInt(result.timeline[key]?.count) }}
             </button>
           </div>
-          <p v-if="!timeline?.records?.length" class="panel-text">当前筛选范围内没有这类记录，可切换核验状态或调整筛选。</p>
+          <p v-if="!timeline?.records?.length" class="panel-text">当前范围没有这类记录，可切换核验状态。</p>
           <ol v-else class="verification-timeline">
             <li v-for="row in timeline.records" :key="`${row.cycle_id}-${row.station_id}-${row.target}`">
               <time :datetime="row.target">{{ bjDateTime(row.target) }}</time>
@@ -722,29 +597,6 @@ const coverageOption = computed(() => {
           </div>
         </PanelCard>
 
-        <PanelCard title="站点与提前量误差热力图" note="数值为 RMSE（μg/m³）。点开单元格可查看该组误差最大的已核验记录。">
-          <p v-if="!heatmap.stations.size" class="panel-text">匹配到实测后显示误差。</p>
-          <div v-else class="table-wrap tall">
-            <table class="error-heatmap">
-              <thead><tr><th>站点</th><th v-for="lead in 6" :key="lead">+{{ lead }} h</th></tr></thead>
-              <tbody>
-                <tr v-for="[stationId, leads] in heatmap.stations" :key="stationId">
-                  <th scope="row">{{ stationLabel(stationId) }}</th>
-                  <td v-for="lead in 6" :key="lead">
-                    <a v-if="leads.has(lead)"
-                      :href="recordHref(leads.get(lead), stationId)"
-                      :aria-label="`${stationLabel(stationId)} +${lead} h，RMSE ${fmt(leads.get(lead).rmse, 2)}，查看案例`"
-                      :style="{ backgroundColor: `rgba(190, 83, 35, ${0.08 + 0.4 * leads.get(lead).rmse / heatmap.max})` }">
-                      {{ fmt(leads.get(lead).rmse, 2) }}
-                    </a>
-                    <span v-else>—</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </PanelCard>
-
         <div class="grid-2">
           <PanelCard
             title="不同浓度与变化幅度的误差"
@@ -801,7 +653,7 @@ const coverageOption = computed(() => {
         </template>
 
         <PanelCard
-          v-if="uncertainty"
+          v-if="section === 'overview' && uncertainty"
           class="uncertainty-panel"
           kicker="不确定性与重污染"
           title="提升有多可靠，重污染和高值预警表现如何"
@@ -967,56 +819,12 @@ const coverageOption = computed(() => {
   gap: 16px;
 }
 
-.scope-form {
-  display: grid;
-  gap: 12px;
-}
-
-.scope-fields {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px 14px;
-}
-
-.scope-fields .field,
-.scope-fields input,
-.scope-fields select {
-  min-width: 0;
-  width: 100%;
-}
-
-.scope-advanced {
-  border-top: 1px solid var(--border);
-  padding-top: 8px;
-}
-
-.scope-advanced summary {
-  width: fit-content;
-  padding-block: 4px;
-  color: var(--brand-strong);
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.advanced-fields {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 8px;
-}
-
-.scope-actions,
 .verification-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px 16px;
-}
-
-.scope-actions p {
-  font-size: 13px;
-}
-
-.verification-toolbar {
   border-bottom: 1px solid var(--border-strong);
 }
 
@@ -1168,17 +976,6 @@ const coverageOption = computed(() => {
 .verification-timeline time,
 .verification-timeline span { color: var(--ink-2); }
 .return-link { justify-self: start; }
-.error-heatmap td { text-align: center; }
-.error-heatmap th { white-space: nowrap; }
-.error-heatmap a {
-  display: block;
-  min-width: 48px;
-  padding: 5px;
-  border-radius: var(--radius-sm);
-  color: var(--ink);
-  text-decoration: underline;
-  font-variant-numeric: tabular-nums;
-}
 
 @media (max-width: 620px) {
   .verification-timeline li { grid-template-columns: minmax(0, 1fr); }
@@ -1224,15 +1021,8 @@ const coverageOption = computed(() => {
 }
 
 @media (max-width: 740px) {
-  .scope-fields,
   .verification-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 380px) {
-  .scope-fields {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 </style>
