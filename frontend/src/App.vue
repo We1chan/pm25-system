@@ -52,6 +52,16 @@ const pages = [
     icon: BadgeCheck,
     view: OnlineView,
     description: '把实际发布的北京单站预测与后来到达的实测逐条匹配。每条样本对应一个站点和一个目标整点。',
+    related: { href: '#model-test', label: '查看实时模型的历史测试' },
+  },
+  {
+    id: 'model-test',
+    group: 'live',
+    name: '实时模型历史测试',
+    icon: FlaskConical,
+    view: WeatherEvaluationView,
+    description: '查看站点 TCN 在 2025 年独立测试中的误差，以及加入未来天气预报带来的变化。',
+    related: { href: '#online', label: '查看实际发布后的在线核验' },
   },
   {
     id: 'analysis',
@@ -78,35 +88,32 @@ const pages = [
       {
         id: 'city', label: '北京城市均值', title: '北京城市均值回放', view: ForecastView,
         description: '选择 2024—2025 年的预测起点和模型，比较起点之后六小时的预测、实测和持续性基线。',
+        related: { href: '#models?tab=city', label: '查看城市均值回放的模型评估' },
       },
       {
         id: 'station', label: '单个监测站', title: '监测站预测回放', view: StationView,
         props: { section: 'replay' },
         description: '选择六城中的一个站点和 2024—2025 年的预测起点，查看接下来六小时的模型结果与实测。',
+        related: { href: '#models?tab=station', label: '查看监测站回放的模型评估' },
       },
     ],
   },
   {
     id: 'models',
     group: 'research',
-    name: '离线模型评估',
-    icon: FlaskConical,
+    parentNavId: 'forecast',
+    name: '历史回放模型评估',
     tabs: [
       {
-        id: 'city', label: '北京城市均值', title: '北京城市均值预测评估', view: ModelsView,
+        id: 'city', label: '城市均值回放', title: '北京城市均值回放模型评估', view: ModelsView,
         description: '在同一批北京城市均值样本上比较 Spark 随机森林、梯度提升树和持续性基线。可切换 2025 年独立测试和 2024 年验证。',
         related: { href: '#forecast?tab=city', label: '回放某个历史时刻' },
       },
       {
-        id: 'station', label: '监测站误差', title: '监测站预测评估', view: StationView,
+        id: 'station', label: '监测站回放', title: '监测站回放模型评估', view: StationView,
         props: { section: 'evaluation' },
         description: '比较 TCN、随机森林与持续性基线在单站预测上的误差。可切换北京或六城站点，以及验证集或测试集。',
         related: { href: '#forecast?tab=station', label: '回放某个站点' },
-      },
-      {
-        id: 'weather', label: '未来天气对照实验', title: '未来天气对照实验', view: WeatherEvaluationView,
-        description: '在同一批 2025 年历史站点样本上，比较是否加入未来天气预报对误差的影响，并查看预测区间的覆盖率。',
-        related: { href: '#online', label: '查看上线后的实测核验' },
       },
     ],
   },
@@ -143,13 +150,17 @@ const pages = [
         id: 'gpu', label: 'CUDA 训练记录', title: '站点 TCN 的 CUDA 训练记录', view: StationView,
         props: { section: 'training' },
         description: '查看站点 TCN 训练归档中的设备、显存、耗时和每轮验证误差。',
-        related: { href: '#models?tab=station', label: '查看站点模型评估' },
+        related: { href: '#models?tab=station', label: '查看监测站回放的模型评估' },
       },
     ],
   },
 ]
 
-const legacyRoutes = new Map([['stations', ['forecast', 'station']], ['overview', ['analysis', 'overview']]])
+const legacyRoutes = new Map([
+  ['stations', ['forecast', 'station']],
+  ['overview', ['analysis', 'overview']],
+  ['models?tab=weather', ['model-test', '']],
+])
 
 const pageId = ref('live')
 const tabId = ref('')
@@ -160,14 +171,17 @@ const now = ref(Date.now())
 const current = computed(() => pages.find(page => page.id === pageId.value) || pages[0])
 const currentTab = computed(() => current.value.tabs?.find(tab => tab.id === tabId.value) || current.value.tabs?.[0])
 const currentGroup = computed(() => groups.find(group => group.id === current.value.group))
+const activeNavId = computed(() => current.value.parentNavId || current.value.id)
+const related = computed(() => currentTab.value?.related || current.value.related)
 
 function pagesOf(groupId) {
-  return pages.filter(page => page.group === groupId)
+  return pages.filter(page => page.group === groupId && !page.parentNavId)
 }
 
 function route() {
-  const [hash, query] = location.hash.slice(1).split('?')
-  const [page, tab] = legacyRoutes.get(hash) || [hash, new URLSearchParams(query).get('tab')]
+  const path = location.hash.slice(1)
+  const [hash, query] = path.split('?')
+  const [page, tab] = legacyRoutes.get(path) || legacyRoutes.get(hash) || [hash, new URLSearchParams(query).get('tab')]
   pageId.value = pages.some(item => item.id === page) ? page : 'live'
   tabId.value = tab || (hash === 'analysis' ? 'patterns' : '')
   document.title = `${currentTab.value?.title || current.value.name} · 北京空气观察`
@@ -221,7 +235,7 @@ onBeforeUnmount(() => {
             :key="page.id"
             :href="page.tabs ? `#${page.id}?tab=${page.tabs[0].id}` : `#${page.id}`"
             class="nav-item"
-            :class="{ active: current.id === page.id }"
+            :class="{ active: activeNavId === page.id }"
             :aria-current="current.id === page.id ? 'page' : undefined"
           >
             <component :is="page.icon" :size="17" :stroke-width="1.8" aria-hidden="true" />
@@ -263,8 +277,8 @@ onBeforeUnmount(() => {
         <header class="page-head">
           <h1>{{ currentTab?.title || current.name }}</h1>
           <p>{{ currentTab?.description || current.description }}</p>
-          <a v-if="currentTab?.related" class="related-link" :href="currentTab.related.href">
-            {{ currentTab.related.label }} →
+          <a v-if="related" class="related-link" :href="related.href">
+            {{ related.label }} →
           </a>
         </header>
 

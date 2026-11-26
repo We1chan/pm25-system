@@ -9,6 +9,7 @@ import { regimeNames } from '../lib/labels'
 import { baseOption, categoryAxis, categoryTooltip, legend, lineSeries, palette, roleColors, valueAxis } from '../lib/chart'
 
 const report = ref(null)
+const liveCheckpoint = ref('')
 const stations = ref([])
 const stationNames = computed(() => new Map(stations.value.map(item => [item.station_id, item.name])))
 
@@ -25,13 +26,24 @@ onMounted(async () => {
       api('live/meta').catch(() => null),
     ])
     stations.value = meta?.stations || []
+    liveCheckpoint.value = meta?.checkpoint_sha256 || ''
     report.value = model
   } catch (reason) {
     error.value = reason.message
   }
 })
 
-const testRuns = computed(() => report.value?.runs || null)
+const testRuns = computed(() => {
+  const runs = report.value?.runs
+  return runs?.future_weather?.test && runs?.history_only?.test ? runs : null
+})
+const reportVersion = computed(() => {
+  const checkpoint = report.value?.checkpoint_sha256
+  if (!checkpoint) return ''
+  if (checkpoint === liveCheckpoint.value) return '与最近一轮实时预测使用相同权重'
+  const version = `报告模型 ${checkpoint.slice(0, 8)}`
+  return liveCheckpoint.value ? `${version} · 最近实时模型 ${liveCheckpoint.value.slice(0, 8)}` : version
+})
 
 // 历史测试：加入未来天气 vs 仅过去天气 vs 持续性基线，按距实测的小时数
 const offlineOption = computed(() => {
@@ -72,16 +84,18 @@ const offlineOption = computed(() => {
   }
 })
 
-// +6 小时的几个关键子集，用于说明区间在困难情形下的不足
+// +6 小时的历史测试结果和重点样本分组。
 const h6 = computed(() => {
-  const test = testRuns.value?.future_weather.test
-  if (!test) {
-    return null
-  }
+  const runs = testRuns.value
+  if (!runs) return null
+
+  const test = runs.future_weather.test
   return {
+    forecast: test.by_horizon.find(row => row.horizon === 6),
+    history: runs.history_only.test.by_horizon.find(row => row.horizon === 6),
     city: test.city_by_horizon?.[5],
-    high: test.regimes.pm_ge75[5],
-    abrupt: test.regimes.abrupt_ge20[5],
+    high: test.regimes?.pm_ge75?.[5],
+    abrupt: test.regimes?.abrupt_ge20?.[5],
   }
 })
 
@@ -98,13 +112,13 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
       kicker="2025 年独立历史测试"
       title="加入未来天气预报，预测是否更准"
     >
-      <template #actions>
-        <span class="tag">同条件 GPU 对照实验</span>
+      <template v-if="reportVersion" #actions>
+        <span class="tag">{{ reportVersion }}</span>
       </template>
-      <p class="panel-text">
-        训练 2024 年 1—8 月，选模 9—10 月，区间校准 11—12 月，最终测试 2025 年全年；
-        训练起点 {{ fmtInt(report.samples.train) }} 个，测试起点 {{ fmtInt(report.samples.test) }} 个。
-        两组模型使用相同的数据切分和历史输入，只改变是否读取未来天气。
+      <p v-if="h6?.forecast && h6?.history" class="panel-text">
+        提前 6 小时预测时，使用未来天气的 TCN 得到的 RMSE 为 <strong>{{ fmt(h6.forecast.rmse, 2) }} μg/m³</strong>，
+        仅用历史天气的 TCN 为 {{ fmt(h6.history.rmse, 2) }}，沿用起点实测值的基线为 {{ fmt(h6.forecast.baseline_rmse, 2) }}。
+        RMSE 越低，预测整体越接近实测。
       </p>
       <Chart :option="offlineOption" height="280px" label="仅过去天气与加入未来天气的各时长 RMSE" />
       <div class="table-wrap">
@@ -138,13 +152,18 @@ const worstCases = computed(() => testRuns.value?.future_weather.worst_test_h6.s
         北京覆盖站点均值单独校准：+6 h 共 {{ fmtInt(h6.city.n) }} 个完整小时，区间实际覆盖
         {{ fmtPercent(h6.city.coverage) }}，平均宽度 {{ fmt(h6.city.mean_width) }} μg/m³。
       </p>
-      <Notice v-if="h6" kind="warn" class="gap">
+      <Notice v-if="h6?.high && h6?.abrupt" kind="warn" class="gap">
         总体覆盖率不代表所有情形：+6 h 高浓度子集的实际覆盖率只有 {{ fmtPercent(h6.high.coverage) }}，
         浓度突变子集 {{ fmtPercent(h6.abrupt.coverage) }}；高浓度子集模型 RMSE
         {{ fmt(h6.high.rmse, 2) }}，持续性基线 {{ fmt(h6.high.baseline_rmse, 2) }}。这些情况仍需改进。
       </Notice>
       <details class="more">
-        <summary>查看历史测试的浓度分组与最大误差案例</summary>
+        <summary>查看测试方法、浓度分组与最大误差案例</summary>
+        <p class="panel-text">
+          训练使用 2024 年 1—8 月，选模用 9—10 月，区间校准用 11—12 月。独立测试覆盖 2025 年全年。
+          训练包含 {{ fmtInt(report.samples.train) }} 个起点，测试包含 {{ fmtInt(report.samples.test) }} 个起点。
+          两组模型使用相同的数据切分和历史输入，只改变是否读取未来天气。
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
