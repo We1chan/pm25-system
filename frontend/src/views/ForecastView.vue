@@ -5,8 +5,8 @@
  * 预测只用起点及之前的信息；后来的真实值只用于对照，不参与预测。
  * 2024 年是验证期（用于选择模型），2025 年是独立测试期。
  */
-import { computed, onMounted, ref } from 'vue'
-import { ArrowRight, CircleCheck, Download, Info, ScanLine } from '@lucide/vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { CircleCheck, Download, Info } from '@lucide/vue'
 import Chart from '../components/Chart.vue'
 import Notice from '../components/Notice.vue'
 import PanelCard from '../components/PanelCard.vue'
@@ -29,42 +29,51 @@ import {
 } from '../lib/chart'
 
 const meta = ref(null)
-const origin = ref('2025-12-30T12:00')
+const origin = ref('')
 const model = ref('best')
 const result = ref(null)
 const error = ref('')
 const busy = ref(false)
-const loadedModel = ref('')
 
 const lastPoint = computed(() => result.value?.points.at(-1) || null)
-const pendingChanges = computed(() => result.value && !busy.value
-  && (origin.value !== result.value.origin.replace(' ', 'T').slice(0, 16) || model.value !== loadedModel.value))
 
 // 自动择优时各时长实际使用的模型可能不同；图中颜色取第一个时长的模型
 const usedModel = computed(() => result.value?.points[0]?.model || 'rf')
 
-async function predict() {
-  busy.value = true
+watch([origin, model, () => meta.value?.models_ready], async ([selectedOrigin, selectedModel, modelsReady], _previous, onCleanup) => {
+  let active = true
+  onCleanup(() => { active = false })
+  if (!modelsReady) return
+
   error.value = ''
-  const requestedModel = model.value
-  try {
-    result.value = await api('forecast', { origin: origin.value, model: requestedModel })
-    loadedModel.value = requestedModel
-  } catch (reason) {
+  const [first, last] = meta.value.forecast_range || []
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:00$/.test(selectedOrigin) ||
+      (first && selectedOrigin < first) || (last && selectedOrigin > last)) {
     result.value = null
-    error.value = reason.message
-  } finally {
     busy.value = false
+    error.value = '请选择可用日期范围内的整点。'
+    return
   }
-}
+
+  busy.value = true
+  try {
+    const forecast = await api('forecast', { origin: selectedOrigin, model: selectedModel })
+    if (active) result.value = forecast
+  } catch (reason) {
+    if (active) {
+      result.value = null
+      error.value = reason.message
+    }
+  } finally {
+    if (active) busy.value = false
+  }
+})
 
 onMounted(async () => {
   try {
-    meta.value = await loadHistoryMeta()
-    origin.value = meta.value.default_origin.replace(' ', 'T').slice(0, 16)
-    if (meta.value.models_ready) {
-      await predict()
-    }
+    const historyMeta = await loadHistoryMeta()
+    origin.value = historyMeta.default_origin.replace(' ', 'T').slice(0, 16)
+    meta.value = historyMeta
   } catch (reason) {
     error.value = reason.message
   }
@@ -105,6 +114,7 @@ const option = computed(() => {
   const base = baseOption()
   return {
     ...base,
+    animation: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     legend: legend(['历史观测', '模型预测', '后续真实值', '持续性基线']),
     grid: { ...base.grid, bottom: 62 },
     tooltip: { ...base.tooltip, formatter: timeTooltip() },
@@ -159,8 +169,9 @@ const option = computed(() => {
         <label class="field">
           预测起点（北京时间）
           <input
-            v-model="origin"
+            v-model.lazy="origin"
             type="datetime-local"
+            :disabled="!meta?.models_ready"
             :min="meta?.forecast_range?.[0]"
             :max="meta?.forecast_range?.[1]"
             step="3600"
@@ -168,22 +179,14 @@ const option = computed(() => {
         </label>
         <label class="field">
           预测模型
-          <select v-model="model">
+          <select v-model="model" :disabled="!meta?.models_ready">
             <option v-for="(name, id) in cityModelNames" :key="id" :value="id">{{ name }}</option>
           </select>
         </label>
-        <button
-          class="button primary"
-          type="button"
-          :disabled="busy || !meta?.models_ready"
-          @click="predict"
-        >
-          <ScanLine :size="15" />{{ busy ? '正在读取' : '运行回放' }}<ArrowRight :size="14" />
-        </button>
       </div>
       <template #note>
         可选 2024 年（验证期，用于选择模型）和 2025 年（独立测试期）的整点。
-        页面读取 Spark ML 模型事先批量算好的结果，不会重新训练。
+        选择起点或模型后，自动读取已计算的回放结果。
       </template>
     </PanelCard>
 
@@ -191,8 +194,7 @@ const option = computed(() => {
       模型正在训练：已完成 {{ meta.training.completed || 0 }} / {{ meta.training.total || 24 }} 组实验，完成后可以回放。
     </Notice>
     <Notice v-if="error" kind="error">{{ error }}</Notice>
-    <Notice v-if="busy" kind="loading">正在读取六个预测时长的模型输出…</Notice>
-    <Notice v-if="pendingChanges" kind="info">下方仍是上次回放的结果。点击「运行回放」应用新的起点或模型。</Notice>
+    <Notice v-if="busy && !result" kind="loading">正在读取六个预测时长的模型输出…</Notice>
 
     <template v-if="result">
       <div class="stat-row">
@@ -226,11 +228,17 @@ const option = computed(() => {
 
       <PanelCard title="起点前 48 小时实测与起点后 6 小时预测">
         <template #actions>
-          <button class="button small" type="button" @click="exportCsv">
+          <span class="replay-loading" role="status">
+            <template v-if="busy">
+              <span class="spinner" aria-hidden="true"></span>
+              正在读取
+            </template>
+          </span>
+          <button class="button small" type="button" :disabled="busy" @click="exportCsv">
             <Download :size="14" />导出 CSV
           </button>
         </template>
-        <Chart :option="option" height="340px" label="北京 PM2.5 历史观测、模型预测、真实值与持续性基线" />
+        <Chart :option="option" :aria-busy="busy" height="340px" label="北京 PM2.5 历史观测、模型预测、真实值与持续性基线" />
         <div class="table-wrap">
           <table>
             <thead>
@@ -271,3 +279,15 @@ const option = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.replay-loading {
+  display: inline-flex;
+  min-width: 6.5em;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+</style>
