@@ -10,7 +10,6 @@ import {
   Clock3,
   Database,
   FileText,
-  FlaskConical,
   History,
   Map as MapIcon,
   Menu,
@@ -22,6 +21,7 @@ import {
 import { api } from './lib/api'
 import { bjFull } from './lib/format'
 import LiveView from './views/LiveView.vue'
+import AchievementsView from './views/AchievementsView.vue'
 import WeatherEvaluationView from './views/WeatherEvaluationView.vue'
 import OnlineView from './views/OnlineView.vue'
 import StationView from './views/StationView.vue'
@@ -48,22 +48,29 @@ const pages = [
     description: '定位或选择北京监测站，查看该站最新实测和接下来六个整点的 PM₂.₅ 预测。',
   },
   {
+    id: 'achievements',
+    group: 'live',
+    name: '项目成果',
+    icon: BadgeCheck,
+    view: AchievementsView,
+    ownHeading: true,
+  },
+  {
     id: 'online',
     group: 'live',
+    parentNavId: 'achievements',
     name: '在线核验',
-    icon: BadgeCheck,
     view: OnlineView,
     description: '把实际发布的北京单站预测与后来到达的实测逐条匹配。每条样本对应一个站点和一个目标整点。',
-    related: { href: '#model-test', label: '查看实时模型的历史测试' },
   },
   {
     id: 'model-test',
     group: 'live',
+    parentNavId: 'achievements',
     name: '实时模型历史测试',
-    icon: FlaskConical,
     view: WeatherEvaluationView,
     description: '查看站点 TCN 在 2025 年独立测试中的误差，以及加入未来天气预报带来的变化。',
-    related: { href: '#online', label: '查看实际发布后的在线核验' },
+    related: { href: '#achievements', label: '返回项目成果' },
   },
   {
     id: 'analysis',
@@ -176,6 +183,7 @@ const current = computed(() => pages.find(page => page.id === pageId.value) || p
 const currentTab = computed(() => current.value.tabs?.find(tab => tab.id === tabId.value) || current.value.tabs?.[0])
 const currentGroup = computed(() => groups.find(group => group.id === current.value.group))
 const activeNavId = computed(() => current.value.parentNavId || current.value.id)
+const parentPage = computed(() => pages.find(page => page.id === current.value.parentNavId))
 const related = computed(() => currentTab.value?.related || current.value.related)
 
 function pagesOf(groupId) {
@@ -285,6 +293,10 @@ onBeforeUnmount(() => {
         <div class="breadcrumb">
           <span>{{ currentGroup.name }}</span>
           <span aria-hidden="true">/</span>
+          <template v-if="parentPage && !currentTab">
+            <a :href="`#${parentPage.id}`">{{ parentPage.name }}</a>
+            <span aria-hidden="true" class="breadcrumb-parent-separator">/</span>
+          </template>
           <template v-if="currentTab">
             <a :href="`#${current.id}?tab=${current.tabs[0].id}`">{{ current.name }}</a>
             <span aria-hidden="true">/</span>
@@ -298,11 +310,11 @@ onBeforeUnmount(() => {
       </header>
 
       <div class="page">
-        <header class="page-head">
+        <header v-if="!current.ownHeading" class="page-head">
           <h1>{{ currentTab?.title || current.name }}</h1>
           <p>{{ currentTab?.description || current.description }}</p>
           <a v-if="related" class="related-link" :href="related.href">
-            {{ related.label }} →
+            {{ related.label }} <span aria-hidden="true">→</span>
           </a>
         </header>
 
@@ -343,7 +355,7 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 600px) {
-  .breadcrumb a { display: none; }
+  .breadcrumb a, .breadcrumb-parent-separator { display: none; }
 }
 
 .section-nav {

@@ -92,6 +92,7 @@ function isLiveLink(href) {
 
 function getCaseBackLink(query) {
   const back = query.get('back')
+  if (back === '#achievements') return { href: back, label: '返回项目成果' }
   if (isLiveLink(back)) return { href: back, label: '返回实时预测' }
   if (back === '#online' || back?.startsWith('#online?')) {
     const view = new URLSearchParams(back.split('?')[1]).get('view') || 'overview'
@@ -394,6 +395,10 @@ const coverageOption = computed(() => {
     </template>
 
     <template v-else>
+      <a v-if="!listBackLink" class="button small return-link" href="#achievements">
+        <ArrowLeft :size="14" aria-hidden="true" />
+        返回项目成果
+      </a>
       <div class="verification-toolbar">
         <nav class="verification-nav" aria-label="在线核验视图">
           <a v-for="item in sections" :key="item.id" :href="sectionHref(item.id, { offset: item.id === section ? timelineOffset : 0 })"
