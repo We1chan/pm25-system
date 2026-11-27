@@ -1,8 +1,7 @@
 <script setup>
 /*
  * 时空分析页（第一代，2015—2025 城市小时均值）。
- * 数据：/api/pattern（月份 × 小时平均与四季平均）、/api/weather（气象与浓度散点及相关系数）、
- *       /api/overview（城市间相关矩阵）。
+ * 数据：/api/pattern（月份 × 小时平均与四季平均）、/api/weather（气象与浓度散点及相关系数）。
  * 散点图为了绘图速度按时间等距抽样，相关系数用全部有效小时计算。相关不代表因果。
  */
 import { computed, onMounted, ref, watch } from 'vue'
@@ -36,7 +35,6 @@ const city = ref('beijing')
 const variable = ref('relative_humidity_2m')
 const pattern = ref(null)
 const weather = ref(null)
-const analysis = ref(null)
 const error = ref('')
 const busy = ref(true)
 
@@ -48,15 +46,13 @@ async function load() {
   error.value = ''
   const year = historyYear.value
   try {
-    const [patternResult, weatherResult, overviewResult] = await Promise.all([
+    const [patternResult, weatherResult] = await Promise.all([
       api('pattern', { city: city.value, year }),
       api('weather', { city: city.value, year, variable: variable.value }),
-      api('overview', { year }),
     ])
     if (token === request) {
       pattern.value = patternResult
       weather.value = weatherResult
-      analysis.value = overviewResult.analysis
     }
   } catch (reason) {
     if (token === request) {
@@ -180,47 +176,6 @@ const scatterOption = computed(() => {
     }],
   }
 })
-
-const matrixOption = computed(() => {
-  const names = cityIds.map(id => cityNames[id])
-  const cells = []
-  for (const row of analysis.value?.city_correlations || []) {
-    const a = cityIds.indexOf(row.city)
-    const b = cityIds.indexOf(row.other)
-    const value = Number(row.correlation.toFixed(3))
-    // 深色格子上用白字，浅色格子上用深色字，保证文字可读
-    const label = { color: value >= 0.75 ? '#fff' : ink.primary }
-    cells.push({ value: [a, b, value], label })
-    if (a !== b) {
-      cells.push({ value: [b, a, value], label })
-    }
-  }
-  return {
-    textStyle: baseOption().textStyle,
-    tooltip: {
-      confine: true,
-      formatter: item => {
-        const [a, b, value] = item.value
-        return `${names[a]} × ${names[b]}<br/>Pearson r = <b>${fmt(value, 3)}</b>`
-      },
-    },
-    grid: { top: 8, left: 56, right: 12, bottom: 30 },
-    xAxis: categoryAxis(names, { axisLine: { show: false }, axisLabel: { color: ink.secondary } }),
-    // 纵轴倒序，使北京位于左上角，与横轴顺序对应
-    yAxis: categoryAxis(names, {
-      inverse: true,
-      axisLine: { show: false },
-      axisLabel: { color: ink.secondary },
-    }),
-    visualMap: { show: false, min: 0.3, max: 1, inRange: { color: greenRamp } },
-    series: [{
-      type: 'heatmap',
-      data: cells,
-      label: { show: true, fontSize: 12, formatter: item => fmt(item.value[2], 2) },
-      itemStyle: { borderColor: '#fff', borderWidth: 3, borderRadius: 4 },
-    }],
-  }
-})
 </script>
 
 <template>
@@ -259,33 +214,22 @@ const matrixOption = computed(() => {
         </PanelCard>
       </div>
 
-      <div class="grid-2">
-        <PanelCard :title="`${cityNames[city]}：${weatherOptions[variable].name}与 PM₂.₅ 的关联`">
-          <template #actions>
-            <select v-model="variable" class="select" aria-label="选择气象变量">
-              <option v-for="(info, key) in weatherOptions" :key="key" :value="key">
-                {{ info.name }}
-              </option>
-            </select>
-          </template>
-          <div class="correlation">
-            <span>Pearson 相关系数</span>
-            <strong>{{ fmt(weather?.correlation, 3) }}</strong>
-            <span>基于 {{ fmtInt(weather?.n) }} 个有效小时；图中按时间等距抽样显示</span>
-          </div>
-          <Chart :option="scatterOption" height="300px" label="气象变量与 PM2.5 散点图" />
-          <template #note>相关不代表因果；气象为 ERA5 历史再分析资料。</template>
-        </PanelCard>
-        <PanelCard
-          title="六城浓度相关矩阵"
-          note="使用 2015—2025 年全期数据。每对城市只统计两地同时有观测的小时，相关系数越接近 1 越同步。"
-        >
-          <template #actions>
-            <span class="tag">2015—2025 全时段</span>
-          </template>
-          <Chart :option="matrixOption" height="340px" label="六城 PM2.5 小时浓度相关矩阵" />
-        </PanelCard>
-      </div>
+      <PanelCard :title="`${cityNames[city]}：${weatherOptions[variable].name}与 PM₂.₅ 的关联`">
+        <template #actions>
+          <select v-model="variable" class="select" aria-label="选择气象变量">
+            <option v-for="(info, key) in weatherOptions" :key="key" :value="key">
+              {{ info.name }}
+            </option>
+          </select>
+        </template>
+        <div class="correlation">
+          <span>Pearson 相关系数</span>
+          <strong>{{ fmt(weather?.correlation, 3) }}</strong>
+          <span>基于 {{ fmtInt(weather?.n) }} 个有效小时；图中按时间等距抽样显示</span>
+        </div>
+        <Chart :option="scatterOption" height="300px" label="气象变量与 PM2.5 散点图" />
+        <template #note>相关不代表因果；气象为 ERA5 历史再分析资料。</template>
+      </PanelCard>
     </template>
   </div>
 </template>

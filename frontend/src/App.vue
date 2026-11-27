@@ -79,12 +79,12 @@ const pages = [
     icon: MapIcon,
     tabs: [
       {
-        id: 'overview', label: '地图与趋势', title: '六城污染地图与趋势', view: OverviewView,
-        description: '查看 2015—2025 年北京及周边五城的城市均值。地图按所选时刻显示，趋势图可切换全期月均与所选年日均。',
+        id: 'overview', label: '趋势与相关性', title: '六城浓度趋势与相关性', view: OverviewView,
+        description: '比较北京及周边五城的全期月均与所选年日均浓度。六城浓度相关矩阵使用 2015—2025 年全期观测。',
       },
       {
         id: 'patterns', label: '季节与气象', title: '季节规律与气象关联', view: AnalysisView,
-        description: '按年份查看城市的月内小时分布、季节均值与气象关联。六城浓度相关矩阵使用全期观测。',
+        description: '按年份查看城市的月内小时分布、季节均值与气象关联。',
       },
     ],
   },
