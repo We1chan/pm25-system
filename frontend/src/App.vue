@@ -75,7 +75,7 @@ const pages = [
   {
     id: 'analysis',
     group: 'research',
-    name: '历史观测',
+    name: '规律分析',
     icon: MapIcon,
     tabs: [
       {
@@ -91,7 +91,7 @@ const pages = [
   {
     id: 'forecast',
     group: 'research',
-    name: '历史预测回放',
+    name: '预测回放',
     icon: History,
     tabs: [
       {
