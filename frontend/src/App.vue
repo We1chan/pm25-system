@@ -324,7 +324,6 @@ onBeforeUnmount(() => {
             :key="tab.id"
             :href="`#${current.id}?tab=${tab.id}`"
             class="button small"
-            :class="{ primary: currentTab?.id === tab.id }"
             :aria-current="currentTab?.id === tab.id ? 'page' : undefined"
           >{{ tab.label }}</a>
         </nav>
@@ -363,7 +362,7 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
 }
 
-.section-nav [aria-current="page"] {
+.section-nav .button[aria-current="page"] {
   border-color: var(--brand);
   color: var(--brand-strong);
   background: var(--brand-soft);
