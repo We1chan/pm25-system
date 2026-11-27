@@ -296,7 +296,7 @@ const dayProgress = computed(() => {
 
 const stationRows = computed(() => {
   const rows = [...(result.value?.by_station || [])]
-  return rows.sort((a, b) => (b.rmse ?? -1) - (a.rmse ?? -1))
+  return rows.sort((a, b) => (a.rmse ?? Infinity) - (b.rmse ?? Infinity))
 })
 
 function selectDay(event) {
@@ -306,20 +306,6 @@ function selectDay(event) {
     filters: { ...scope.value, start: day, end: day },
     status: 'verified',
   })
-}
-
-function covered(row) {
-  if (row.lower === null || row.lower === undefined) {
-    return '无区间'
-  }
-  return row.actual >= row.lower && row.actual <= row.upper ? '是' : '否'
-}
-
-function intervalText(row) {
-  if (row.lower === null || row.lower === undefined) {
-    return '—'
-  }
-  return `${fmt(row.lower)}–${fmt(row.upper)}`
 }
 
 // ---------- 图表 ----------
@@ -655,14 +641,14 @@ const coverageOption = computed(() => {
             </div>
           </PanelCard>
 
-          <PanelCard title="各站点误差（从大到小）" note="RMSE 单位为 μg/m³。">
+          <PanelCard title="各站点误差（从小到大）" note="RMSE 单位为 μg/m³。">
             <div class="table-wrap tall">
               <table>
                 <thead>
                   <tr>
                     <th>站点</th>
                     <th class="num">已匹配</th>
-                    <th class="num">RMSE</th>
+                    <th class="num" aria-sort="ascending">RMSE</th>
                     <th class="num">区间覆盖率</th>
                   </tr>
                 </thead>
@@ -789,40 +775,6 @@ const coverageOption = computed(() => {
           </div>
         </PanelCard>
 
-        <PanelCard v-if="section === 'analysis' && summary.n" title="误差最大的预测" note="按绝对误差降序列出最多 20 条已核验记录，浓度和误差单位为 μg/m³。">
-          <p v-if="!result.failures.length" class="panel-text">等待当前模型的目标实测到达。</p>
-          <div v-else class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>目标时刻</th>
-                  <th>站点</th>
-                  <th>发布后第几个整点</th>
-                  <th class="num">预测</th>
-                  <th class="num">实测</th>
-                  <th class="num">绝对误差</th>
-                  <th class="num">发布时的区间</th>
-                  <th>实测落在区间内</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="row in result.failures"
-                  :key="`${row.cycle_id}-${row.station_id}-${row.target}`"
-                >
-                  <td>{{ bjDateTime(row.target) }}</td>
-                  <td><a :href="recordHref(row)">{{ stationLabel(row.station_id) }}</a></td>
-                  <td>第 {{ row.horizon }} 个</td>
-                  <td class="num">{{ fmt(row.prediction) }}</td>
-                  <td class="num">{{ fmt(row.actual) }}</td>
-                  <td class="num strong">{{ fmt(row.absolute_error) }}</td>
-                  <td class="num">{{ intervalText(row) }}</td>
-                  <td>{{ covered(row) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </PanelCard>
       </template>
     </template>
   </div>
